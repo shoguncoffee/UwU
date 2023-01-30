@@ -2,7 +2,7 @@
 
 install 
 ```
-pip3 install -r requirements.txt
+pip3 install -r requirements
 ```
 
 python >= 3.11
