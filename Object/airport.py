@@ -3,4 +3,7 @@ from base import *
 @dataclass
 class Airport:
     name: str
-    location: int
+    airport_id: str
+    city: str
+    country: str
+    #location: int

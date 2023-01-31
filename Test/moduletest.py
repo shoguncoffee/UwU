@@ -1,10 +1,10 @@
-deprecated_names = ["old_function"]
-
 def qwe(): print(999)
 
-def __getattr__(name):
+def __getattr__(name: str):
     print(name)
-    if name in deprecated_names:
-        print('warn')
-        return 10
-    #raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    if not name.startswith('_'):
+        return globals()[f'?{name}']
+
+for name in list(globals()):
+    if not name.startswith('_'):
+        globals()[f'?{name}'] = globals().pop(name)

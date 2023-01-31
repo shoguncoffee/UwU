@@ -4,8 +4,10 @@
 import os, sys
 import tqdm
 import numpy, itertools
+import asyncio
 from datetime import datetime, date, time
 from dataclasses import dataclass
+from Function.checking import *
 from types import ModuleType
 from typing import (
     ItemsView, 
@@ -18,11 +20,7 @@ from typing import (
     Union, 
     Sequence, 
     Optional,
-)
-for func in vars(__import__('checking')).values():
-    if callable(func) and (error := func()):
-        raise Exception(error)
-    
+)   
 if TYPE_CHECKING:
     ...
     
@@ -31,4 +29,4 @@ def qwe():
     
 
 if __name__ == '__main__':
-    print(__class__)
+    print()

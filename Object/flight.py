@@ -1,12 +1,13 @@
 from base import *
 from aircraft import Aircraft
+from airport import Airport
 
 @dataclass
 class Flight:
-    ID: str
+    code: str
     aircraft: Aircraft
-    origin: str
-    destination: str
+    origin: Airport
+    destination: Airport
     departure: datetime
     arrival: datetime
     status = ...
@@ -15,7 +16,7 @@ class Flight:
         ...
     
     @property
-    def travel_time():
+    def travel_time(self):
         return 
     
     @property
