@@ -4,4 +4,3 @@ from base import *
 class Privilege:
     expired: datetime
     
-class 

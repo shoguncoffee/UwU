@@ -8,57 +8,51 @@ def module():
     with open('requirements') as file:
         for module in file:
             name, *version = module.split('==')
-            try: 
-                version = version or False
-                __import__(name)
+            try: __import__(name.removesuffix('\n'))
             except:
                 return f'please install requirements file: {name}'
+
 
 def directory():
     from os import getcwd
     *_, dir = getcwd().split('/')
-    return dir == 'UwU' or ...
+    if dir != 'UwU':
+        return 'please run from correct directory'
 
-
-###################################################################
-
-def __name(name: str):
-    return f'!{name}'
-
-def __filter():
-    return [
-        n for n, v in globals().items() 
-        if callable(v) and not n.startswith('_')
-    ]
 
 def __main():
+    label = lambda name: f'!{name}'
     var = globals()
-    new = {
-        __name(n): var.pop(n) for n in __filter()
-    }
-    var.update(new)
+    all = [
+        n for n, v in var.items() 
+        if callable(v) and not n.startswith('_')
+    ]
     
-def __warp(func_name: str):
-    def new():
-        func = globals()[__name(func_name)]
-        if (error := func()):
-            raise Exception(error)
-        
-        print(f'check {func_name}: PASS')
-    return new
-        
-def __getattr__(name: str):
-    match name:
-        case '__path__':
-            pass
-        case '__all__':
-            for func in __all__:
-                __warp(func)()
-            return __all__
-        case _:
-            (func := __warp(name))()
-            return func
+    def warp(func_name: str):
+        def new():
+            func = var[label(func_name)]
+            assert not (error := func()), error
+            print(f'check {func_name}: PASS')
+        return new
 
-if __name__ != '__main__': 
-    __all__ = __filter() # type: ignore
-    __main()
+    def getattr(name: str):
+        match name:
+            case '__path__':
+                pass
+            case '__all__':
+                for func in all:
+                    warp(func)()
+                return all
+            case _:
+                (func := warp(name))()
+                return func
+
+    new = {
+        label(n): var.pop(n) for n in all
+    }
+    var.update(new, 
+        __all__ = all, 
+        __getattr__ = getattr
+    )
+        
+__main()

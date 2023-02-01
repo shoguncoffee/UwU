@@ -4,25 +4,32 @@ if TYPE_CHECKING:
 
 @dataclass
 class Person: 
-    username: str
-    name: str
+    forename: str
     surname: str
     
+
+class CustomerProfile(Person):
+    email: str
+    booking: list[Booking]
+    privilege: ...
+    payment_method: ...
+
+class Passenger(Person):
+    date_of_birth: date
+    nationality: str
+    gender: ...
+    
+    
+class Adult(Passenger):
+    title: str
+    travel_document: ...
+    
+    
+class Infant(Passenger):
+    ...
     
 class Employee(Person):
     position: ...
     
-
-class Customer(Person):
-    booking: list[Booking]
-    privilege: ...
-    payment: ...
-    
-    
 class Pilot(Employee):
     ...
-    
-
-class Passenger(Customer):
-    ...
-    

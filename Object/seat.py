@@ -2,8 +2,8 @@ from base import *
 
 @dataclass
 class Seat:
-    row: 
-    column: 
+    row: int
+    column: str
     price: int
         
     pitch: int

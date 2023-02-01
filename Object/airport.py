@@ -6,4 +6,4 @@ class Airport:
     airport_id: str
     city: str
     country: str
-    #location: int
+    #location: tuple(float, float)

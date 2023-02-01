@@ -8,3 +8,7 @@ def __getattr__(name: str):
 for name in list(globals()):
     if not name.startswith('_'):
         globals()[f'?{name}'] = globals().pop(name)
+
+def g():
+    globals().update(u = 9)
+    print(globals().keys())

@@ -1,7 +1,7 @@
 from base import *
-from airport import Airport
 if TYPE_CHECKING:
     from seat import Seat
+    from airport import Airport
 
 @dataclass
 class Aircraft:
