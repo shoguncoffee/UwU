@@ -1,6 +1,6 @@
-import os
+from os import listdir, path
 
-dir = os.listdir(__file__.removesuffix('__init__.py'))
+dir = listdir(path.dirname(__file__))
 file = [
     f.removesuffix('.py') for f in dir 
     if f.endswith('.py') and not f.startswith('_')
