@@ -19,9 +19,9 @@ from typing import (
     TYPE_CHECKING, 
     Generator, 
     TypeVar, 
-    Union, 
     Sequence, 
     Optional,
+    ClassVar
 )   
 if TYPE_CHECKING:
     ...

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from base import *
 if TYPE_CHECKING:
     from seat import Seat

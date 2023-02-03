@@ -1,3 +1,4 @@
+from __future__ import annotations
 from base import *
 
 @dataclass
@@ -8,7 +9,8 @@ class Seat:
         
     pitch: int
     width: int
-    lie_flat: bool # 180 degree recline
+    information: list[str]
+    #-> lie flat 180 degree recline
     
 class Economy(Seat):
     price: int = 
