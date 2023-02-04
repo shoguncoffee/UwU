@@ -1,15 +1,17 @@
 {
-    "First Class": {
-        "price": 300,
-        "": ,
-    },
-    "Business Class": {
-        "price": 200,
-        "": ,
-    },
-    "Economy Class": {
-        "price": 100,
-        "": ,
+    "SeatType": {
+        "First Class": {
+            "price": 300,
+            "": ,
+        },
+        "Business Class": {
+            "price": 200,
+            "": ,
+        },
+        "Economy Class": {
+            "price": 100,
+            "": ,
+        }
     },
     "": {
         "": ,

@@ -1,6 +1,8 @@
 from base import *
 from objects import *
 
+def importer():
+    ...
 
 async def main():
     ...

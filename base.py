@@ -6,7 +6,7 @@ import tqdm
 import numpy, itertools
 import asyncio
 import csv, json
-from Function.checking import *
+from functions.checking import *
 from enum import Enum
 from datetime import datetime, date, time
 from dataclasses import dataclass

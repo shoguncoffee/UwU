@@ -3,23 +3,24 @@ from base import *
 
 @dataclass
 class Seat:
+    type: SeatType
     row: int
     column: str
-    price: int
-        
+
     pitch: int
     width: int
     information: list[str]
     #-> lie flat 180 degree recline
     
-class Economy(Seat):
-    price: int = 
-
-
-class Business(Seat):
-    price: int = 
+    @property
+    def id(self):
+        return f'{self.row}{self.column.upper()}'
     
+    @property
+    def price(self):
+        return self.type.price
     
-class First(Seat):
-    
-    
+@dataclass
+class SeatType:
+    name: str
+    price: int
