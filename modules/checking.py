@@ -1,3 +1,7 @@
+"""
+contains functions intended to use immediately when importing occur
+*you may be surprised by my amazing trick
+"""
 def version():
     from sys import version_info
     if version_info <= (3, 11):

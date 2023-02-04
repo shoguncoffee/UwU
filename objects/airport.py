@@ -1,22 +1,22 @@
+"""
+airport
+"""
 from __future__ import annotations
 from base import *
 from geopy.distance import distance
-from geopy import Point
 
-
-class Airport():
+@dataslots
+class Airport:
     name: str
     airport_id: str
     city: str
     country: str
     coordinate: tuple[float, float]
     
-    def distance(self, a: Airport):
+    def distance(self, target: Airport):
         """
         distance in km
         """
-        length = distance(
-            self.coordinate, 
-            a.coordinate
-        )
-        return round(length.km)
+        coors = (x.coordinate for x in (self, target))
+        length = distance(*coors).km
+        return round(length)

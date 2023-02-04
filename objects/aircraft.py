@@ -1,10 +1,13 @@
+"""
+aircraft
+"""
 from __future__ import annotations
 from base import *
 if TYPE_CHECKING:
-    from seat import Seat
-    from airport import Airport
+    import seat
+    import airport
 
-@dataclass
+@dataslots
 class Aircraft:
     """
     Aircraft Specifications
@@ -21,7 +24,7 @@ class Aircraft:
     #def u(self):
     #    return sum(self.seats)
     
-@dataclass 
+@dataslots
 class Layout:
     """
        |-------| => column_width
@@ -37,14 +40,15 @@ class Layout:
     """
     column_width: int
     row_class: tuple[int, int, int] # first, business, economy
-    position_exception: list[tuple[int, int]]
+    space: list[tuple[int, int]]
     
     @property
-    def capacity(self):
+    def capacity(self, type: Optional[seat.TYPE] = None):
         n = self.column_width * sum(self.row_class)
-        return n - len(self.except_position)
+        
+        return n - len(self.space)
     
     
-    self.column_width * row_class[0] -> จำนวน first
-    self.column_width * row_class[1] -> จำนวน buss
-    self.column_width * row_class[3] -> จำนวน eco
+    self.column_width * row_class[0]
+    self.column_width * row_class[1]
+    self.column_width * row_class[3]

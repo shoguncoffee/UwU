@@ -1,1 +1,2 @@
-y = 3
+import os
+print(os.listdir())

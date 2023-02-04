@@ -1,6 +1,9 @@
+"""
+test
+"""
 from base import *
-"""
-run test
 
-"""
+__all__ = [
+    'setup'
+]
 #for file in :

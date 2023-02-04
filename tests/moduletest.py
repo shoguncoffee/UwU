@@ -1,4 +1,7 @@
-def qwe(): print(999)
+def qwe(): 
+    print(globals())
+    math.sin(2)
+    print(999)
 
 def __getattr__(name: str):
     print(name)
@@ -12,3 +15,4 @@ for name in list(globals()):
 def g():
     globals().update(u = 9)
     print(globals().keys())
+    

@@ -1,3 +1,6 @@
+"""
+filter some airports from airportRAW.csv
+"""
 import csv
 
 new_field = 'Code', 'Name', 'Country', 'Latitude', 'Longitude'

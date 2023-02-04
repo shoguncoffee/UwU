@@ -1,15 +1,19 @@
+"""
+"""
 from __future__ import annotations
 from base import *
 if TYPE_CHECKING:
     from seat import Seat
+    from person import Passenger
 
 STATUS = Enum(
-    'status', 
-    'PAID CHECK'
+    'Booking Status', 
+    'PAID CHECKIN'
 )
 
-@dataclass
+@dataslots
 class Booking:
+    passenger: Passenger
     seats: list[Seat]
     status: STATUS
     

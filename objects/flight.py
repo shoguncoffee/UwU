@@ -1,3 +1,5 @@
+"""
+"""
 from __future__ import annotations
 from base import *
 if TYPE_CHECKING:
@@ -5,24 +7,26 @@ if TYPE_CHECKING:
     from airport import Airport
     from seat import Seat
 
-Status = Enum('Flight Status', 
-    'SCHEDULED CANCLE'
+STATUS = Enum('Flight Status', 
+    'SCHEDULED IN_FLIGHT ARRIVED CANCLE DELAY'
 )
 
-@dataclass
+@dataslots
 class Flight:
-    code: str
+    number: str
     aircraft: Aircraft
+    gate: str
     origin: Airport
     destination: Airport
-    departure: datetime
-    arrival: datetime
+    departure_time: datetime
+    arrival_time: datetime
     seats: list[Seat]
-    status: Status = Status.SCHEDULED
+    status: STATUS = STATUS.SCHEDULED
         
-    
     def __post_init__(self):
         ...
+    
+    
     
     @property
     def travel_time(self):
@@ -37,6 +41,9 @@ class Flight:
         return self.arrival - self.departure
     
     
+    
+    
 if __name__ != '__main__':
     #globals().update()
-    Flight(status=Status.CANCLE)
+    ...
+    #Flight(status=Status.CANCLE)
