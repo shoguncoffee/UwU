@@ -6,6 +6,7 @@ import tqdm
 import numpy, itertools
 import asyncio
 import csv, json
+from moneyed import Money
 from enum import Enum
 from datetime import datetime, date, time
 from dataclasses import dataclass

@@ -5,38 +5,53 @@ from __future__ import annotations
 from base import *
 if TYPE_CHECKING:
     from booking import Booking
+    from privilege import Privilege
 
-@dataslots
+@dataclass
 class Person: 
+    """
+    a man
+    """
     forename: str
     surname: str
 
-@dataslots
-class CustomerProfile(Person):
-    email: str
-    booking: list[Booking]
-    privilege: ...
-    payment_method: ...
 
-@dataslots
+@dataclass
+class Account:
+    """
+    
+    """
+    username: str
+    password: str
+    
+    def login(self):
+        ...
+
+
+@dataclass
+class Customer(Person):
+    """
+    account profile for customer
+    """
+    email: str
+    booking: list[Booking] # bag, cart
+    payment_method: ...
+    privilege: ...
+    
+    def as_passenger(self):
+        return
+
+@dataclass
 class Passenger(Person):
     date_of_birth: date
     nationality: str
     gender: ...
 
-@dataslots
+@dataclass
 class Adult(Passenger):
     title: str
     travel_document: ...
 
-@dataslots
+@dataclass
 class Infant(Passenger):
-    ...
-
-@dataslots
-class Employee(Person):
-    position: ...
-
-@dataslots
-class Pilot(Employee):
     ...

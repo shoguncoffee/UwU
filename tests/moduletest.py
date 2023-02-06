@@ -1,6 +1,6 @@
 def qwe(): 
     print(globals())
-    math.sin(2)
+    #math.sin(2)
     print(999)
 
 def __getattr__(name: str):

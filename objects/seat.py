@@ -4,29 +4,34 @@ seat
 from __future__ import annotations
 from base import *
 
-TYPE = Enum(
+CLASS = Enum(
     'Travel Class', 
     'FIRST BUSINESS ECONOMY'
 )
 
-@dataslots
+@dataclass
 class SeatType:
-    name: str # standard, elite
-    type: TYPE
+    name: str # standard, comfort, elite, convenience, etc.
+    cls: CLASS
     price: int
-    information: list[str] # lie flat 180 degree recline, checked baggage: 2 pieces, 23 kg each, hand baggage ...
+    pitch: float
+    width: float
+    information: InfoType # lie flat 180 degree recline, checked baggage: 2 pieces, 23 kg each, hand baggage ...
 
-@dataslots
-class SeatPostion
+@dataclass
+class SeatPostion:
+    row: int
+    column: int
+    
+    
 
-@dataslots
+@dataclass
 class Seat:
     type: SeatType
     row: int
     column: str
 
-    pitch: int
-    width: int
+    
     
     @property
     def id(self):

@@ -1,13 +1,14 @@
 """
-nessary fancy functions
+nessary fancy variables and functions
 """
 from __future__ import annotations
 from modules.checking import *
 from modules.packages import *
+
 if TYPE_CHECKING:
-    ...
-    
-dataslots = dataclass(slots=True)
+    InfoType = tuple[tuple[str, str], ...]
+else:
+    dataclass = dataclass(slots=True)
 
 
 def qwe():

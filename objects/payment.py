@@ -1,10 +1,12 @@
 """
-
+no idea
 """
 from __future__ import annotations
 from base import *
 
+Status = Enum()
+
 @dataclass
-class Privilege:
-    expired: datetime
-    information: InfoType
+class Payment:
+    transaction_id: str
+    

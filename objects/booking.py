@@ -5,18 +5,19 @@ from base import *
 if TYPE_CHECKING:
     from seat import Seat
     from person import Passenger
-
-STATUS = Enum(
+    
+Status = Enum(
     'Booking Status', 
-    'PAID CHECKIN'
+    'UNPAID PAID CHECKIN'
 )
 
-@dataslots
+@dataclass
 class Booking:
+    id: str
     passenger: Passenger
-    seats: list[Seat]
-    status: STATUS
+    seats: Seat
+    status: Status = Status.UNPAID
     
     
 if __name__ != '__main__':
-    globals().update(STATUS.__members__)
+    globals().update(Status.__members__)

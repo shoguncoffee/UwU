@@ -7,14 +7,14 @@ if TYPE_CHECKING:
     import seat
     import airport
 
-@dataslots
+@dataclass
 class Aircraft:
     """
-    Aircraft Specifications
+    Aircraft specifications
     """
     model: str
-    layout: list[Layout]
-    information: list[str]
+    layout: tuple[Layout, ...]
+    information: InfoType
     
     @property
     def capacity(self):
@@ -24,7 +24,7 @@ class Aircraft:
     #def u(self):
     #    return sum(self.seats)
     
-@dataslots
+@dataclass
 class Layout:
     """
        |-------| => column_width
@@ -49,6 +49,6 @@ class Layout:
         return n - len(self.space)
     
     
-    self.column_width * row_class[0]
-    self.column_width * row_class[1]
-    self.column_width * row_class[3]
+    # self.column_width * row_class[0]
+    # self.column_width * row_class[1]
+    # self.column_width * row_class[3]

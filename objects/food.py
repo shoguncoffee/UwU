@@ -4,15 +4,16 @@ Deprecation
 from __future__ import annotations
 from base import *
 
-@dataslots
+@dataclass
 class Food:
+    name: str
     price: int
 
-@dataslots
+@dataclass
 class Berverage(Food):
     ...
     
-@dataslots
+@dataclass
 class Meal(Food):
     ...
     

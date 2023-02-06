@@ -12,6 +12,7 @@ with (
     old_field = next(data)
     writer = csv.writer(file, delimiter=';')
     writer.writerow(new_field)
+    
     for line in data:
         seats = line.pop(2)
         if float(seats) > 9_000_000:
