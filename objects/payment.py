@@ -10,3 +10,5 @@ Status = Enum()
 class Payment:
     transaction_id: str
     
+    def __init__(self):
+        ...

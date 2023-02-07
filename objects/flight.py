@@ -1,44 +1,49 @@
 """
+take care of flight system
 """
 from __future__ import annotations
 from base import *
 if TYPE_CHECKING:
     from aircraft import Aircraft
     from airport import Airport
-    from seat import Seat
-
+    import seat
+    
 Status = Enum('Flight Status', 
     'SCHEDULED IN_FLIGHT ARRIVED'
 )
+
+class FlightGenerator:
+    """
+    a base policy for generating flight
+    """
+    def __init__(self, airline_designator: str = 'UW'):
+        ...
+
+    def generate_flight(self):
+        ...
+    
+    def generate_designator(self):
+        ...
+
 
 @dataclass
 class FlightManager:
     """
     manipulate a flight
     """
-    fligt: list[Flight]
-    flight_generater: FlightGenerater = ...
+    flight: set[Flight]
+    flight_generater: FlightGenerator = FlightGenerator()
     
-    def create_flight(self):
-        ...
+    def create_flight(self, origin: Airport, destination: Airport):
+        self.flight_generater.generate_flight()
         
-
-class FlightGenerater:
-    @classmethod
-    def generate_flight():
-        ...
-        
-    @classmethod
-    def generate_designator():
-        ...
-
 
 @dataclass
 class FlightService:
     """
-    
+    represent and organize a flight service
     """
-    reservation: list[Seat]
+    reservation: set[seat.Seat]
     status: Status = Status.SCHEDULED
     
     def __post_init__(self):
@@ -47,11 +52,20 @@ class FlightService:
     @property
     def passenger(self):
         return len(self.reservation)
+    
+    def is_full(self, seat_class: Optional[seat.Class] = None):
+        if seat_class is None:
+            return self.passenger == self.aircraft.capacity
+        else:
+            ...
+            
+            return self.passenger == self.aircraft.capacity
+
 
 @dataclass
 class Flight:
     """
-    contain all information about a flight
+    contain information about a flight
     """
     aircraft: Aircraft
     designator: FlightDesignator
@@ -64,7 +78,6 @@ class Flight:
     def travel_time(self):
         return 
     
-   
     @property
     def duration(self):  
         return self.arrival_time - self.departure_time

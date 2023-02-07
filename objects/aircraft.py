@@ -7,6 +7,8 @@ if TYPE_CHECKING:
     import seat
     import airport
 
+AVARAGE_SPEED = 700
+
 @dataclass
 class Aircraft:
     """
@@ -14,7 +16,9 @@ class Aircraft:
     """
     model: str
     layout: tuple[Layout, ...]
-    information: InfoType
+    max_range: int
+    speed: int = AVARAGE_SPEED
+    information: InfoType = InfoType()
     
     @property
     def capacity(self):
@@ -23,6 +27,7 @@ class Aircraft:
     #@property
     #def u(self):
     #    return sum(self.seats)
+    
     
 @dataclass
 class Layout:
@@ -40,10 +45,10 @@ class Layout:
     """
     column_width: int
     row_class: tuple[int, int, int] # first, business, economy
-    space: list[tuple[int, int]]
+    space: set[tuple[int, int]]
     
     @property
-    def capacity(self, type: Optional[seat.TYPE] = None):
+    def capacity(self, type: Optional[seat.Class] = None):
         n = self.column_width * sum(self.row_class)
         
         return n - len(self.space)
