@@ -1,11 +1,10 @@
 """
 """
 from __future__ import annotations
-from base import *
-from src import *
+from .base import *
+from .src import *
 from fastapi import FastAPI
 
-from src.constants import TravelClass
 if TYPE_CHECKING:
     from src import (
         Customer, 
@@ -13,17 +12,19 @@ if TYPE_CHECKING:
         PassengerDetails, 
         FlightInstance, 
         SeatReservation, 
-        Booking
+        Booking,
+        Trip,
+        TravelClass
     )
 
 class Airline:
     name = 'Qatar Airways'
-    code = 'QR'
+    designator = 'QR'
 
     @classmethod 
     def create_booking(cls,
             creator: Customer,
-            journey: list[tuple[FlightInstance, TravelClass]],
+            journey: list[Trip],
             passengers: list[PassengerDetails],
             contact: ContactInformation
     ):

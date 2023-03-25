@@ -1,4 +1,4 @@
-from base import *
+from app.base import *
 """
 run test
 
