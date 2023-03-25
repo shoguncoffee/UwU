@@ -2,8 +2,7 @@
 take care of flight system
 """
 from __future__ import annotations
-from datetime import timedelta
-from base import *
+from app.base import *
 
 from src.constants import FlightStatus
 if TYPE_CHECKING:

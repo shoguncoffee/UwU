@@ -1,7 +1,7 @@
 """
 """
 from __future__ import annotations
-from base import *
+from app.base import *
 if TYPE_CHECKING:
     from src import Flight, ScheduleCatalog
     

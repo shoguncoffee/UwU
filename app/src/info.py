@@ -1,7 +1,7 @@
 """
 """
 from __future__ import annotations
-from base import *
+from app.base import *
 
 class Infomations:
     def __init__(self, *info: str):
