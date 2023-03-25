@@ -1,15 +1,11 @@
-"""
-take care of flight system
-"""
+r'''
 from __future__ import annotations
 from base import *
 
 from src.constants import FlightStatus
-if TYPE_CHECKING:
-    from src import Aircraft
-    from src import Airport
-    from src import seat
-
+from src import Aircraft
+from src import Airport
+from src import seat
 
 class FlightGenerator:
     """
@@ -111,3 +107,4 @@ if __name__ != '__main__':
     ...
     #globals().update()
     #Flight(status=Status.CANCLE)
+'''
