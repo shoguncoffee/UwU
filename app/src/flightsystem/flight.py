@@ -2,42 +2,37 @@
 take care of flight system
 """
 from __future__ import annotations
-from app.base import *
+from base import *
 
-from src.constants import FlightStatus
+from src.constants import FlightStatus, BookingStatus
 if TYPE_CHECKING:
-    from src import Aircraft, Airport, Seat, Booking, FlightReservation
+    from src import Aircraft, Airport, Seat, Booking, FlightReservation, TravelClass
     from main import Airline
-    
 
-class FlightCatalog:
-    _instance: None | FlightCatalog = None
-    
-    def __new__(cls):    
-        cls._instance = cls._instance or super().__new__(cls)
-        return cls._instance
+
+class FlightCatalog(Singleton):
+    _instance: FlightCatalog
     
     def __init__(self):
         self.__record: set[Flight] = set()
     
     @classmethod
     def add(cls, flight: Flight):
-        cls 
+        cls._instance.__record.add(flight)
     
     @classmethod
     def search(cls, designator: str):
         ...
-        
 
-    
+
 @dataclass
-class Flight:
+class Flight:#(HasReference):
     __designator: str #type: ignore
     __departure: time #type: ignore
     __arrival: time #type: ignore
     __origin: Airport #type: ignore
     __destination: Airport #type: ignore
-    __reference: Optional[str] = None #type: ignore
+    __reference: Optional[UUID] = None #type: ignore
     
     def __post_init__(self):
         self.__designator = self.designator.upper()
@@ -56,7 +51,7 @@ class Flight:
     
     @classmethod
     def generate_reference(cls):
-        return ''
+        return 
     
     
 @dataclass
@@ -65,8 +60,7 @@ class FlightInstance:
     __date: date #type: ignore
     __aircraft: Aircraft #type: ignore
     __base_price: float #type: ignore
-    
-    __booking_record: set[FlightReservation] = field(default_factory=set) #type: ignore
+    __booking_record: set[FlightReservation] = field_set #type: ignore
     __status: FlightStatus = FlightStatus.SCHEDULED #type: ignore
     
     @property
@@ -77,17 +71,44 @@ class FlightInstance:
         self.__status = status
     
     def get_reserved_seats(self):
+        """
+        get all reserved seats that be paid
+        """
         return set(
-            seat.seat for reservation in self.__booking_record 
+            seat for reservation in self.get_comfirmed()
             for seat in reservation.seats
         )
         
-@dataclass    
+    def get_comfirmed(self):
+        """
+        get all confirmed reservations
+        """
+        return set(
+            reservation for reservation in self.__booking_record 
+            if reservation.holder.status == BookingStatus.CONFIRMED
+        )
+
+
+@dataclass
 class FlightItinerary:
     __flights: list[FlightInstance] #type: ignore
-        
+    
+    @property
+    def flight(self):
+        return self.__flights
+    
+    def choice(self, cls: TravelClass):
+        return Trip(self.__flights, cls)
+
 
 @dataclass    
 class Trip(FlightItinerary):
+    """
+    trip segment
+    """
     __travel_class: TravelClass #type: ignore
+    
+    @property
+    def travel_class(self):
+        return self.__travel_class
     
