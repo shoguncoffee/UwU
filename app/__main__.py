@@ -1,14 +1,16 @@
-"""
-A command-line interface for a package.
-executed when package itself is invoked directly from the command line
-- python -m app
-- python app
-- etc.
+r"""
+command-line interface of this package (UwU/app)
+
+for this package:
+- `\UwU> python -m app`
+
+
+for individual submodule in this package:
+- ``\UwU> python -m app.<module>`
 """
 
+from app.src import *
 """
-from src import *
-
 airline = Airline()
 
 airport1 = Airport(
