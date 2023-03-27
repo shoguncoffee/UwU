@@ -1,9 +1,9 @@
 """
 """
 from __future__ import annotations
-from app.base import *
+from base import *
 
-class Infomations:
+class Information:
     def __init__(self, *info: str):
         self.__info = info
     

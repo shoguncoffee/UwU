@@ -3,3 +3,4 @@ numpy
 geopy
 py-moneyed
 tdqm
+rapidfuzz
