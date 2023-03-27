@@ -1,5 +1,5 @@
-from src import Account
-from booking import Booking
+from ..K import Account
+from .booking import Booking
 
 class Customer(Account):
 

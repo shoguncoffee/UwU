@@ -1,11 +1,11 @@
 """
+system
 """
 from __future__ import annotations
-from base import *
-from fastapi import FastAPI
+from .base import *
 
-from src import *
-from src.flightsystem import Flight
+if TYPE_CHECKING:
+    from src import *
 """
 class Airline(Singleton):
     name = 'Qatar Airways'

@@ -1,6 +1,6 @@
-from src import CabinLayout
-from ..ArthurWork.cabin_layout import CabinLayout
-from src.ArthurWork.cabin_layout import CabinLayout
+from .cabin_layout import CabinLayout
+#from ..ArthurWork.cabin_layout import CabinLayout
+#from src.ArthurWork.cabin_layout import CabinLayout
 
 class Aircraft:
 
