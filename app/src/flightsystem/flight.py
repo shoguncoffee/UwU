@@ -91,6 +91,9 @@ class FlightInstance:
 
 @dataclass
 class FlightItinerary:
+    """
+    collection of flight, 
+    """
     __flights: list[FlightInstance] #type: ignore
     
     @property
