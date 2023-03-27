@@ -6,9 +6,9 @@ class ScheduleCatalog :
         pass
     def delete_history() :
         pass
-    def search_flight() :
+    def search_flight(self,date,origin,destination,passenger_no) :
         pass
-    def get_possible_schedule_date() :
+    def get_possible_schedule_date(self,date) :
         pass
     def match_flight_itinerary_between_airport() :
         pass

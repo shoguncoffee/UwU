@@ -24,3 +24,9 @@ SeatType = Enum(
 GenderType = Enum(
     'GenderType', 'MALE FEMALE'
 )
+PaymentStatus = Enum(
+    'PaymentStatus', 'PENDING', 'FAILED', 'COMPLETED'
+)
+PaymentMethod = Enum(
+    'PaymentMethod', 'PAYPAL', 'INTERNETBANKING', 'CREDITCARD'
+)
