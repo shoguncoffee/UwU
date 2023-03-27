@@ -1,11 +1,10 @@
 """
+
 """
 from __future__ import annotations
-from base import *
+from ..base import *
 if TYPE_CHECKING:
-    from src import ScheduleCatalog
-    from src.flightsystem import Flight
-    
+    from src import *
 
 class FlightScheduling(Singleton):
     __advance_days: int = 365 #type: ignore

@@ -1,6 +1,6 @@
-from constants import BookingStatus
-from contact_information import ContactInformation
-from passenger_detail import PassengerDetail
+from ..constants import BookingStatus
+from .contact_information import ContactInformation
+from .passenger_detail import PassengerDetail
 
 class Booking:
     def __init__(self, creator, reference, contact_info, total_fare, status=BookingStatus.PENDING):

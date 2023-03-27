@@ -1,0 +1,7 @@
+python -m app
+
+- test
+python -m app.test
+
+
+csv separator = ;

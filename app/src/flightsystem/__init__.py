@@ -1,2 +1,2 @@
-from .flight import *
+from .aflight import *
 from .scheduling import *

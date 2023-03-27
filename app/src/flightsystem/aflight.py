@@ -2,13 +2,9 @@
 take care of flight system
 """
 from __future__ import annotations
-from base import *
-
-from src.constants import FlightStatus, BookingStatus
+from ..base import *
 if TYPE_CHECKING:
-    from src import Aircraft, Airport, Seat, Booking, FlightReservation, TravelClass
-    from main import Airline
-
+    from src import *
 
 class FlightCatalog(Singleton):
     _instance: FlightCatalog
@@ -26,7 +22,7 @@ class FlightCatalog(Singleton):
 
 
 @dataclass
-class Flight:#(HasReference):
+class Flight: #(HasReference):
     __designator: str #type: ignore
     __departure: time #type: ignore
     __arrival: time #type: ignore
