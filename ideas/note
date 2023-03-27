@@ -6,4 +6,5 @@ python -m app.test
 
 csv separator = ;
 
-"python3 -c \"__import__('os').system('python3 -i -u -m ' + r'$fullFileName'.replace(r'$workspaceRoot' + chr(92), '').replace(chr(92), '.').replace('.py', ''))\""
+supreme command for code-runner (cmd or bash)
+"(cls || clear) && python3 -c \"__import__('os').system('python3 -i -u -m ' + r'$fullFileName'.removesuffix('.py').removeprefix(r'$workspaceRoot').replace(__import__('os').sep, '.').removeprefix('.'))\""
