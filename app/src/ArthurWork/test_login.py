@@ -56,7 +56,7 @@ else:
             
             # Check if user don't input new password
             if len(new_password) < 8:
-                print("Your Password is to weak enter new password")
+                print("Your Password is too short enter new password atleast 8 characters.")
                 continue
             else:
                 # Username is available, add new account and break loop
