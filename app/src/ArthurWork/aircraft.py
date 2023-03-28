@@ -1,6 +1,4 @@
-from src import CabinLayout
 from ..ArthurWork.cabin_layout import CabinLayout
-from src.ArthurWork.cabin_layout import CabinLayout
 
 class Aircraft:
 
@@ -14,3 +12,8 @@ class Aircraft:
 
     def get_all_seat(self):
         pass
+
+
+    #getter
+    def get_model(self):
+        return self.__model

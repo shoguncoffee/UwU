@@ -10,7 +10,7 @@ PassengerType = Enum(
     'PassengerType', 'ADULT CHILD INFANT'
 )
 TravelClass = Enum(
-    'TravelClass', 'Economy Bussiness First'
+    'TravelClass', 'ECONOMY BUSINESS FIRST'
 )
 AccountStatus = Enum(
     'AccountStatus', 'PENDING ACTIVE SUSPENDED'

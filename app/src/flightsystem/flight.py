@@ -54,6 +54,23 @@ class Flight:#(HasReference):
         return 
     
     
+    #getter
+    def get_origin(self):
+        return self.__origin
+    
+    def get_destination(self):
+        return self.__destination
+    
+    def get_departure(self):
+        return self.__departure
+    
+    def get_arrival(self):
+        return self.__arrival
+    
+    def calculate_duration(self):
+        pass
+    
+    
 @dataclass
 class FlightInstance:
     __flight: Flight #type: ignore
@@ -87,7 +104,17 @@ class FlightInstance:
             reservation for reservation in self.__booking_record 
             if reservation.holder.status == BookingStatus.CONFIRMED
         )
-
+    
+    #begin edit : add getter
+    def get_flight(self):
+        return self.__flight
+    
+    def get_aircraft(self):
+        return self.__aircraft
+    
+    def get_date(self):
+        return self.__date
+    
 
 @dataclass
 class FlightItinerary:

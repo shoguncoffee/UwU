@@ -3,9 +3,9 @@ necessary packages
 """
 import os, sys
 #import tqdm
-import numpy, itertools
+#import numpy, itertools
 import asyncio
-import rapidfuzz
+#import rapidfuzz
 import csv, json
 #from moneyed import Money
 from datetime import datetime, date, time, timedelta
