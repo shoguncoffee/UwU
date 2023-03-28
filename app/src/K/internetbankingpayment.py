@@ -1,4 +1,4 @@
-from payment import Payment
+from .payment import Payment
 class InternetBankingPayment(Payment) :
     def create_payment() :
         pass
