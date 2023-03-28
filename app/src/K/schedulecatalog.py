@@ -13,9 +13,9 @@ class ScheduleCatalog :
             pass
     def match_flight_itinerary_between_airport(self) :
         pass
-    def create_flight_instance(self) :
+    def create_flight_instance(self,date,flight,aircraft,base_price) :
         pass
-    def get_flight_instance(self) :
+    def get_flight_instance(self,origin,destination) :
         pass
-    def modify_flight_instance(self) :
+    def modify_flight_instance(self,aircraft,base_price,flight_instance) :
         pass
