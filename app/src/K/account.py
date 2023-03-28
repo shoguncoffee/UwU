@@ -6,9 +6,9 @@ class Account :
         self._password = password
         self._status = status
 
-    def verify_account() :
+    def verify_account(self) :
         pass
-    def check_username() :
+    def check_username(self) :
         pass
-    def create_account() :
+    def create_account(self) :
         pass
