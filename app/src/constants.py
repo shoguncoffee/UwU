@@ -25,8 +25,8 @@ GenderType = Enum(
     'GenderType', 'MALE FEMALE'
 )
 PaymentStatus = Enum(
-    'PaymentStatus', 'PENDING', 'FAILED', 'COMPLETED'
+    'PaymentStatus', 'PENDING FAILED COMPLETED'
 )
 PaymentMethod = Enum(
-    'PaymentMethod', 'PAYPAL', 'INTERNETBANKING', 'CREDITCARD'
+    'PaymentMethod', 'PAYPAL INTERNETBANKING CREDITCARD'
 )
