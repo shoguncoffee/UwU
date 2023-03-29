@@ -16,7 +16,7 @@ AccountStatus = Enum(
     'AccountStatus', 'PENDING ACTIVE SUSPENDED'
 )
 BookingStatus = Enum(
-    'BookingStatus', 'PENDING CONFIRMED CANCELLED'
+    'BookingStatus', 'INCOMPLETE PENDING COMPLETE CANCELLED'
 )
 SeatType = Enum(
     'SeatType', 'STANDARD'
