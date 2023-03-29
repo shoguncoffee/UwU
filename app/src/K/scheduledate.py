@@ -1,4 +1,5 @@
-from flightsystem.aflight import FlightInstance
+from ..flightsystem.aflight import FlightInstance
+
 class ScheduleDate :
     def __init__(self,date,schedule_flight) :
         self.__date = date

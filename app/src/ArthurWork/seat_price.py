@@ -1,9 +1,7 @@
 from __future__ import annotations
 from ..base import *
-if TYPE_CHECKING:
-    from ..constants import PassengerType
 
-@dataclass
+@dataclass(slots=True)
 class SeatPrice:
     __price: float # type: ignore
     __passenger_type: PassengerType # type: ignore

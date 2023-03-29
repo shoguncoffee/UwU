@@ -1,14 +1,14 @@
 from __future__ import annotations
 from ..base import *
-from ..constants import AccountStatus
 
-@dataclass
-class Account :
-    _username: str # type: ignore
-    _password: str # type: ignore
-    _email: str # type: ignore
-    _status: AccountStatus = AccountStatus.PENDING # type: ignore
-    #__reference: str # type: ignore
+@dataclass(slots=True)
+class Account:
+    _username: str
+    _password: str
+    _email: str
+    _phone: str
+    _status: AccountStatus = field(init=False, default=AccountStatus.PENDING)
+    # __reference: str # type: ignore
     
     @property
     def username(self):
