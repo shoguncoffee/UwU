@@ -10,7 +10,7 @@ for individual submodule in this package:
 """
 
 from app.src import *
-"""
+from app.src.airline import Airline
 airline = Airline()
 
 airport1 = Airport(
@@ -28,7 +28,7 @@ airport3 = Airport(
 
 aircraft1 = Aircraft(
     'Boeing 747',
-    {
+    [
         CabinLayout(
             1, TravelClass.Economy, {
                 Seat(1, 1, SeatType.STANDARD),
@@ -43,7 +43,7 @@ aircraft1 = Aircraft(
                 Seat(1, 3, SeatType.STANDARD),
             }
         )
-    }
+    ]
 )
 
 flight1 = Flight(
@@ -93,16 +93,10 @@ flightin4 = FlightInstance(
 )
 
 client1 = Customer(
-        phone ='0812345678',
         username = 'Plum123',
         password = '12345678',
         email = '516516@kmitl.com',   
-)
-contact1 = ContactInformation(
-    'Arpleum',
-    '+66',
-    '0812345678',
-    '516516@kmitl.com'
+        phone ='0812345678',
 )
 passengerDetails1 = PassengerDetails(
     'Plum',
@@ -111,8 +105,13 @@ passengerDetails1 = PassengerDetails(
     GenderType.MALE,
     '254123543',
     PassengerType.ADULT,
-    'Thai',
-    None
+    'Thai'
+)
+contact1 = ContactInformation(
+    passengerDetails1,
+    '+66',
+    '0812345678',
+    '516516@kmitl.com'
 )
 
 client1.request_booking(
@@ -123,4 +122,3 @@ client1.request_booking(
     [passengerDetails1],
     contact1
 )
-"""

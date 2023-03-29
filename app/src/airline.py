@@ -3,14 +3,14 @@ system
 """
 from __future__ import annotations
 from .base import *
-
 if TYPE_CHECKING:
-    from src import *
-"""
+    from app.src import *
+from .booking_related import Booking
+
 class Airline(Singleton):
+    _instance: Airline
     name = 'Qatar Airways'
     designator = 'QR'
-    _instance: Airline
     
     def __init__(self):
         self.__accounts: set[Account] = set()
@@ -38,28 +38,17 @@ class Airline(Singleton):
         passengers: list[PassengerDetails],
         contact: ContactInformation
     ):
-        reserve = [
-            SeatReservation(passenger, None) for passenger in passengers
+        all_reservation = [
+            FlightReservation(flight, trip.travel_class) for trip in journey for flight in trip.flights
         ]
-        for trip in journey:
-            for flight in trip.flight:
-                
-                FlightReservation(
-                    trip.travel_class,
-                    ,
-                    flight,
-                    reserve
-                )
-        
-        return Booking(
+        booking = Booking(
             creator,
+            all_reservation,
             passengers,
-            ,
-            contact,
+            contact
         )
+        creator.add_booking(booking)
         
     @classmethod 
     def asd(cls):
         cls._instance
-        
-"""
