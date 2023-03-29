@@ -9,7 +9,7 @@ import rapidfuzz
 import csv, json
 #from moneyed import Money
 from datetime import datetime, date, time, timedelta
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, KW_ONLY, replace
 from types import ModuleType
 from uuid import UUID, uuid4
 from abc import ABC, abstractmethod
