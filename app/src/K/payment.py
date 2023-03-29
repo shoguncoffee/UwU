@@ -1,12 +1,13 @@
-from ..constants import PaymentStatus, PaymentMethod
+from ..base import *
 
-#CLASS
-class Payment():
+class Payment(ABC):
     
     def __init__(self,transaction_id,payment_time,status) :
         self._transaction_id = transaction_id
         self._payment_time = payment_time
         self._status = status
+        
+    @abstractmethod
     def pay(self) :
         pass
 
