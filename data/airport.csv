@@ -1,0 +1,76 @@
+Code;Name;Country;Latitude;Longitude
+SYD;Kingsford Smith;Australia;-33.94419861;151.1757965
+VIE;Vienna International;Austria;48.11109924;16.55830002
+BRU;Brussels Airport;Belgium;50.90140152;4.484399796
+GRU;Guarulhos Intl;Brazil;-23.43499947;-46.47280121
+YVR;Vancouver Intl;Canada;49.18719864;-123.1853027
+YYZ;Toronto Lester B. Pearson Intl;Canada;43.67969894;-79.625
+CAN;Baiyun International;China;23.39249992;113.2996979
+PEK;Capital International;China;40.06669998;116.5999985
+PVG;Pudong International;China;31.14389992;121.7913971
+PRG;Ruzyne;Czech Republic;50.09999847;14.26669979
+CPH;Kastrup;Denmark;55.60810089;12.63329983
+CAI;Cairo International Airport;Egypt;30.13750076;31.40690041
+HEL;Helsinki-Vantaa;Finland;60.32559967;24.97170067
+CDG;Charles De Gaulle;France;49.00970078;2.548599958
+ORY;Orly;France;48.72890091;2.357199907
+DUS;Duesseldorf International;Germany;51.28110123;6.752799988
+FRA;Frankfurt International Airport;Germany;50.03889847;8.570599556
+MUC;Franz Josef Strauss International;Germany;48.34999847;11.7833004
+TXL;Tegel;Germany;52.56060028;13.29559994
+ATH;Eleftherios Venizelos Airport;Greece;37.93640137;23.94440079
+HKG;Hong Kong Intl;Hong Kong (SAR);22.30360031;113.9205017
+BUD;Liszt Ferenc International;Hungary;47.43330002;19.23329926
+DEL;Indira Gandhi Intl;India;28.57360077;77.10079956
+CGK;Soekarno-Hatta Intl;Indonesia;-6.125800133;106.6577988
+DUB;Dublin International;Ireland;53.43249893;-6.252200127
+TLV;Ben Gurion Intl;Israel;32.0121994;34.8824997
+FCO;Fiumicino;Italy;41.8003006;12.23890019
+MXP;Malpensa;Italy;45.63280106;8.732199669
+HND;Tokyo Intl (Haneda);Japan;35.55360031;139.7657929
+KIX;Kansai International;Japan;34.42499924;135.2471924
+NRT;Narita;Japan;35.76390076;140.391098
+KWI;Kuwait Intl;Kuwait;29.2303009;47.97529984
+KUL;Kuala Lumpur International Airport;Malaysia;2.745599985;101.7098999
+CUN;Cancun International;Mexico;21.0333004;-86.86669922
+MEX;Benito Juarez Intl;Mexico;19.43530083;-99.07279968
+AMS;Schiphol;Netherlands;52.30830002;4.768099785
+OSL;Oslo Airport;Norway;60.20000076;11.08329964
+MCT;Muscat International Airport;Oman;23.5916996;58.27920151
+PTY;Tocumen Intl, Panama R;Panama;9.069999695;-79.38359833
+MNL;Ninoy Aquino Intl;Philippines;14.50860024;121.0193024
+WAW;Okecie;Poland;52.16669846;20.9666996
+LIS;Lisboa;Portugal;38.7818985;-9.133299828
+DOH;Hamad International Airport;Qatar;25.27440071;51.60829926
+SVO;Sheremetyevo;Russian Federation;55.98329926;37.41669846
+JED;King Abdulaziz Intl;Saudi Arabia;21.67130089;39.15969849
+SIN;Changi;Singapore;1.357800007;103.990799
+ICN;Incheon International Airport;South Korea;37.46020126;126.4406967
+AGP;Malaga Airport;Spain;36.67169952;-4.498099804
+BCN;Barcelona;Spain;41.2969017;2.078299999
+MAD;Adolfo Suarez-Barajas;Spain;40.47359848;-3.561100006
+PMI;Palma de Mallorca;Spain;39.55360031;2.727799892
+ARN;Arlanda;Sweden;59.66189957;17.93390083
+GVA;Geneva International Airport;Switzerland;46.23809815;6.10890007
+ZRH;Zurich;Switzerland;47.45830154;8.551699638
+TPE;Taiwan Taoyuan International Airport;Taiwan;25.08259964;121.2285004
+BKK;Suvarnabhumi - New Bangkok International Airport;Thailand;13.70269966;100.7455978
+DMK;Don Mueang International Airport;Thailand;13.91110039;100.6082993
+AYT;Antalya;Turkey;36.9056015;30.79059982
+IST;Istanbul Airport;Turkey;40.97669983;28.81529999
+AUH;Abu Dhabi Intl;United Arab Emirates;24.43309975;54.64889908
+DXB;Dubai International;United Arab Emirates;25.25;55.35779953
+LGW;Gatwick;United Kingdom;51.14810181;-0.196700007
+LHR;Heathrow;United Kingdom;51.47140122;-0.452800006
+LTN;Luton International;United Kingdom;51.87440109;-0.366400003
+MAN;Manchester Airport;United Kingdom;53.35329819;-2.27670002
+STN;Stansted;United Kingdom;51.88280106;0.233899996
+ATL;Hartsfield-Jackson Int;United States;33.64080048;-84.42720032
+EWR;Newark Liberty Intl;United States;40.69580078;-74.17169952
+IAH;George Bush Intercontinental;United States;29.98329926;-95.33999634
+JFK;John F Kennedy Intl;United States;40.6385994;-73.77690125
+LAX;Los Angeles Intl;United States;33.94219971;-118.4072037
+MIA;Miami International;United States;25.79249954;-80.2861023
+ORD;O'Hare International;United States;41.97809982;-87.90609741
+SFO;San Francisco Intl;United States;37.61940002;-122.3728027
+SGN;Tan Son Nhat International Airport;Vietnam;10.81719971;106.6577988
