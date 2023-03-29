@@ -4,7 +4,14 @@ system
 from __future__ import annotations
 from .base import *
 if TYPE_CHECKING:
-    from app.src import *
+    from app.src import (
+        Account,
+        Customer,
+        Trip,
+        PassengerDetails,
+        ContactInformation,
+        FlightReservation,
+    )
 from .booking_related import Booking
 
 class Airline(Singleton):
@@ -13,7 +20,7 @@ class Airline(Singleton):
     designator = 'QR'
     
     def __init__(self):
-        self.__accounts: set[Account] = set()
+        # self.__accounts: set[Account] = set()
         
         self.init_aircraft()
         self.init_airport()
@@ -35,17 +42,14 @@ class Airline(Singleton):
     def create_booking(cls,
         creator: Customer,
         journey: list[Trip],
-        passengers: list[PassengerDetails],
-        contact: ContactInformation
+        contact: ContactInformation,
+        *passengers: PassengerDetails,
     ):
-        all_reservation = [
-            FlightReservation(flight, trip.travel_class) for trip in journey for flight in trip.flights
-        ]
         booking = Booking(
+            journey,
             creator,
-            all_reservation,
             passengers,
-            contact
+            contact,
         )
         creator.add_booking(booking)
         
