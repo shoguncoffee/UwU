@@ -1,7 +1,23 @@
+from __future__ import annotations
+from ..base import *
+if TYPE_CHECKING:
+    from .seat import Seat
+from dataclasses import dataclass
+         
+@dataclass(slots=True, frozen=True)
 class CabinLayout:
+    __desk: int # type: ignore
+    __class_type: TravelClass # type: ignore
+    __seats: set[Seat] # type: ignore
+
+    @property
+    def desk(self):
+        return self.__desk
     
-    def __init__(self, cabin_no, deck, class_type, seats):
-        self.__cabin_no = cabin_no
-        self.__deck = deck
-        self.__class_type = class_type
-        self.__seats = []
+    @property
+    def class_type(self):
+        return self.__class_type
+
+    @property
+    def seats(self):
+        return self.__seats

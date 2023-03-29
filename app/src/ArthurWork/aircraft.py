@@ -1,16 +1,30 @@
-from .cabin_layout import CabinLayout
-#from ..ArthurWork.cabin_layout import CabinLayout
-#from src.ArthurWork.cabin_layout import CabinLayout
+from __future__ import annotations
+from ..base import *
+if TYPE_CHECKING:
+    from .cabin_layout import CabinLayout
+from dataclasses import dataclass
 
+@dataclass(slots=True, frozen=True)
 class Aircraft:
-
-    def __init__(self, model, type, cabin):
-        self.__model = model
-        self.__type = type
-        self.__cabin = [CabinLayout]
-
-    def get_seat_layout(self):
-        pass
-
-    def get_all_seat(self):
+    __model: str # type: ignore
+    __cabins: tuple[CabinLayout] # type: ignore
+    
+    @property
+    def model(self):
+        return self.__model
+    
+    @property
+    def cabins(self):
+        return self.__cabins
+    
+    def get_seats(self):
+        """
+        get all passenger seat in the aircraft
+        """
+        return set(
+            seat for cabin in self.cabins
+            for seat in cabin.seats
+        )
+        
+    def get_layout(self):
         pass
