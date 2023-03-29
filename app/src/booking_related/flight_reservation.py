@@ -5,12 +5,13 @@ if TYPE_CHECKING:
     from .booking import Booking
     from .seat_reservation import SeatReservation
 
-@dataclass
+@dataclass(slots=True, unsafe_hash=True)
 class FlightReservation:
     __flight: FlightInstance # type: ignore
     __class_of_service: TravelClass # type: ignore
-    __holder: Optional[Booking] = None # type: ignore
-    __seats: set[SeatReservation] | None = field(init=False, default=None) # type: ignore
+    __holder: Booking # type: ignore
+    
+    __seats: Optional[tuple[SeatReservation]] = field(init=False, hash=False, default=None) # type: ignore
 
     @property
     def flight(self):
@@ -26,14 +27,27 @@ class FlightReservation:
     
     @property
     def seats(self):
-        return self.__seats
+        return self.__seats or []
 
     @property
     def is_selected(self):
+        """
+        True if seats has been selected
+        """
         return self.seats is not None
     
+    @property
+    def is_booking(self):
+        """
+        True if ...
+        """
+        return self.holder is not None
     
-    def select_seat(self, selected: set[SeatReservation]):
-        if len(selected) == self.holder.passenger_number:
+    
+    def select_seat(self, selected: tuple[SeatReservation]):
+        if self.holder and len(selected) == self.holder.passenger_number:
             self.__seats = selected
             return True
+    
+    def init_holder(self, holder: Booking):
+        self.__holder = holder

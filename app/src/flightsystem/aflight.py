@@ -6,7 +6,6 @@ from ..base import *
 if TYPE_CHECKING:
     from ..ArthurWork import Aircraft, Airport
     from ..booking_related import FlightReservation
-    from ..constants import FlightStatus, BookingStatus
 
 class FlightCatalog(Singleton):
     _instance: FlightCatalog
@@ -24,10 +23,17 @@ class FlightCatalog(Singleton):
     
     @classmethod
     def search(cls, designator: str):
-        ...
+        return rapidfuzz.process.extract(
+            designator, cls._instance.record, 
+            scorer = rapidfuzz.fuzz.partial_ratio,
+            processor = lambda f: f.designator,
+            limit = 10,
+            score_cutoff = 70,
+        )
+        
 
 
-@dataclass
+@dataclass(slots=True, frozen=True)
 class Flight: #(HasReference):
     __designator: str # type: ignore
     __departure: time # type: ignore
@@ -35,10 +41,6 @@ class Flight: #(HasReference):
     __origin: Airport # type: ignore
     __destination: Airport # type: ignore
     # __reference: Optional[UUID] = None # type: ignore
-    
-    def __post_init__(self):
-        self.__designator = self.designator.upper()
-        # self.__reference = self.__reference or self.generate_reference()
     
     @property
     def designator(self):
@@ -71,15 +73,16 @@ class Flight: #(HasReference):
     def generate_reference(cls):
         return 
     
-    
-@dataclass
+
+@dataclass(slots=True, unsafe_hash=True)
 class FlightInstance:
     __flight: Flight # type: ignore
     __date: date # type: ignore
     __aircraft: Aircraft # type: ignore
-    __base_price: float # type: ignore
-    __booking_record: set[FlightReservation] = field_set # type: ignore
-    __status: FlightStatus = FlightStatus.SCHEDULED # type: ignore
+    
+    __base_price: float = field(hash=False) # type: ignore
+    __booking_record: set[FlightReservation] = field(init=False, hash=False, default_factory=set) # type: ignore
+    __status: FlightStatus = field(init=False, hash=False, default=FlightStatus.SCHEDULED) # type: ignore
     
     @property
     def flight(self):
@@ -126,5 +129,5 @@ class FlightInstance:
         """
         return set(
             reservation for reservation in self.__booking_record 
-            if reservation.holder.status == BookingStatus.COMPLETE
+            if reservation.holder.status == BookingStatus.COMPLETED
         )

@@ -2,9 +2,6 @@ from __future__ import annotations
 from app.base import *
 from .constants import *
 
-field_set = field(default_factory=set)
-
-
 class Singleton(ABC):
     def __new__(cls):
         instance = vars(cls).get('_instance')

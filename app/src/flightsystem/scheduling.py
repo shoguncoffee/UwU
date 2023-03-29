@@ -3,14 +3,14 @@
 from __future__ import annotations
 from ..base import *
 if TYPE_CHECKING:
-    from src import *
+    from .aflight import Flight
 
 class FlightScheduling(Singleton):
     _instance: FlightScheduling 
     
     def __init__(self, advance_days: int = 365):
         self.__advance_days = advance_days
-        self.__plans: set[FlightPlan] = set()
+        self.__plans: list[FlightPlan] = []
     
     @property
     def advance_days(self):
@@ -22,17 +22,29 @@ class FlightScheduling(Singleton):
     
     @classmethod
     def add(cls, plan: FlightPlan):
-        cls._instance.__plans.add(plan)
+        cls._instance.__plans.append(plan)
     
 
-@dataclass
+@dataclass(slots=True)
 class Deviation:
-    __weekdays: set[int] = field_set # type: ignore
-    __months: set[int] = field_set # type: ignore
-    __dates: set[date] = field_set # type: ignore
+    __weekdays: set[int] = field(default_factory=set) # type: ignore
+    __months: set[int] = field(default_factory=set) # type: ignore
+    __dates: set[date] = field(default_factory=set) # type: ignore
+    
+    @property
+    def weekdays(self):
+        return self.__weekdays
+    
+    @property
+    def months(self):
+        return self.__months
+    
+    @property
+    def dates(self):
+        return self.__dates
     
 
-@dataclass    
+@dataclass(slots=True)
 class FlightPlan:
     __flight: Flight # type: ignore
     __start_date: date # type: ignore
