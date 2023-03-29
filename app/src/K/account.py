@@ -1,14 +1,27 @@
-class Account :
-    def __init__(self,username,email,reference,password,status) :
-        self._username = username
-        self._email = email
-        self._reference = reference
-        self._password = password
-        self._status = status
+from __future__ import annotations
+from ..base import *
 
-    def verify_account() :
-        pass
-    def check_username() :
-        pass
-    def create_account() :
-        pass
+@dataclass(slots=True)
+class Account:
+    _username: str
+    _password: str
+    _email: str
+    _phone: str
+    _status: AccountStatus = field(init=False, default=AccountStatus.PENDING)
+    # __reference: str # type: ignore
+    
+    @property
+    def username(self):
+        return self._username
+    
+    @property
+    def email(self):
+        return self._email
+    
+    @property
+    def password(self):
+        return self._password
+    
+    @property
+    def status(self):
+        return self._status

@@ -1,65 +1,73 @@
-from ..constants import BookingStatus
-from .contact_information import ContactInformation
-from .passenger_detail import PassengerDetail
+from __future__ import annotations
+from ..base import *
+if TYPE_CHECKING:
+    from .customer import Customer
+    from .passenger_detail import PassengerDetails
+    from .contact_information import ContactInformation
+    from ..K import Payment
+    from ..ArthurWork.flight_itinerary import Trip
+from dataclasses import InitVar
+from .flight_reservation import FlightReservation
 
-class Booking:
-    def __init__(self, creator, reference, contact_info, total_fare, status=BookingStatus.PENDING):
-        self.__creator = creator
-        self.__reference = reference
-        self.__status = status
-        self.__contact_info = contact_info
-        self.__total_fare = total_fare #total fare should be added via create booking sequence
-        self.__reserved_flights = []
-        self.__passenger_details = []
-        self.__ticket_ref = []
+@dataclass(slots=True, unsafe_hash=True)
+class Booking: #(HasReference):
+    __datetime: datetime = field(init=False, default_factory=datetime.now)
+    __reservation: tuple[FlightReservation, ...] = field(init=False, hash=False) # type: ignore
+    # __reference: Optional[UUID] = reference or self.generate_reference() # type: ignore
+    
+    __journey: InitVar[list[Trip]] # type: ignore
+    __creator: Customer = field(hash=False) # type: ignore
+    __passenger: tuple[PassengerDetails, ...] = field(hash=False) # type: ignore
+    __contactinfo: ContactInformation = field(hash=False) # type: ignore
+    __payment: Optional[Payment] = field(init=False, hash=False, default=None) # type: ignore
+    __status: BookingStatus = field(init=False, hash=False, default=BookingStatus.INCOMPLETE) # type: ignore
 
-    def get_all_flight():
-        pass
+    def __post_init__(self, journey: list[Trip]):
+        self.__reservation = tuple(
+            FlightReservation(flight, trip.travel_class, self) 
+            for trip in journey for flight in trip.itinerary.flights
+        )
 
-    def is_connecting_flight():
-        pass
-
-    def calculate_fare():
-        pass
-
-    def create_payment():
-        pass
-
-    def request_modify_booking():
-        pass
-
-    #def modify_booking():
-    #    pass
-
-    #def create_booking():
-    #    pass
-
-    def fill_information():
-        pass
-
-    #def cancel_booking():
-    #    pass
-
-    def add_passenger_detail(self, passenger_detail): #Temporary
-        self.__passenger_details.append(passenger_detail)
-
-    #main dish boii
-    '''
-    def view_booking(self):
-        #get passenger details
-        count = 1
-        for i in self.__passenger_details:
-            print("Passenger {} : ".format(count))
-            print(i.get_forename())
-            print(i.get_surname())
-            print(i.get_birthday())
-            print(i.get_gender())
-            print(i.get_passport())
-            print(i.get_passenger_type())
-            print(i.get_nationality())
-            if i.get_travel_document() != None:
-                print(i.get_travel_document())
-
-    '''
-        #get contact information
+    @property
+    def creator(self):
+        return self.__creator
+                
+    @property
+    def reservation(self):
+        return self.__reservation
+    
+    @property
+    def passenger(self):
+        return self.__passenger
+    
+    @property
+    def contactinfo(self):
+        return self.__contactinfo
         
+    @property
+    def payment(self):
+        return self.__payment
+    
+    @property
+    def status(self):
+        return self.__status
+    
+    @property
+    def creation_datetime(self):
+        return self.__datetime
+    
+    
+    @property
+    def is_completed(self):
+        return self.status == BookingStatus.COMPLETED
+    
+    @property
+    def is_connecting_flight(self):
+        return len(self.reservation) > 1
+    
+    @property
+    def passenger_number(self):
+        return len(self.passenger)
+    
+    def cancel(self):
+        self.__status = BookingStatus.CANCELLED

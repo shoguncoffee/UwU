@@ -1,24 +1,36 @@
+from __future__ import annotations
+from ..base import *
+if TYPE_CHECKING:
+    from ..ArthurWork.flight_itinerary import Trip
+    from .booking import Booking
+    from .passenger_detail import PassengerDetails
+    from .contact_information import ContactInformation
 from ..K import Account
-from .booking import Booking
 
+@dataclass(slots=True)
 class Customer(Account):
+    __bookings: set[Booking] = field(init=False, default_factory=set) # type: ignore
+    
+    @property
+    def bookings(self):
+        return self.__bookings
 
-    def __init__(self, username, email, reference, password, status, phone):
-        Account.__init__(self, username, email, reference, password, status)
-        self.__phone = phone
-        self.__bookings = []
 
-        
-    def select_booking(self, num):
-        while (num > len(self.__bookings)):
-            print("This booking doesn't exist currently.")
-        else:
-            return self.__bookings[num - 1]
+    def request_booking(self,
+        journey: list[Trip],
+        contact: ContactInformation,
+        *passenger: PassengerDetails,
+    ):
+        from ..airline import Airline
+        booking = Airline.create_booking(
+            self, journey, contact, *passenger, 
+        )
+
+    def add_booking(self, booking: Booking):
+        self.__bookings.add(booking)            
+    
+    def selected_booking(self, num):
+        ...
             
-
-    def view_booking():
-        pass
-
-
-    def add_booking(self, booking): #Temporary
-        self.__bookings.append(booking)
+    def view_booking(self):
+        ...

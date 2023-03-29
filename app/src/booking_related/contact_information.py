@@ -1,15 +1,38 @@
+from __future__ import annotations
+from ..base import *
+if TYPE_CHECKING:
+    from .passenger_detail import PassengerDetails
+
+@dataclass(slots=True)
 class ContactInformation:
-    def __init__(self, name, phone, phone_country, email):
-        self.__name = name
-        self.__phone = phone
-        self.__phone_country = phone_country
-        self.__email = email
+    __passenger: PassengerDetails  # type: ignore
+    __phone: str # type: ignore
+    __phone_country: str # type: ignore
+    __email: str # type: ignore
+    
+    @property
+    def passenger(self):
+        return self.__passenger
 
-    def request_contact_information():
+    @property
+    def phone(self):
+        return self.__phone
+
+    @property
+    def phone_country(self):
+        return self.__phone_country
+
+    @property
+    def email(self):
+        return self.__email
+
+
+    @property
+    def name(self):
+        return self.passenger.fullname
+    
+    def request_contact():
         pass
 
-    def modify_contact_information():
-        pass
-
-    def create_contact_information():
+    def modify_contact():
         pass

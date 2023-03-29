@@ -16,11 +16,17 @@ AccountStatus = Enum(
     'AccountStatus', 'PENDING ACTIVE SUSPENDED'
 )
 BookingStatus = Enum(
-    'BookingStatus', 'PENDING CONFIRMED CANCELLED'
+    'BookingStatus', 'INCOMPLETE PENDING COMPLETED CANCELLED'
 )
 SeatType = Enum(
     'SeatType', 'STANDARD'
 )
 GenderType = Enum(
     'GenderType', 'MALE FEMALE'
+)
+PaymentStatus = Enum(
+    'PaymentStatus', 'PENDING FAILED COMPLETED'
+)
+PaymentMethod = Enum(
+    'PaymentMethod', 'PAYPAL INTERNETBANKING CREDITCARD'
 )
