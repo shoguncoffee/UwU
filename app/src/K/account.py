@@ -4,24 +4,24 @@ from ..constants import AccountStatus
 
 @dataclass
 class Account :
-    __username: str # type: ignore
-    __password: str # type: ignore
-    __email: str # type: ignore
-    __status: AccountStatus = AccountStatus.PENDING # type: ignore
+    _username: str # type: ignore
+    _password: str # type: ignore
+    _email: str # type: ignore
+    _status: AccountStatus = AccountStatus.PENDING # type: ignore
     #__reference: str # type: ignore
     
     @property
     def username(self):
-        return self.__username
+        return self._username
     
     @property
     def email(self):
-        return self.__email
+        return self._email
     
     @property
     def password(self):
-        return self.__password
+        return self._password
     
     @property
     def status(self):
-        return self.__status
+        return self._status

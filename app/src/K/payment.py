@@ -1,48 +1,38 @@
-#from constants import PaymentStatus,PaymentMethod
-#from creditcardpayment import CreditClassPayment
-#from paypalpayment import PaypalPayment
-#from internetbankingpayment import InternetBankingPayment
-
-
-#ENUM
-class PaymentStatus(enumerate) :
-    PENDING = 'PENDING'
-    FAILED = 'FAILED'
-    COMPLETED = 'COMPLETED'
-class PaymentMethod(enumerate) :
-    PAYPAL = 'PAYPAL'
-    INTERNETBANKING = 'INTERNETBANKING'
-    CREDITCARD = 'CREDITCARD'
-
+from ..constants import PaymentStatus, PaymentMethod
 
 #CLASS
-class Payment:
+class Payment():
+    
     def __init__(self,transaction_id,payment_time,status) :
         self._transaction_id = transaction_id
         self._payment_time = payment_time
         self._status = status
+    def pay(self) :
+        pass
 
-    def create_payment(self,total_fare,payment_method,balance) :
-        if self.check_balance(total_fare,balance) == True:
-            if payment_method == PaymentMethod.PAYPAL :
-                self.pay(total_fare,balance)    #PayPalPayment
-            elif payment_method == PaymentMethod.INTERNETBANKING :
-                self.pay(total_fare,balance)    #InternetBankingPayment
-            elif payment_method == PaymentMethod.CREDITCARD :
-                self.pay(total_fare,balance)    #CreditCardPayment 
-        else :
-            self._status = PaymentStatus.FAILED
-            print("PAYMENT STATUS :",self._status)
 
-    def check_balance(self,total_fare,balance) :
-        if balance >= total_fare :
-            return True
-        else :
-            return False
-        
-    def pay(self,total_fare,balance) :
-        balance = balance - total_fare
-        self._status = PaymentStatus.COMPLETED
+class CreditClassPayment(Payment) :
+    #def __init__(self, securtity_code):
+    #    self.security_code = securtity_code
+
+    def pay(self,total_fare) :
+        print("Credit Class Payment : SUCCESS")
         print("TRANSACTION ID :",self._transaction_id)
-        print("YOUR BALANCE :",balance)
-        print("PAYMENT STATUS :",self._status)
+        print("TOTAL FARE :",total_fare,"THB")
+        self._status = PaymentStatus.COMPLETED
+
+
+class InternetBankingPayment(Payment) :
+    def pay(self,total_fare) :
+        print("Internet Banking Payment : SUCCESS")
+        print("TRANSACTION ID :",self._transaction_id)
+        print("TOTAL FARE :",total_fare,"THB")
+        self._status = PaymentStatus.COMPLETED
+
+
+class PaypalPayment(Payment) :
+    def pay(self,total_fare) :
+        print("Paypal Payment : SUCCESS")
+        print("TRANSACTION ID :",self._transaction_id)
+        print("TOTAL FARE :",total_fare,"THB")
+        self._status = PaymentStatus.COMPLETED
