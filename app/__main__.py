@@ -8,9 +8,9 @@ for this package:
 for individual submodule in this package:
 - ``\UwU> python -m app.<module>`
 """
+from .src import *
+from .src.airline import Airline
 
-from app.src import *
-from app.src.airline import Airline
 airline = Airline()
 
 airport1 = Airport(
@@ -28,22 +28,22 @@ airport3 = Airport(
 
 aircraft1 = Aircraft(
     'Boeing 747',
-    [
+    Desk(
         CabinLayout(
-            1, TravelClass.Economy, {
+            TravelClass.Economy, frozenset([
                 Seat(1, 1, SeatType.STANDARD),
                 Seat(1, 2, SeatType.STANDARD),
                 Seat(1, 3, SeatType.STANDARD),
-            }
+            ])
         ),
         CabinLayout(
-            1, TravelClass.Bussiness, {
+            TravelClass.Bussiness, frozenset([
                 Seat(1, 1, SeatType.STANDARD),
                 Seat(1, 2, SeatType.STANDARD),
                 Seat(1, 3, SeatType.STANDARD),
-            }
+            ])
         )
-    ]
+    )
 )
 
 flight1 = Flight(
@@ -68,57 +68,50 @@ flight4 = Flight(
 )
 
 flightin1 = FlightInstance(
-    flight1,
-    date(18, 1, 2023),
-    aircraft1,
-    50_000
+    flight1, date(2023, 1, 18),
+    aircraft1, 50_000
 )
 flightin2 = FlightInstance(
-    flight2,
-    date(18, 1, 2023),
-    aircraft1,
-    50_000
+    flight2, date(2023, 1, 18),
+    aircraft1, 50_000
 )
 flightin3 = FlightInstance(
-    flight3,
-    date(23, 1, 2023),
-    aircraft1,
-    50_000
+    flight3, date(2023, 1, 23),
+    aircraft1, 50_000
 )
 flightin4 = FlightInstance(
-    flight4,
-    date(23, 1, 2023),
-    aircraft1,
-    50_000
+    flight4, date(2023, 1, 23),
+    aircraft1, 50_000
 )
 
 client1 = Customer(
-        username = 'Plum123',
-        password = '12345678',
-        email = '516516@kmitl.com',   
-        phone ='0812345678',
+    'Plum123',
+    '12345678',
+    '516516@kmitl.com',   
+    '0812345678',
 )
 passengerDetails1 = PassengerDetails(
-    'Plum',
-    'Arpleum',
+    'Plum', 'Arpleum',
     date(1999, 1, 1),
-    GenderType.MALE,
+    'Thai',
     '254123543',
+    GenderType.MALE,
     PassengerType.ADULT,
-    'Thai'
 )
 contact1 = ContactInformation(
     passengerDetails1,
-    '+66',
-    '0812345678',
+    '+66', '0812345678',
     '516516@kmitl.com'
 )
+search_outbound = FlightItinerary(flightin1, flightin2)
+search_inbound = FlightItinerary(flightin3, flightin4)
 
+return_trip = [
+    Trip(search_outbound, TravelClass.Economy),
+    Trip(search_inbound, TravelClass.Bussiness)
+]
 client1.request_booking(
-    [
-        Trip([flightin1, flightin2], TravelClass.Economy),
-        Trip([flightin3, flightin4], TravelClass.Bussiness)
-    ],
-    [passengerDetails1],
-    contact1
+    return_trip,
+    contact1,
+    passengerDetails1,
 )
