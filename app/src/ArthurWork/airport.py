@@ -1,13 +1,12 @@
 from __future__ import annotations
 from ..base import *
-from dataclasses import dataclass
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True, frozen=True)
 class Airport:
-    __name: str = name # type: ignore
-    __location_code: str = location_code # type: ignore
-    __city: str = city # type: ignore
-    __country: str = country # type: ignore
+    __name: str # type: ignore
+    __location_code: str # type: ignore
+    __city: str # type: ignore
+    __country: str # type: ignore
     
     @property
     def name(self):

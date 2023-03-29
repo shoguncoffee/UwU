@@ -2,12 +2,12 @@ from __future__ import annotations
 from ..base import *
 from ..info import Information
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True, frozen=True)
 class Seat:
     __row: int # type: ignore
     __column: int # type: ignore
     __type: SeatType # type: ignore
-    __description: Information = field(default_factory=Information) # type: ignore
+    __description: Information = field(hash=False, default_factory=Information) # type: ignore
     
     @property
     def row(self):

@@ -3,7 +3,7 @@ from ..base import *
 if TYPE_CHECKING:
     from .passenger_detail import PassengerDetails
 
-@dataclass
+@dataclass(slots=True)
 class ContactInformation:
     __passenger: PassengerDetails  # type: ignore
     __phone: str # type: ignore
