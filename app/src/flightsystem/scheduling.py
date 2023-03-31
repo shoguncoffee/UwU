@@ -5,7 +5,7 @@ from ..base import *
 if TYPE_CHECKING:
     from .aflight import Flight
 
-class FlightScheduling(Singleton):
+class FlightScheduling:
     _instance: FlightScheduling 
     
     def __init__(self, advance_days: int = 365):
