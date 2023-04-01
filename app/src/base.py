@@ -1,12 +1,7 @@
 from __future__ import annotations
-from app.base import *
-from .constants import *
+from ..base import *
 
-class Singleton(ABC):
-    def __new__(cls):
-        instance = vars(cls).get('_instance')
-        cls._instance = instance or super().__new__(cls)
-        return cls._instance
+from .constants import *
 
 
 class HasReference(ABC):
