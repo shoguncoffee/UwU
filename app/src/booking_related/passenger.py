@@ -46,3 +46,7 @@ class PassengerDetails:
 
     def change_forename(self, name: str):
         self.__forename = name
+        
+        
+if __name__ == '__main__':
+    '''man = PassengerDetails(*(str(i) for i in range(7)))'''

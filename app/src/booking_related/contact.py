@@ -1,7 +1,7 @@
 from __future__ import annotations
 from ..base import *
 if TYPE_CHECKING:
-    from .passenger_detail import PassengerDetails
+    from app.src import *
 
 @dataclass(slots=True)
 class ContactInformation:
