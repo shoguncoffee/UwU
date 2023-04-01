@@ -2,15 +2,26 @@
 necessary packages
 """
 import os, sys
-# import tqdm
-import numpy, itertools, random
-import asyncio
+import numpy
 import csv, json
-# from moneyed import Money
+import asyncio
+# import tqdm
+
 from datetime import datetime, date, time, timedelta
-from math import ceil, floor
-from dataclasses import dataclass, field, KW_ONLY, replace
+from dataclasses import dataclass, field, replace, KW_ONLY
 from uuid import UUID, uuid4
+
+# from moneyed import Money
+from math import ceil, floor
+from random import randint
+from itertools import (
+    count, 
+    product,
+    chain, 
+    repeat, 
+    islice, 
+    cycle
+)
 from abc import ABC, abstractmethod
 from types import ModuleType
 from typing import (
