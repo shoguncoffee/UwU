@@ -1,6 +1,4 @@
-from .aircraft import *
-from .airport import *
-from .cabin_layout import *
-from .flight_itinerary import *
-from .seat_price import *
-from .seat import *
+from .aircraft import Aircraft, Desk, CabinLayout, Seat
+from .itinerary import FlightItinerary, Trip
+from .airport import Airport
+from .seat_price import SeatPrice

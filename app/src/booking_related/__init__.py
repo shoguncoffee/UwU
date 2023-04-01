@@ -1,6 +1,4 @@
-from .booking import *
-from .contact_information import *
-from .customer import *
-from .flight_reservation import *
-from .passenger_detail import *
-from .seat_reservation import *
+from .booking import Booking
+from .contact import ContactInformation
+from .passenger import PassengerDetails
+from .reservation import SeatReservation, FlightReservation

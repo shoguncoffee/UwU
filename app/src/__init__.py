@@ -1,7 +1,10 @@
 from .constants import *
-from .info import *
-from .K import *
+from .information import Info
+
 from .ArthurWork import *
+from .K import *
 from .booking_related import *
 from .flightsystem import *
-from .airline import *
+
+from .catalog import *
+from .system import Airline

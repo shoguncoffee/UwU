@@ -1,5 +1,2 @@
-from .account import Account
-from .payment import *
-from .admin import Admin
-from .schedulecatalog import ScheduleCatalog
-from .scheduledate import ScheduleDate
+from .payment import Payment, CreditClassPayment, InternetBankingPayment, PaypalPayment
+from .account import Account, Customer, Admin

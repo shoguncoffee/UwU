@@ -1,2 +1,2 @@
-from .aflight import *
-from .scheduling import *
+from .schedule import FlightPlan, Deviation
+from .flight import Flight, FlightInstance
