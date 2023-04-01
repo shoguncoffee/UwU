@@ -3,10 +3,13 @@ system
 """
 from __future__ import annotations
 from .base import *
+
 if TYPE_CHECKING:
     from app.src import *
-from .catalog import *
-from .booking_related import Booking
+    
+from .src.catalog import *
+from .src.booking_related import Booking
+
 
 class Airline:
     name = 'Qatar Airways'
@@ -17,19 +20,13 @@ class Airline:
             cls._instance = super().__new__(cls)
         return cls._instance
     
-    def __init__(self, boot: bool = False):
+    def __init__(self):
         self.__aircraft = AircraftCatalog()
         self.__airport = AirportCatalog()
-        
         self.__schedule = ScheduleCatalog()
         self.__plan = FlightScheduling()
         self.__flight = FlightCatalog()
-        
         self.__accounts = AccountCatalog()
-        
-        if boot:
-            self.init_aircraft()
-            self.init_airport()
     
     @classmethod
     @property
@@ -60,17 +57,6 @@ class Airline:
     @property
     def plan(cls):
         return cls._instance.__plan
-    
-    def init_aircraft(self):
-        with open('app/data/aircraft.csv') as f:
-            data = ...
-            return
-    
-    def init_airport(self):
-        with open('app/data/airport.csv') as f:
-            data = ...
-            return
-    
     
     @classmethod
     def create_booking(cls,
@@ -106,26 +92,44 @@ class Airline:
         return False
 
     @classmethod
-    def search_journey(self,
-        date: date
+    def search_segment(cls,
+        origin: Airport, 
+        destination: Airport, 
+        date: date,
+        pax: int,
     ):
-        self.schedule[date].search(
-            
+        result = cls.schedule[date].search(
+            origin, destination, 
         )
-        return
+        return [
+            flight for flight in result
+            if flight.bookingable(pax)
+        ]
     
     @classmethod
-    def search_return_journey(self, 
+    def search_journey(cls,
+        stops: list[Airport], 
+        date: date,
+        pax: int,
+    ): 
+        for org, dst in zip(stops, stops[1:]):
+            result = cls.search_segment(
+                org, dst, date, pax
+            )
+    
+    @classmethod
+    def search_return(cls, 
         origin: Airport, 
         destination: Airport, 
         dates: tuple[date, date],
         pax: int,
-    ):
-        return self.search_journey(origin, destination, date)
-    
+    ):  
+        return [
+            cls.search_segment(origin, destination, date, pax)
+            for date in dates
+        ]
     
 
 if __name__ == '__main__':
-    Airline()
     print(Airline.aircraft)
     print(Airline.airport)
