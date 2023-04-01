@@ -4,34 +4,7 @@ take care of flight system
 from __future__ import annotations
 from ..base import *
 if TYPE_CHECKING:
-    from ..ArthurWork import Aircraft, Airport
-    from ..booking_related import FlightReservation
-
-class FlightCatalog(Singleton):
-    _instance: FlightCatalog
-    
-    def __init__(self):
-        self.__record: set[Flight] = set()
-    
-    @property
-    def record(self):
-        return self.__record
-    
-    @classmethod
-    def add(cls, flight: Flight):
-        cls._instance.__record.add(flight)
-    
-    @classmethod
-    def search(cls, designator: str):
-        return rapidfuzz.process.extract(
-            designator, cls._instance.record, 
-            scorer = rapidfuzz.fuzz.partial_ratio,
-            processor = lambda f: f.designator,
-            limit = 10,
-            score_cutoff = 70,
-        )
-        
-
+    from app.src import *     
 
 @dataclass(slots=True, frozen=True)
 class Flight: #(HasReference):
@@ -69,10 +42,10 @@ class Flight: #(HasReference):
         d1 = datetime.combine(date.min, self.__departure)
         return d2 - d1
     
-    @classmethod
-    def generate_reference(cls):
-        return 
-    
+    # @classmethod
+    # def generate_reference(cls):
+    #     return 
+
 
 @dataclass(slots=True, unsafe_hash=True)
 class FlightInstance:
@@ -81,8 +54,9 @@ class FlightInstance:
     __aircraft: Aircraft # type: ignore
     
     __base_price: float = field(hash=False) # type: ignore
-    __booking_record: set[FlightReservation] = field(init=False, hash=False, default_factory=set) # type: ignore
-    __status: FlightStatus = field(init=False, hash=False, default=FlightStatus.SCHEDULED) # type: ignore
+    
+    __booking_record: set[FlightReservation] = field(init=False, hash=False, default_factory=set)
+    __status: FlightStatus = field(init=False, hash=False, default=FlightStatus.SCHEDULED)
     
     @property
     def flight(self):
@@ -108,26 +82,50 @@ class FlightInstance:
     def designator(self):
         return self.flight.designator
     
-    def update_status(self, status: FlightStatus):
-        self.__status = status
+    @property
+    def all_travel_class(self):
+        return {
+            cabin.travel_class for desk in self.aircraft.desks 
+            for cabin in desk.cabins
+        }
     
-    def get_reserved_seats(self):
+    def cancel(self):
+        self.__status = FlightStatus.CANCELLED
+    
+    def get_seats_of(self, travel_class: TravelClass):
+        return self.aircraft.get_seats_of(travel_class)
+    
+    def get_all_comfirmed(self):
+        """
+        get all confirmed reservations of this FlightInstance
+        """
+        return {
+            reservation for reservation in self.booking_record 
+            if reservation.holder.status == BookingStatus.COMPLETED
+        }
+    
+    def get_occupied_of(self, travel_class: TravelClass):
         """
         get all reserved seats that have be paid (reservation status is confirmed)
         """
-        return set(
-            seat for reservation in self.get_comfirmed()
-            for seat in reservation.seats
-        )
+        return {
+            seatRE.seat for flightRE in self.get_comfirmed_of(travel_class)
+            for seatRE in flightRE.reservation
+        }
         
-    def get_available_seats(self):
-        ...
-        
-    def get_comfirmed(self):
+    def get_comfirmed_of(self, travel_class: TravelClass):
         """
-        get all confirmed reservations
+        get confirmed reservations that match travel_class of this FlightInstance
         """
-        return set(
-            reservation for reservation in self.__booking_record 
-            if reservation.holder.status == BookingStatus.COMPLETED
-        )
+        return {
+            reservation for reservation in self.get_all_comfirmed() 
+            if reservation.travel_class == travel_class
+        }
+
+    def bookable(self, travel_class: TravelClass, pax: int):
+        free = self.get_seats_of(travel_class)
+        occupied = self.get_occupied_of(travel_class)
+        return len(free) - len(occupied) >= pax
+    
+    def booked(self, reservation: FlightReservation):
+        self.booking_record.add(reservation)

@@ -3,28 +3,8 @@
 from __future__ import annotations
 from ..base import *
 if TYPE_CHECKING:
-    from .aflight import Flight
-
-class FlightScheduling:
-    _instance: FlightScheduling 
+    from app.src import *
     
-    def __init__(self, advance_days: int = 365):
-        self.__advance_days = advance_days
-        self.__plans: list[FlightPlan] = []
-    
-    @property
-    def advance_days(self):
-        return self.__advance_days
-    
-    @property
-    def plans(self):
-        return self.__plans
-    
-    @classmethod
-    def add(cls, plan: FlightPlan):
-        cls._instance.__plans.append(plan)
-    
-
 @dataclass(slots=True)
 class Deviation:
     __weekdays: set[int] = field(default_factory=set) # type: ignore
@@ -77,4 +57,5 @@ class FlightPlan:
         
     
     def scheduled(self):
-        FlightScheduling.add(self)
+        from app.src import Airline
+        Airline.plan.add(self)
