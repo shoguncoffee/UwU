@@ -4,52 +4,52 @@ amazing search functions, Wow!
 from __future__ import annotations
 from .base import *
 
-from rapidfuzz.process import extract
+from rapidfuzz.process import extract as _extract
 from rapidfuzz.fuzz import *
 
-scorer = partial_ratio
-limit = 30
-score_cutoff = 50
+_scorer = partial_ratio
+_limit = 24
+_score_cutoff = 50
 
 
 def _search(
     key: str,
     query: str,
-    pool: Iterable[T],
-    scorer: Callable = partial_ratio,
-    limit: int = limit,
-    score_cutoff: int = score_cutoff,
+    pool: Sequence[T],
+    scorer: Callable = _scorer,
+    limit: int = _limit,
+    score_cutoff: int = _score_cutoff,
 ):
     """
-    supported object-attr search for rapidfuzz.process.extract()
+    supported object-attr search for rapidfuzz.process._extract()
     """
-    choices: list[tuple[str, T]] = [
-       (getattr(obj, key), obj) for obj in pool
+    choices: list[str] = [
+       getattr(obj, key) for obj in pool
     ]
-    results = extract(
+    results = _extract(
         query, choices, 
         scorer=scorer, 
         limit=limit, 
-        processor=lambda x: x[0],
         score_cutoff=score_cutoff
     )
-    for (choice, obj), score, index in results:
-        yield score, obj
+    for choice, score, index in results:
+        yield score, pool[index]
 
 
 def simple(
     key: str,
     query: str,
     pool: Iterable[T],
-    scorer: Callable = scorer,
-    limit: int = limit,
-    score_cutoff: int = score_cutoff,
+    scorer: Callable = _scorer,
+    limit: int = _limit,
+    score_cutoff: int = _score_cutoff,
 ):
     """
     one key search
     """
+    sequence = pool if isinstance(pool, Sequence) else list(pool)
     results = _search(
-        key, query, pool, scorer, limit, score_cutoff
+        key, query, sequence, scorer, limit, score_cutoff
     )
     for score, obj in results:
         yield obj
@@ -75,22 +75,23 @@ def multi(
     *keys: str,
     query: str,
     pool: Iterable[T],
-    scorer: Callable = scorer,
-    limit: int = limit,
-    score_cutoff: int = score_cutoff,
+    scorer: Callable = _scorer,
+    limit: int = _limit,
+    score_cutoff: int = _score_cutoff,
 ):
     """
     chain from _search()
     """
-    results = []
-    if TYPE_CHECKING:
-        results = [*_search('', '', pool)]
-        
+    sequence = pool if isinstance(pool, Sequence) else list(pool)
+    results = [] if not TYPE_CHECKING else [*_search('', '', sequence)] 
     for key in keys:
         results.extend(
-            _search(key, query, pool, scorer, limit, score_cutoff)
+            _search(key, query, sequence, scorer, limit, score_cutoff)
         )
-    results.sort(reverse=True)    
+    results.sort(
+        key=lambda i: i[0], 
+        reverse=True
+    )
     yield from _filter(
         (obj for score, obj in results), limit
     )
@@ -100,9 +101,9 @@ def multi_opt(
     *keys: str,
     query: str,
     pool: Iterable[T],
-    scorer: Callable = scorer,
-    limit: int = limit,
-    score_cutoff: int = score_cutoff,
+    scorer: Callable = _scorer,
+    limit: int = _limit,
+    score_cutoff: int = _score_cutoff,
 ):  
     """
     more low level optimization, a bit faster
@@ -113,11 +114,10 @@ def multi_opt(
         for obj in sequence 
         for key in keys
     ]
-    n = len(keys)
-    results = extract(
+    results = _extract(
         query, choices, 
         scorer=scorer, 
-        limit=limit * n, 
+        limit=limit * len(keys), 
         score_cutoff=score_cutoff
     )
     yield from _filter(
@@ -129,8 +129,8 @@ def alignment(
     key: str,
     query: str,
     pool: Iterable[T],
-    limit: int = limit,
-    score_cutoff: int = score_cutoff,
+    limit: int = _limit,
+    score_cutoff: int = _score_cutoff,
 ):
     """
     alignment search with more information
@@ -152,15 +152,15 @@ def alignment(
         key=lambda i: i[0].score, 
         reverse=True
     )
-    yield from results
+    yield from results[:limit]
     
 
 def multi_alignment(
     *keys: str,
     query: str,
     pool: Iterable[T],
-    limit: int,
-    score_cutoff: int,
+    limit: int = _limit,
+    score_cutoff: int = _score_cutoff,
 ):
     """
     multi alignment search
@@ -173,68 +173,68 @@ def multi_alignment(
     results = [
         (
             [
-                ratio for choice in attrs
-                if (
+                ratio for choice in attrs if (
                     ratio := partial_ratio_alignment(
                         choice, query, score_cutoff=score_cutoff,
                     )
                 ) is not None
-            ], 
-            obj
+            ], obj
         ) for attrs, obj in choices 
     ]
     results.sort(
-        key=lambda i: max(r.score for r in i[0]), 
+        key=lambda i: max(r.score for r in i[0]) if i[0] else 0, 
         reverse=True
     )
-    yield from results
+    yield from results[:limit]
     
     
 if __name__ == '__main__':
-    import string, time
+    import string, time, dataclasses, random
     alphabet = string.ascii_letters
     
-    @dataclass(slots=True)
+    @dataclasses.dataclass(slots=True, frozen=True)
     class test:
         name: str
-        hello: str
         home: str
-        xxx: str
+        # age: str
+        # love: str
     
     s = [*test.__slots__]
     size = len(s)
-    n = 10
-    times = 20_000
-    lenght = 15
+    n = 1
+    times = 2000
+    lenght = 30
     
     t = time.time()
-    '''l = [
+    l = [
         test(
             *[
                 ''.join(
                     random.choice(alphabet) for _ in range(lenght)
-                )*2 for _ in range(size)
+                ) for _ in range(size)
             ]
         ) for _ in range(times)
-    ]'''
-    l = [
-        test(*x) for x in (
-            ('halloween', 'zxc', 'iop', 'asd'),
-            ('362', 'he', '135', '96'),
-            ('741', '675', 'hello', '14'),
-            ('haoo', 'ge', 'saA3hello0qwe', 'ol'),
-            ('h', 'e', 'l', 'l'),
-        )
     ]
+    '''l = [
+        test(*x) for x in (
+            ('halloween', 'zxc',),
+            ('hkllo', 'pppp',),
+            ('h123o', '675',),
+            ('Whelloq', 'sdawq',),
+            ('hbsbfsd', 'hi',),
+        )
+    ]'''
     kw = {'query': 'hello', 'pool': l}
     
     t1 = time.time()
     print(t1-t)
     
-    for _ in range(n):
-        f1 = list(multi_opt(*s, **kw))
+    for _ in range(n): 
+        f1 = list(multi_alignment(*s, **kw))
     t2 = time.time()
     print((t2-t1)/n)
+    
+    print('------------------')
     
     for _ in range(n):
         f2 = list(multi(*s, **kw))
