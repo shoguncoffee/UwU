@@ -1,3 +1,6 @@
+"""
+amazing search functions, Wow!
+"""
 from __future__ import annotations
 from .base import *
 
@@ -8,23 +11,30 @@ scorer = partial_ratio
 limit = 30
 score_cutoff = 50
 
+
 def _search(
     key: str,
     query: str,
-    pool: Iterable,
-    scorer: Callable,
-    limit: int,
-    score_cutoff: int,
+    pool: Iterable[T],
+    scorer: Callable = partial_ratio,
+    limit: int = limit,
+    score_cutoff: int = score_cutoff,
 ):
-    choices: list[str] = [
-        getattr(item, key) for item in pool
+    """
+    supported object-attr search for rapidfuzz.process.extract()
+    """
+    choices: list[tuple[str, T]] = [
+       (getattr(obj, key), obj) for obj in pool
     ]
-    yield from extract(
+    results = extract(
         query, choices, 
         scorer=scorer, 
         limit=limit, 
+        processor=lambda x: x[0],
         score_cutoff=score_cutoff
     )
+    for (choice, obj), score, index in results:
+        yield score, obj
 
 
 def simple(
@@ -35,25 +45,23 @@ def simple(
     limit: int = limit,
     score_cutoff: int = score_cutoff,
 ):
-    sequence: Sequence[T] = pool if isinstance(pool, Sequence) else list(pool)
-    result = _search(
-        key, query, sequence, 
-        scorer, limit, score_cutoff
+    """
+    one key search
+    """
+    results = _search(
+        key, query, pool, scorer, limit, score_cutoff
     )
-    for value, score, index in result:
-        yield sequence[index] 
-    
-    
-def _filter(
-    sequence: Sequence,
-    result: list[tuple[str, Any, int]],
-    limit: int,
-    size: int
-):
+    for score, obj in results:
+        yield obj
+
+
+def _filter(results: Iterable[T], limit: int):
+    """
+    filter duplicate object for `limit` times 
+    """
     temp = set()
     tick = iter(range(limit-1))
-    for value, score, index in result:
-        obj = sequence[index//size]
+    for obj in results: 
         if (ID := id(obj)) not in temp:
             try: 
                 yield obj
@@ -71,18 +79,21 @@ def multi(
     limit: int = limit,
     score_cutoff: int = score_cutoff,
 ):
-    sequence: Sequence[T] = pool if isinstance(pool, Sequence) else list(pool)
-    result = []
+    """
+    chain from _search()
+    """
+    results = []
+    if TYPE_CHECKING:
+        results = [*_search('', '', pool)]
+        
     for key in keys:
-        result.extend(
-            _search(
-                key, query, sequence, 
-                scorer, limit, score_cutoff
-            )
+        results.extend(
+            _search(key, query, pool, scorer, limit, score_cutoff)
         )
-    result.sort(reverse=True, key=lambda x: x[1])
-    print('normal', result)
-    yield from _filter(sequence, result, limit, len(keys))
+    results.sort(reverse=True)    
+    yield from _filter(
+        (obj for score, obj in results), limit
+    )
     
     
 def multi_opt(
@@ -93,6 +104,9 @@ def multi_opt(
     limit: int = limit,
     score_cutoff: int = score_cutoff,
 ):  
+    """
+    more low level optimization, a bit faster
+    """
     sequence: Sequence[T] = pool if isinstance(pool, Sequence) else list(pool)
     choices: list[str] = [
         getattr(obj, key) 
@@ -100,16 +114,82 @@ def multi_opt(
         for key in keys
     ]
     n = len(keys)
-    result = extract(
+    results = extract(
         query, choices, 
         scorer=scorer, 
         limit=limit * n, 
         score_cutoff=score_cutoff
     )
-    print('opt', result)
-    yield from _filter(sequence, result, limit, n)
-            
-            
+    yield from _filter(
+        (sequence[index//size] for value, score, index in results), limit
+    )
+    
+    
+def alignment(
+    key: str,
+    query: str,
+    pool: Iterable[T],
+    limit: int = limit,
+    score_cutoff: int = score_cutoff,
+):
+    """
+    alignment search with more information
+    """
+    choices: list[tuple[str, T]] = [
+        (
+            getattr(obj, key), obj
+        ) for obj in pool
+    ]
+    results = [
+        (ratio, obj) for choice, obj in choices
+        if (
+            ratio := partial_ratio_alignment(
+                choice, query, score_cutoff=score_cutoff,
+            )
+        ) is not None
+    ]
+    results.sort(
+        key=lambda i: i[0].score, 
+        reverse=True
+    )
+    yield from results
+    
+
+def multi_alignment(
+    *keys: str,
+    query: str,
+    pool: Iterable[T],
+    limit: int,
+    score_cutoff: int,
+):
+    """
+    multi alignment search
+    """
+    choices: list[tuple[list[str], T]] = [
+        (
+            [getattr(obj, key) for key in keys], obj
+        ) for obj in pool
+    ]
+    results = [
+        (
+            [
+                ratio for choice in attrs
+                if (
+                    ratio := partial_ratio_alignment(
+                        choice, query, score_cutoff=score_cutoff,
+                    )
+                ) is not None
+            ], 
+            obj
+        ) for attrs, obj in choices 
+    ]
+    results.sort(
+        key=lambda i: max(r.score for r in i[0]), 
+        reverse=True
+    )
+    yield from results
+    
+    
 if __name__ == '__main__':
     import string, time
     alphabet = string.ascii_letters
