@@ -1,32 +1,32 @@
 """
 enum constants
 """
-from enum import Enum
+from enum import Enum as _Enum
 
-FlightStatus = Enum(
+FlightStatus = _Enum(
     'FlightStatus', 'SCHEDULED CANCELLED DELAYED IN_FLIGHT ARRIVED'
 )
-PassengerType = Enum(
+PassengerType = _Enum(
     'PassengerType', 'ADULT CHILD INFANT'
 )
-TravelClass = Enum(
+TravelClass = _Enum(
     'TravelClass', 'Economy Bussiness First'
 )
-AccountStatus = Enum(
+AccountStatus = _Enum(
     'AccountStatus', 'PENDING ACTIVE SUSPENDED'
 )
-BookingStatus = Enum(
-    'BookingStatus', 'INCOMPLETE PENDING COMPLETED CANCELLED'
+BookingStatus = _Enum(
+    'BookingStatus', 'FAILED INCOMPLETE PENDING COMPLETED CANCELLED'
 )
-SeatType = Enum(
+SeatType = _Enum(
     'SeatType', 'STANDARD'
 )
-GenderType = Enum(
+GenderType = _Enum(
     'GenderType', 'MALE FEMALE'
 )
-PaymentStatus = Enum(
+PaymentStatus = _Enum(
     'PaymentStatus', 'PENDING FAILED COMPLETED'
 )
-PaymentMethod = Enum(
+PaymentMethod = _Enum(
     'PaymentMethod', 'PAYPAL INTERNETBANKING CREDITCARD'
 )
