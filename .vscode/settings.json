@@ -1,0 +1,19 @@
+{
+    "code-runner.executorMap": {
+        "python": "(cls || clear) && python3.11 -c \"import os; os.system('python3.11 -u -m ' + r'$fullFileName'.removesuffix('.py').removeprefix(r'$workspaceRoot').replace(os.sep, '.').removeprefix('.'))\""
+    },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "code-runner.showExecutionMessage": false,
+    "code-runner.clearPreviousOutput": true,
+    "code-runner.saveFileBeforeRun": true,
+    "code-runner.runInTerminal": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUnboundVariable": "information",
+        "reportGeneralTypeIssues": "information",
+        "reportWildcardImportFromLibrary": "none",
+        "reportSelfClsParameterName": "none",
+        "reportInvalidTypeVarUse": "none"
+    },
+}
