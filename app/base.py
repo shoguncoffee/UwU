@@ -2,9 +2,8 @@
 fancy variables and functions
 """
 from __future__ import annotations
-#from .utils.checking import *
+# from .utils.checking import *
 from .utils.packages import *
 if TYPE_CHECKING:
-    ...
-else:
-    ...
+    T = TypeVar('T')
+    U = TypeVar('U')
