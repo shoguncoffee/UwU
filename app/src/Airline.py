@@ -18,12 +18,14 @@ class Airline:
         return cls._instance
     
     def __init__(self, boot: bool = False):
+        self.__aircraft = AircraftCatalog()
+        self.__airport = AirportCatalog()
+        
         self.__schedule = ScheduleCatalog()
         self.__plan = FlightScheduling()
         self.__flight = FlightCatalog()
+        
         self.__accounts = AccountCatalog()
-        self.__aircraft = AircraftCatalog()
-        self.__airport = AirportCatalog()
         
         if boot:
             self.init_aircraft()
@@ -69,6 +71,7 @@ class Airline:
             data = ...
             return
     
+    
     @classmethod
     def create_booking(cls,
         creator: Customer,
@@ -96,11 +99,31 @@ class Airline:
     
     @classmethod
     def register(cls, account: Account):
-        if account.username not in cls.accounts:
-            cls.accounts.append(account)
-        else:
-            return False
+        if account not in cls.accounts:
+            cls.accounts.add(account)
+            return True
+        
+        return False
 
+    @classmethod
+    def search_journey(self,
+        date: date
+    ):
+        self.schedule[date].search(
+            
+        )
+        return
+    
+    @classmethod
+    def search_return_journey(self, 
+        origin: Airport, 
+        destination: Airport, 
+        dates: tuple[date, date],
+        pax: int,
+    ):
+        return self.search_journey(origin, destination, date)
+    
+    
 
 if __name__ == '__main__':
     Airline()
