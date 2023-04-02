@@ -1,16 +1,13 @@
 from __future__ import annotations
 from ..base import *
+
 from ..information import Info
 
 
-@dataclass(init=False, slots=True, unsafe_hash=True)
+@dataclass(slots=True, frozen=True)
 class Aircraft:
-    __model: str
-    __desks: tuple[Desk, ...]
-    
-    def __init__(self, model: str, *desk: Desk):
-        self.__model = model
-        self.__desks = desk
+    __model: str # type: ignore
+    __desks: tuple[Desk, ...] # type: ignore
     
     @property
     def model(self):
@@ -47,12 +44,9 @@ class Aircraft:
         }
         
 
-@dataclass(init=False, slots=True, unsafe_hash=True)
+@dataclass(slots=True, frozen=True)
 class Desk:
-    __cabins: tuple[CabinLayout, ...]
-
-    def __init__(self, *cabin: CabinLayout):
-        self.__cabins = cabin
+    __cabins: tuple[CabinLayout, ...] # type: ignore
     
     @property
     def cabins(self):

@@ -9,11 +9,8 @@ class Account:
     _password: str
     _email: str
     _phone: str
-    _status: AccountStatus = field(init=False, default=AccountStatus.PENDING)
+    _status: AccountStatus = field(init=False, compare=False, default=AccountStatus.PENDING)
     # __reference: str = field(init=False)
-    
-    def __hash__(self):
-        return hash(self._username)
     
     @property
     def username(self):
@@ -46,8 +43,8 @@ class Customer(Account):
         contact: ContactInformation,
         *passenger: PassengerDetails,
     ):
-        from app.src import Airline
         if self.status != AccountStatus.PENDING:
+            from app.system import Airline
             Airline.create_booking(
                 self, 
                 journey, 
@@ -67,5 +64,5 @@ class Customer(Account):
     
 @dataclass(slots=True)
 class Admin(Account):
-    def add(self):
+    def request(self):
         ...

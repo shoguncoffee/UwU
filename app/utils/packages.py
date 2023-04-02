@@ -15,11 +15,10 @@ from uuid import UUID, uuid4
 from math import ceil, floor
 from random import randint
 from itertools import (
-    count, 
     product,
-    chain, 
     repeat, 
     islice, 
+    count, 
     cycle
 )
 from abc import ABC, abstractmethod

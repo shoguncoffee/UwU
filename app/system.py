@@ -5,7 +5,7 @@ from __future__ import annotations
 from .base import *
 
 if TYPE_CHECKING:
-    from app.src import *
+    from .src import *
     
 from .src.catalog import *
 from .src.booking_related import Booking
@@ -21,22 +21,22 @@ class Airline:
         return cls._instance
     
     def __init__(self):
-        self.__aircraft = AircraftCatalog()
-        self.__airport = AirportCatalog()
-        self.__schedule = ScheduleCatalog()
-        self.__plan = FlightScheduling()
-        self.__flight = FlightCatalog()
+        self.__aircrafts = AircraftCatalog()
+        self.__airports = AirportCatalog()
         self.__accounts = AccountCatalog()
+        self.__flights = FlightCatalog()
+        self.__plans = FlightScheduling()
+        self.__schedules = ScheduleCatalog()
     
     @classmethod
     @property
-    def schedule(cls):
-        return cls._instance.__schedule
+    def schedules(cls):
+        return cls._instance.__schedules
     
     @classmethod
     @property
-    def flight(cls):
-        return cls._instance.__flight
+    def flights(cls):
+        return cls._instance.__flights
     
     @classmethod
     @property
@@ -45,18 +45,18 @@ class Airline:
     
     @classmethod
     @property
-    def aircraft(cls):
-        return cls._instance.__aircraft
+    def aircrafts(cls):
+        return cls._instance.__aircrafts
     
     @classmethod
     @property
-    def airport(cls):
-        return cls._instance.__airport
+    def airports(cls):
+        return cls._instance.__airports
     
     @classmethod
     @property
-    def plan(cls):
-        return cls._instance.__plan
+    def plans(cls):
+        return cls._instance.__plans
     
     @classmethod
     def create_booking(cls,
@@ -98,7 +98,7 @@ class Airline:
         date: date,
         pax: int,
     ):
-        result = cls.schedule[date].search(
+        result = cls.schedules[date].route_search(
             origin, destination, 
         )
         return [
@@ -131,5 +131,5 @@ class Airline:
     
 
 if __name__ == '__main__':
-    print(Airline.aircraft)
-    print(Airline.airport)
+    print(Airline.aircrafts)
+    
