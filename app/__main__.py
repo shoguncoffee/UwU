@@ -8,10 +8,12 @@ for this package:
 for individual submodule in this package:
 - ``\UwU> python -m app.<module>`
 """
+import pickle
 from .src import *
-from .src.airline import Airline
+from base import *
+from .system import Airline
 
-airline = Airline()
+Airline()
 
 airport1 = Airport(
     'Homad International Airport',
@@ -28,22 +30,24 @@ airport3 = Airport(
 
 aircraft1 = Aircraft(
     'Boeing 747',
-    Desk(
-        CabinLayout(
-            TravelClass.Economy, frozenset([
-                Seat(1, 1, SeatType.STANDARD),
-                Seat(1, 2, SeatType.STANDARD),
-                Seat(1, 3, SeatType.STANDARD),
-            ])
-        ),
-        CabinLayout(
-            TravelClass.Bussiness, frozenset([
-                Seat(1, 1, SeatType.STANDARD),
-                Seat(1, 2, SeatType.STANDARD),
-                Seat(1, 3, SeatType.STANDARD),
-            ])
-        )
-    )
+    (
+        Desk((
+            CabinLayout(
+                TravelClass.Economy, frozenset([
+                    Seat(1, 1, SeatType.STANDARD),
+                    Seat(1, 2, SeatType.STANDARD),
+                    Seat(1, 3, SeatType.STANDARD),
+                ])
+            ),
+            CabinLayout(
+                TravelClass.Bussiness, frozenset([
+                    Seat(1, 1, SeatType.STANDARD),
+                    Seat(1, 2, SeatType.STANDARD),
+                    Seat(1, 3, SeatType.STANDARD),
+                ])
+            )
+        ))
+    ,)
 )
 
 flight1 = Flight(
@@ -68,19 +72,19 @@ flight4 = Flight(
 )
 
 flightin1 = FlightInstance(
-    flight1, date(2023, 1, 18),
+    date(2023, 1, 18), flight1, 
     aircraft1, 50_000
 )
 flightin2 = FlightInstance(
-    flight2, date(2023, 1, 18),
+    date(2023, 1, 18), flight2, 
     aircraft1, 50_000
 )
 flightin3 = FlightInstance(
-    flight3, date(2023, 1, 23),
+    date(2023, 1, 23), flight3, 
     aircraft1, 50_000
 )
 flightin4 = FlightInstance(
-    flight4, date(2023, 1, 23),
+    date(2023, 1, 23), flight4, 
     aircraft1, 50_000
 )
 
@@ -93,8 +97,7 @@ client1 = Customer(
 passengerDetails1 = PassengerDetails(
     'Plum', 'Arpleum',
     date(1999, 1, 1),
-    'Thai',
-    '254123543',
+    'Thai', '254123543',
     GenderType.MALE,
     PassengerType.ADULT,
 )
@@ -115,3 +118,9 @@ client1.request_booking(
     contact1,
     passengerDetails1,
 )
+
+if __name__ == '__main__a':
+    with open('', 'rb') as f:
+        pickle.load(f)
+    if 0:
+        Airline()
