@@ -2,14 +2,29 @@
 """
 from __future__ import annotations
 from ..base import *
+
 if TYPE_CHECKING:
     from app.src import *
     
+    
 @dataclass(slots=True)
 class Deviation:
+    """
+    A exception to a FlightPlan
+
+        - 0 <= weekday <= 6
+        - 1 <= month <= 12
+    """
     __weekdays: set[int] = field(default_factory=set) # type: ignore
     __months: set[int] = field(default_factory=set) # type: ignore
     __dates: set[date] = field(default_factory=set) # type: ignore
+    
+    def __contains__(self, d: date):
+        return (
+            d.weekday() in self.weekdays
+            or d.month in self.months
+            or d in self.dates
+        )
     
     @property
     def weekdays(self):
@@ -26,36 +41,82 @@ class Deviation:
 
 @dataclass(slots=True)
 class FlightPlan:
+    """
+    A plan which tell what Flight will be available (operated) 
+    on what period of time or range of dates
+    """
     __flight: Flight # type: ignore
-    __start_date: date # type: ignore
-    __end_date: Optional[date] = None # type: ignore
+    __start: date # type: ignore
+    __end: date = date.max # type: ignore
     __exception: Deviation = field(default_factory=Deviation) # type: ignore
+    
+    _: KW_ONLY
+    __default_aircraft: Aircraft # type: ignore
+    __default_fare: float # type: ignore
+    
+    def __contains__(self, value: date | FlightPlan):
+        """
+        value: date
+            check if it is in the range of this plan
+        
+        value: FlightPlan
+            check if it is overlapping with this plan
+        """
+        if isinstance(value, date):
+            return (
+                self.start <= value <= self.end
+                and value not in self.exception
+            )
+        if isinstance(value, FlightPlan):
+            if (
+                value.start > self.end or 
+                self.start > value.end
+            ):
+                return False
+            
+            base = set(self.get_dates())
+            for _date in value.get_dates():
+                if _date in base:
+                    return True
+                
+            return False
+    
     
     @property
     def flight(self):
         return self.__flight
     
     @property
-    def start_date(self):
-        return self.__start_date
+    def start(self):
+        return self.__start
     
     @property
-    def end_date(self):
-        return self.__end_date
+    def end(self):
+        return self.__end
     
     @property
     def exception(self):
         return self.__exception
     
     @property
+    def default_aircraft(self):
+        return self.__default_aircraft
+    
+    @property
+    def default_fare(self):
+        return self.__default_fare
+    
+    @property
     def duration(self):
-        """
-        if not have end date, return None
-        """
-        if self.__end_date:
-            return self.__end_date - self.__start_date
-        
+        return self.end - self.start
+    
+    def get_dates(self):
+        days = self.duration.days
+        for date in daterange(days, self.start):
+            if date not in self.exception:
+                yield date
+    
     
     def scheduled(self):
-        from app.src import Airline
-        Airline.plan.add(self)
+        from app.system import Airline
+        Airline.plans.add(self)
