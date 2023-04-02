@@ -8,8 +8,24 @@ from rapidfuzz.process import extract as _extract
 from rapidfuzz.fuzz import *
 
 _scorer = partial_ratio
-_limit = 24
+_limit = 30
 _score_cutoff = 50
+
+
+def basic(
+    key: str,
+    pool: Collection[str],
+    scorer: Callable = _scorer,
+    limit: Optional[int] = _limit,
+    score_cutoff: Optional[int] = _score_cutoff,
+):
+    for choice, score, index in _extract(
+        key, pool, 
+        scorer = scorer, 
+        limit = limit, 
+        score_cutoff = score_cutoff
+    ):
+        yield choice
 
 
 def _search(
@@ -17,8 +33,8 @@ def _search(
     query: str,
     pool: Sequence[T],
     scorer: Callable = _scorer,
-    limit: int = _limit,
-    score_cutoff: int = _score_cutoff,
+    limit: Optional[int] = _limit,
+    score_cutoff: Optional[int] = _score_cutoff,
 ):
     """
     supported object-attr search for rapidfuzz.process._extract()
@@ -28,9 +44,9 @@ def _search(
     ]
     results = _extract(
         query, choices, 
-        scorer=scorer, 
-        limit=limit, 
-        score_cutoff=score_cutoff
+        scorer = scorer, 
+        limit = limit, 
+        score_cutoff = score_cutoff
     )
     for choice, score, index in results:
         yield score, pool[index]
@@ -41,13 +57,13 @@ def simple(
     query: str,
     pool: Iterable[T],
     scorer: Callable = _scorer,
-    limit: int = _limit,
-    score_cutoff: int = _score_cutoff,
+    limit: Optional[int] = _limit,
+    score_cutoff: Optional[int] = _score_cutoff,
 ):
     """
     one key search
     """
-    sequence = pool if isinstance(pool, Sequence) else list(pool)
+    sequence = pool if isinstance(pool, Sequence) else [*pool]
     results = _search(
         key, query, sequence, scorer, limit, score_cutoff
     )
@@ -55,12 +71,12 @@ def simple(
         yield obj
 
 
-def _filter(results: Iterable[T], limit: int):
+def _filter(results: Iterable[T], limit: Optional[int]):
     """
     filter duplicate object for `limit` times 
     """
     temp = set()
-    tick = iter(range(limit-1))
+    tick = iter(range(limit-1) if limit else repeat(None))
     for obj in results: 
         if (ID := id(obj)) not in temp:
             try: 
@@ -76,21 +92,21 @@ def multi(
     query: str,
     pool: Iterable[T],
     scorer: Callable = _scorer,
-    limit: int = _limit,
-    score_cutoff: int = _score_cutoff,
+    limit: Optional[int] = _limit,
+    score_cutoff: Optional[int] = _score_cutoff,
 ):
     """
     chain from _search()
     """
-    sequence = pool if isinstance(pool, Sequence) else list(pool)
+    sequence = pool if isinstance(pool, Sequence) else [*pool]
     results = [] if not TYPE_CHECKING else [*_search('', '', sequence)] 
     for key in keys:
         results.extend(
             _search(key, query, sequence, scorer, limit, score_cutoff)
         )
     results.sort(
-        key=lambda i: i[0], 
-        reverse=True
+        key = lambda i: i[0], 
+        reverse = True
     )
     yield from _filter(
         (obj for score, obj in results), limit
@@ -102,13 +118,13 @@ def multi_opt(
     query: str,
     pool: Iterable[T],
     scorer: Callable = _scorer,
-    limit: int = _limit,
-    score_cutoff: int = _score_cutoff,
+    limit: Optional[int] = _limit,
+    score_cutoff: Optional[int] = _score_cutoff,
 ):  
     """
-    more low level optimization, a bit faster
+    more low-level optimizations
     """
-    sequence: Sequence[T] = pool if isinstance(pool, Sequence) else list(pool)
+    sequence: Sequence[T] = pool if isinstance(pool, Sequence) else [*pool]
     choices: list[str] = [
         getattr(obj, key) 
         for obj in sequence 
@@ -116,9 +132,9 @@ def multi_opt(
     ]
     results = _extract(
         query, choices, 
-        scorer=scorer, 
-        limit=limit * len(keys), 
-        score_cutoff=score_cutoff
+        scorer = scorer, 
+        limit = limit and limit * len(keys), 
+        score_cutoff = score_cutoff
     )
     yield from _filter(
         (sequence[index//size] for value, score, index in results), limit
@@ -129,8 +145,8 @@ def alignment(
     key: str,
     query: str,
     pool: Iterable[T],
-    limit: int = _limit,
-    score_cutoff: int = _score_cutoff,
+    limit: Optional[int] = _limit,
+    score_cutoff: Optional[int] = _score_cutoff,
 ):
     """
     alignment search with more information
@@ -159,8 +175,8 @@ def multi_alignment(
     *keys: str,
     query: str,
     pool: Iterable[T],
-    limit: int = _limit,
-    score_cutoff: int = _score_cutoff,
+    limit: Optional[int] = _limit,
+    score_cutoff: Optional[int] = _score_cutoff,
 ):
     """
     multi alignment search
