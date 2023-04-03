@@ -1,7 +1,8 @@
 from __future__ import annotations
 from ..base import *
+
 if TYPE_CHECKING:
-    from app.src import *
+    from app.src import Booking, Trip, ContactInformation, PassengerDetails
 
 @dataclass(slots=True)
 class Account:
@@ -31,7 +32,7 @@ class Account:
     
 @dataclass(slots=True)
 class Customer(Account):
-    __bookings: set[Booking] = field(init=False, default_factory=set)
+    __bookings: list[Booking] = field(init=False, default_factory=list)
     
     @property
     def bookings(self):
@@ -53,7 +54,7 @@ class Customer(Account):
             )
 
     def add_booking(self, booking: Booking):
-        self.__bookings.add(booking)            
+        self.__bookings.append(booking)            
     
     def selected_booking(self, num):
         ...
