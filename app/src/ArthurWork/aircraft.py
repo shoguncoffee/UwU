@@ -78,12 +78,30 @@ class Desk:
             seat for cabin in self.get_cabins_of(travel_class)
             for seat in cabin.seats
         }
-
+        
+    @classmethod
+    def generate(cls,
+        *layouts: tuple[
+            TravelClass, 
+            Sequence[
+                tuple[int, Sequence[int]]
+            ]              
+        ]
+    ):
+        return cls(tuple(
+            CabinLayout.generate(
+                travel_class, *layout, 
+                initial_row=sum(
+                    sum(q[0] for q in k[1]) for k in layouts[:i]
+                )
+            ) for i, (travel_class, layout) in enumerate(layouts)
+        ))
+        
 
 @dataclass(slots=True, frozen=True)
 class CabinLayout:
     __travel_class: TravelClass # type: ignore
-    __seats: frozenset[Seat] # type: ignore
+    __seats: frozenset[Seat] = field(repr=False) # type: ignore
     
     @property
     def travel_class(self):
@@ -93,10 +111,51 @@ class CabinLayout:
     def seats(self):
         return self.__seats
     
+    @classmethod
+    def generate(cls, 
+        travel_class: TravelClass,
+        *layout: tuple[int, Sequence[int]],
+        initial_row: int = 1,
+    ):
+        """
+        generate a CabinLayout
+        """
+        l = []
+        for lenght, config in layout:
+            width = sum(config)
+            aisle = {
+                sum(config[:i]) - k
+                for i in range(1, len(config)) 
+                for k in range(2)
+            }
+            for row, column in product(
+                range(1, lenght+1), range(1, width+1)
+            ):
+                type = SeatType.COMMON
+                info = Info()
+                
+                if row == 1:
+                    type = SeatType.LEGROOM
+                    info.append('Seat has more legroom')
+                
+                if column in aisle:
+                    info.append('Seat has direct access to the aisle')
+                    
+                if column in (1, width):
+                    info.append('Seat has access to the window')
+                
+                letter = ascii_uppercase[column-1]                
+                l.append(Seat(
+                    initial_row + row, letter, column, type, info
+                    )
+                )
+        return cls(travel_class, frozenset(l))
+
 
 @dataclass(slots=True, frozen=True)
 class Seat:
     __row: int # type: ignore
+    __letter: str # type: ignore
     __column: int # type: ignore
     __type: SeatType # type: ignore
     __description: Info = field(hash=False, default_factory=Info) # type: ignore
@@ -104,6 +163,10 @@ class Seat:
     @property
     def row(self):
         return self.__row
+    
+    @property
+    def letter(self):
+        return self.__letter
     
     @property
     def column(self):
@@ -116,3 +179,6 @@ class Seat:
     @property
     def description(self):
         return self.__description
+    
+    def get_number(self):
+        return str(self.row) + self.letter
