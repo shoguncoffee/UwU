@@ -4,7 +4,7 @@ Catalog
 from __future__ import annotations
 from .base import *
 
-from . import search
+from app.utils import search
 from app.src import (
     Account,
     Airport,
@@ -146,9 +146,9 @@ class ScheduleCatalog(dict[date, ScheduleDate]):
     
 class FlightCatalog(list[Flight]):
     def search(self, designator: str):
-        return search.simple(
-            'designator', designator, self
-        )
+        return [
+            *search.simple('designator', designator, self)
+        ]
         
     def route_search(self,
         origin: Airport,
@@ -259,7 +259,105 @@ class AccountCatalog(dict[str, Account]):
 
 
 if __name__ == '__main__':
-    q = AccountCatalog()
-    a = Account('admin', 'admin', 'admin', 'admin')
-    q.add(a)
-    x = 'admin' in q
+    acc = AccountCatalog()
+    acc1 = Account(
+        'admin', 'admin', 
+        'jinny@uwu.com', '0000'
+    )
+    acc2 = Account(
+        'user', '123456', 
+        'jame@uwu.com', '0000'
+    )
+    acc.add(acc1)
+    
+    port = AirportCatalog()
+    port1 = Airport(
+        'Don Mueang International Airport', 
+        'DMK', 'Bangkok', 'Thailand'
+    )
+    port2 = Airport(
+        'Cairo International Airport', 
+        'CAI', 'Cairo', 'Egypt'
+    )
+    port.add(port1)
+    
+    
+    from app.src import Desk
+        
+    craft = AircraftCatalog()
+    craft1 = Aircraft(
+        'Boeing 777', (
+            Desk.generate(
+                (TravelClass.BUSSINESS, [
+                    (4, [2, 2, 2])
+                ]),
+                (TravelClass.BUSSINESS, [
+                    (3, [2, 2, 2])
+                ]),
+                (TravelClass.ECONOMY, [
+                    (2, [3, 3, 3]),
+                    (8, [3, 4, 3]),
+                    (1, [0, 4, 0])
+                ]),
+                (TravelClass.ECONOMY, [
+                    (2, [3, 3, 3]),
+                    (8, [3, 4, 3]),
+                    (3, [3, 3, 3]),
+                    (1, [2, 3, 2]),
+                ])
+            ),
+        )
+    )
+    craft2 = Aircraft(
+        'Airbus 320', (
+            Desk.generate(
+                (TravelClass.BUSSINESS, [
+                    (4, [2, 2, 2])
+                ]),
+                (TravelClass.BUSSINESS, [
+                    (3, [2, 2, 2])
+                ]),
+                (TravelClass.ECONOMY, [
+                    (10, [3, 2, 3])
+                ]),
+                (TravelClass.ECONOMY, [
+                    (10, [3, 2, 3])
+                ])
+            ),
+        )
+    )
+    craft.add(craft1)
+    
+    flight = FlightCatalog()
+    flight1 = Flight(
+        'UWU294', 
+        time(12, 30), time(13, 50), 
+        port1, port2
+    )
+    flight2 = Flight(
+        'UWU1648', 
+        time(8, 20), time(10, 40), 
+        port2, port1
+    )
+    flight.add(flight1)
+    
+    schedule = ScheduleCatalog()
+    d1 = ScheduleDate()
+    schedule.add(
+        date(2023, 2, 1), d1
+    )
+    
+    q = FlightScheduling(3)
+    q1 = FlightPlan(
+        flight1, 
+        date(2022, 11, 1), date(2023, 6, 24),
+        default_aircraft=craft1,
+        default_fare=20_000
+    )
+    q1 = FlightPlan(
+        flight2,
+        date(2023, 2, 3), date(2023, 5, 6),
+        default_aircraft=craft2,
+        default_fare=30_000
+    )
+    q.add(q1)
