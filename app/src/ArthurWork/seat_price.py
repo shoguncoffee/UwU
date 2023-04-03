@@ -1,6 +1,7 @@
 from __future__ import annotations
 from ..base import *
 
+
 @dataclass(slots=True)
 class SeatPrice:
     __price: float # type: ignore

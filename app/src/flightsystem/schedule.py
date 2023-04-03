@@ -4,7 +4,7 @@ from __future__ import annotations
 from ..base import *
 
 if TYPE_CHECKING:
-    from app.src import *
+    from app.src import Flight
     
     
 @dataclass(slots=True)
@@ -51,8 +51,8 @@ class FlightPlan:
     __exception: Deviation = field(default_factory=Deviation) # type: ignore
     
     _: KW_ONLY
-    __default_aircraft: Aircraft # type: ignore
-    __default_fare: float # type: ignore
+    default_aircraft: Aircraft # type: ignore
+    default_fare: float # type: ignore
     
     def __contains__(self, value: date | FlightPlan):
         """
@@ -97,15 +97,7 @@ class FlightPlan:
     @property
     def exception(self):
         return self.__exception
-    
-    @property
-    def default_aircraft(self):
-        return self.__default_aircraft
-    
-    @property
-    def default_fare(self):
-        return self.__default_fare
-    
+
     @property
     def duration(self):
         return self.end - self.start

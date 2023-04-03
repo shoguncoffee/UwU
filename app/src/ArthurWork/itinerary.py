@@ -1,7 +1,9 @@
 from __future__ import annotations
 from ..base import *
+
 if TYPE_CHECKING:
-    from app.src import *
+    from app.src import FlightInstance
+
 
 @dataclass(init=False, slots=True, unsafe_hash=True)
 class FlightItinerary:

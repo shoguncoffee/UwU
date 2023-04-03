@@ -8,7 +8,7 @@ class HasReference(ABC):
     """
     base on uuid4
     """
-    # reference: Optional[UUID]
+    # reference: Optional[UUID] = reference or self.generate_reference() # type: ignore
     @abstractmethod
     def get_reference_pool(self) -> Collection:
         pass 

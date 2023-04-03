@@ -1,6 +1,7 @@
 from __future__ import annotations
 from ..base import *
 
+
 @dataclass(slots=True)
 class PassengerDetails:
     __forename: str # type: ignore
@@ -46,7 +47,3 @@ class PassengerDetails:
 
     def change_forename(self, name: str):
         self.__forename = name
-        
-        
-if __name__ == '__main__':
-    '''man = PassengerDetails(*(str(i) for i in range(7)))'''
