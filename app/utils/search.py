@@ -2,7 +2,7 @@
 amazing search functions, Wow!
 """
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 from rapidfuzz.process import extract as _extract
 from rapidfuzz.fuzz import *
