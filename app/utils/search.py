@@ -130,10 +130,11 @@ def multi_opt(
         for obj in sequence 
         for key in keys
     ]
+    size = len(keys)
     results = _extract(
         query, choices, 
         scorer = scorer, 
-        limit = limit and limit * len(keys), 
+        limit = limit and limit * size, 
         score_cutoff = score_cutoff
     )
     yield from _filter(
