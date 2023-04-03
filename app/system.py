@@ -4,11 +4,7 @@ system
 from __future__ import annotations
 from .base import *
 
-if TYPE_CHECKING:
-    from .src import *
-    
-from .src.catalog import *
-from .src.booking_related import Booking
+from .src import *
 
 
 class Airline:
@@ -25,8 +21,8 @@ class Airline:
         self.__airports = AirportCatalog()
         self.__accounts = AccountCatalog()
         self.__flights = FlightCatalog()
-        self.__plans = FlightScheduling()
         self.__schedules = ScheduleCatalog()
+        self.__plans = FlightScheduling()
     
     @classmethod
     @property
@@ -91,6 +87,7 @@ class Airline:
         
         return False
 
+
     @classmethod
     def search_segment(cls,
         origin: Airport, 
@@ -111,11 +108,18 @@ class Airline:
         stops: list[Airport], 
         date: date,
         pax: int,
+        daylimit: int = 2,
     ): 
-        for org, dst in zip(stops, stops[1:]):
-            result = cls.search_segment(
+        possible = [
+            cls.search_segment(
                 org, dst, date, pax
-            )
+            ) for org, dst in zip(stops, stops[1:])
+        ]
+        for result in product(*possible):
+            ...
+            
+        results = ...
+        return
     
     @classmethod
     def search_return(cls, 
@@ -124,12 +128,19 @@ class Airline:
         dates: tuple[date, date],
         pax: int,
     ):  
+        return search_multicity(
+            
+        )
+        ...
+        
+    @classmethod
+    def search_multicity(cls, 
+        origin: Airport, 
+        destinations: tuple[date, Airport], 
+        pax: int,
+    ):  
         return [
-            cls.search_segment(origin, destination, date, pax)
+            cls.search_journey([origin, destination], date, pax)
             for date in dates
         ]
-    
-
-if __name__ == '__main__':
-    print(Airline.aircrafts)
-    
+        ...
