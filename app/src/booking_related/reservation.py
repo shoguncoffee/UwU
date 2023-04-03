@@ -1,15 +1,17 @@
 from __future__ import annotations
 from ..base import *
-if TYPE_CHECKING:
-    from app.src import *
 
-@dataclass(slots=True, unsafe_hash=True)
+if TYPE_CHECKING:
+    from app.src import FlightInstance, Booking, PassengerDetails, Seat
+
+
+@dataclass(slots=True)
 class FlightReservation:
     __flight: FlightInstance # type: ignore
     __travel_class: TravelClass # type: ignore
     __holder: Booking # type: ignore
     
-    __reservation: Optional[tuple[SeatReservation]] = field(init=False, hash=False, default=None)
+    __reservation: Optional[tuple[SeatReservation]] = field(init=False, default=None)
 
     @property
     def flight(self):

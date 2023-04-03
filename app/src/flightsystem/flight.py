@@ -2,7 +2,7 @@ from __future__ import annotations
 from ..base import *
 
 if TYPE_CHECKING:
-    from app.src import *     
+    from app.src import FlightStatus, FlightReservation, Aircraft, Airport
 
 
 @dataclass(slots=True)
@@ -52,10 +52,9 @@ class FlightInstance:
     __date: date # type: ignore
     __flight: Flight # type: ignore
     __aircraft: Aircraft # type: ignore
-    
     __base_fare: float # type: ignore
     
-    __booking_record: set[FlightReservation] = field(init=False, default_factory=set)
+    __booking_record: list[FlightReservation] = field(init=False, default_factory=list)
     __status: FlightStatus = field(init=False, default=FlightStatus.SCHEDULED)
     
     @property
@@ -111,10 +110,10 @@ class FlightInstance:
         """
         get all confirmed reservations of this FlightInstance
         """
-        return {
+        return [
             reservation for reservation in self.booking_record 
             if reservation.holder.status == BookingStatus.COMPLETED
-        }
+        ]
     
     def get_occupied_of(self, travel_class: TravelClass):
         """
@@ -129,10 +128,10 @@ class FlightInstance:
         """
         get confirmed reservations that match travel_class of this FlightInstance
         """
-        return {
+        return [
             reservation for reservation in self.get_all_comfirmed() 
             if reservation.travel_class == travel_class
-        }
+        ]
 
     def bookable(self, travel_class: TravelClass, pax: int):
         """
@@ -152,4 +151,4 @@ class FlightInstance:
         )
     
     def booked(self, reservation: FlightReservation):
-        self.booking_record.add(reservation)
+        self.booking_record.append(reservation)

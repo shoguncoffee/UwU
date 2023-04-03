@@ -1,23 +1,24 @@
 from __future__ import annotations
 from ..base import *
-if TYPE_CHECKING:
-    from app.src import *
+
 from dataclasses import InitVar
 from .reservation import FlightReservation
+if TYPE_CHECKING:
+    from app.src import *
 
-@dataclass(slots=True, unsafe_hash=True)
-class Booking: #(HasReference):
+
+@dataclass(slots=True)
+class Booking:
     __datetime: datetime = field(init=False, default_factory=datetime.now)
-    # __reference: Optional[UUID] = reference or self.generate_reference() # type: ignore
     
-    __creator: Customer = field(hash=False) # type: ignore
+    __creator: Customer # type: ignore
     __journey: InitVar[list[Trip]] # type: ignore
-    __contactinfo: ContactInformation = field(hash=False) # type: ignore
-    __passenger: tuple[PassengerDetails, ...] = field(hash=False) # type: ignore
+    __contactinfo: ContactInformation # type: ignore
+    __passenger: tuple[PassengerDetails, ...] # type: ignore
     
-    __reservation: tuple[FlightReservation, ...] = field(init=False, hash=False)
-    __payment: Optional[Payment] = field(init=False, hash=False, default=None)
-    __status: BookingStatus = field(init=False, hash=False, default=BookingStatus.INCOMPLETE)
+    __reservation: tuple[FlightReservation, ...] = field(init=False)
+    __payment: Optional[Payment] = field(init=False, default=None)
+    __status: BookingStatus = field(init=False, default=BookingStatus.INCOMPLETE)
 
     def __post_init__(self, journey: list[Trip]):
         self.__reservation = tuple(
