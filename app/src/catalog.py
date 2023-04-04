@@ -200,11 +200,11 @@ class AircraftCatalog(dict[str, Aircraft]):
         
         return key in self.values()
     
-    def add(self, aricraft: Aircraft):
-        self[aricraft.model] = aricraft
+    def add(self, aircraft: Aircraft):
+        self[aircraft.model] = aircraft
     
-    def remove(self, aricraft: Aircraft):
-        del self[aricraft.model]
+    def remove(self, aircraft: Aircraft):
+        del self[aircraft.model]
     
     def search(self, model: str):
         return [
@@ -347,7 +347,7 @@ if __name__ == '__main__':
         date(2023, 2, 1), d1
     )
     
-    q = FlightScheduling(3)
+    '''q = FlightScheduling(3)
     q1 = FlightPlan(
         flight1, 
         date(2022, 11, 1), date(2023, 6, 24),
@@ -360,4 +360,4 @@ if __name__ == '__main__':
         default_aircraft=craft2,
         default_fare=30_000
     )
-    q.add(q1)
+    q.add(q1)'''

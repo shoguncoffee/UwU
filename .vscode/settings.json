@@ -1,6 +1,6 @@
 {
     "code-runner.executorMap": {
-        "python": "(cls || clear) && python3.11 -c \"import os; os.system('python3.11 -u -m ' + r'$fullFileName'.removesuffix('.py').removeprefix(r'$workspaceRoot').replace(os.sep, '.').removeprefix('.'))\""
+        "python": "(cls || clear) && python3.11 -c \"import os; os.system('python3.11 -i -u -m' + r'$fullFileName'.removesuffix('.py').removeprefix(r'$workspaceRoot').replace(os.sep, '.').removeprefix('.'))\""
     },
     "terminal.integrated.defaultProfile.windows": "Command Prompt",
     "code-runner.showExecutionMessage": false,
