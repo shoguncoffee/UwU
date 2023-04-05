@@ -22,7 +22,12 @@ airport5 = Airport(
     'Cairo International Airport', 
     'CAI', 'Cairo', 'Egypt'
 )
-
+for airport in (
+    airport1, airport2, airport3, airport4, airport5
+):
+    Airline.airports.add(airport)
+    
+    
 aircraft1 = Aircraft(
     'Boeing 777', (
         Desk.generate(
@@ -64,7 +69,12 @@ aircraft2 = Aircraft(
         ),
     )
 )
-
+for aircraft in (
+    aircraft1, aircraft2
+):
+    Airline.aircrafts.add(aircraft)
+    
+    
 flight1 = Flight(
     'Q0001',
     time(8, 0), time(15, 20),
@@ -85,6 +95,11 @@ flight4 = Flight(
     time(16, 0), time(23, 20),
     airport2, airport1
 )
+for flight in (
+    flight1, flight2, flight3, flight4
+):
+    Airline.flights.add(flight)
+
 
 client1 = Customer(
     'Plum123',
@@ -92,25 +107,44 @@ client1 = Customer(
     '516516@kmitl.com',   
     '0812345678',
 )
+Airline.accounts.add(client1)
+
+
+schedule1 = ScheduleDate()
+Airline.schedules.add(date(2023, 1, 18), schedule1)
+
+flightin1 = FlightInstance(
+    date(2023, 1, 18), flight1, 
+    aircraft1, 50_000
+)
+flightin2 = FlightInstance(
+    date(2023, 1, 18), flight2, 
+    aircraft1, 50_000
+)
+for instance in (
+    flightin1, flightin2
+):
+    schedule1.add(instance)
+
+
+schedule2 = ScheduleDate()
+Airline.schedules.add(date(2023, 1, 23), schedule2)
+
+flightin3 = FlightInstance(
+    date(2023, 1, 23), flight3, 
+    aircraft1, 50_000
+)
+flightin4 = FlightInstance(
+    date(2023, 1, 23), flight4, 
+    aircraft1, 50_000
+)
+for instance in (
+    flightin3, flightin4
+):
+    schedule2.add(instance)
+
 
 if 0:
-    flightin1 = FlightInstance(
-        date(2023, 1, 18), flight1, 
-        aircraft1, 50_000
-    )
-    flightin2 = FlightInstance(
-        date(2023, 1, 18), flight2, 
-        aircraft1, 50_000
-    )
-    flightin3 = FlightInstance(
-        date(2023, 1, 23), flight3, 
-        aircraft1, 50_000
-    )
-    flightin4 = FlightInstance(
-        date(2023, 1, 23), flight4, 
-        aircraft1, 50_000
-    )
-
     passengerDetails1 = PassengerDetails(
         'Plum', 'Arpleum',
         date(1999, 1, 1),
