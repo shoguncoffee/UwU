@@ -37,11 +37,8 @@ class Flight:
         return self.__destination
     
     @property
-    def duration(self) -> timedelta:
-        crossday = timedelta(self.arrival < self.departure)
-        d2 = datetime.combine(date.min + crossday, self.arrival)
-        d1 = datetime.combine(date.min, self.departure)
-        return d2 - d1
+    def duration(self):
+        return difference_time(self.departure, self.arrival)
 
 
 @dataclass(slots=True)
@@ -104,6 +101,10 @@ class FlightInstance:
         self.__status = FlightStatus.CANCELLED
     
     def get_seats_of(self, travel_class: TravelClass):
+        """
+        get all seats of specified travel class from an aircraft,
+        forward to Aircraft.get_seats_of
+        """
         return self.aircraft.get_seats_of(travel_class)
     
     def get_all_comfirmed(self):
@@ -135,20 +136,11 @@ class FlightInstance:
 
     def bookable(self, travel_class: TravelClass, pax: int):
         """
-        if specified travel class of this FlightInstance is bookable for pax
+        if specified travel class of this FlightInstance is bookable for pax (number of passenger)
         """
         free = self.get_seats_of(travel_class)
         occupied = self.get_occupied_of(travel_class)
         return len(free) - len(occupied) >= pax
-    
-    def bookingable(self, pax: int):
-        """
-        if any travel class of this FlightInstance bookable for pax
-        """
-        return any(
-            self.bookable(travel_class, pax) 
-            for travel_class in self.all_travel_class
-        )
     
     def booked(self, reservation: FlightReservation):
         self.booking_record.append(reservation)
