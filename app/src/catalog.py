@@ -41,30 +41,35 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
         self.__advance_days = days
         self.update()
     
-    def update(self):
+    def update(self, *plans: FlightPlan):
+        from app.system import Airline
+        
         for date in daterange(self.advance_days):
-            schedule = ScheduleDate()
-            for plan in self.on_date(date):
-                schedule.add(
+            schedule = Airline.schedules.search(date)
+            if schedule is None:
+                schedule = ScheduleDate(date)
+                Airline.schedules.append(schedule)
+            
+            for plan in self.on_date(date, plans):
+                schedule.append(
                     FlightInstance(date, 
                         plan.flight, 
                         plan.default_aircraft, 
                         plan.default_fare
                     )
                 )
-            from app.system import Airline
-            Airline.schedules.add(date, schedule)
     
-    def add(self, plan: FlightPlan):
+    def append(self, plan: FlightPlan):
         for p in self:
             if p.flight.designator == plan.flight.designator:
                 if p in plan: break
         else:
-            self.append(plan)
+            super().append(plan) 
+            self.update(plan)
     
     def on_date(self, 
         date: date, 
-        plans: Optional[list[FlightPlan]] = None
+        plans: Optional[Sequence[FlightPlan]] = None
     ):
         for plan in plans or self:
             if date in plan:
@@ -84,71 +89,81 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
                 if plan.flight == flight
             ]
         if date:
-            results = [
-                *self.on_date(date, results)
-            ]
+            results = list(
+                self.on_date(date, results)
+            )
         return results
-    
 
-class ScheduleDate(dict[str, FlightInstance]):
+
+class ScheduleDate(list[FlightInstance]):
+    def __init__(self, date: date):
+        self.__date = date
+    
+    @property
+    def date(self):
+        return self.__date
+    
     def __contains__(self, key: str | FlightInstance):
         if isinstance(key, str):
-            return super().__contains__(key)
+            for instance in self:
+                if instance.designator == key:
+                    return True
         
-        return key in self.values()
+        elif isinstance(key, FlightInstance):
+            if super().__contains__(key):
+                return True
+            
+            for instance in self:
+                if instance.designator == key.designator:
+                    return True
+        
+        return False
     
     def search(self, designator: str):  
-        return [
-            self[instance] for instance in
-            search.basic(designator, self.keys())
-        ]
+        return list(search.simple('designator', designator, self))
     
     def route_search(self,
         origin: Airport,
         destination: Airport,
     ):
         return [
-            instance for instance in self.values()
+            instance for instance in self
             if (instance.origin, instance.destination
             ) == (origin, destination)
         ]
     
-    def add(self, instance: FlightInstance):
-        self[instance.designator] = instance
+    def append(self, instance: FlightInstance):
+        if instance.date == self.date:
+            super().append(instance)
         
-    def remove(self, designator: str):
-        del self[designator]
 
-
-class ScheduleCatalog(dict[date, ScheduleDate]):
+class ScheduleCatalog(list[ScheduleDate]):
     @property
-    def last_date(self):
-        return max(self)
+    def first(self):
+        return min(self, key=lambda schedule: schedule.date)
     
     @property
-    def first_date(self):
-        return min(self)
+    def last(self):
+        return max(self, key=lambda schedule: schedule.date)
+    
+    def search(self, date: date):
+        for schedule in self:
+            if schedule.date == date:
+                return schedule
     
     def clear_history(self, _date: Optional[date] = None):
         """
         remove all schedules before the given date (today by default)
         """
-        delta = (_date or date.today()) - self.first_date
-        for day in daterange(delta.days - 1, self.first_date):
-            self.remove(day)
-                
-    def add(self, date: date, schedule: ScheduleDate):        
-        self[date] = schedule
-    
-    def remove(self, _date: date):
-        del self[_date]
-    
-    
+        delta = (_date or date.today()) - self.first.date
+        for day in daterange(delta.days - 1, self.first.date):
+            if schedule := self.search(day):
+                self.remove(schedule)
+
+
 class FlightCatalog(list[Flight]):
     def search(self, designator: str):
-        return [
-            *search.simple('designator', designator, self)
-        ]
+        return list(search.simple('designator', designator, self))
         
     def route_search(self,
         origin: Airport,
@@ -159,32 +174,32 @@ class FlightCatalog(list[Flight]):
             if (flight.origin, flight.destination
             ) == (origin, destination)
         ]
-        
-    def add(self, flight: Flight):
-        self.append(flight)
-        
-    def remove(self, flight: Flight):
-        self.remove(flight)
-    
 
-class AirportCatalog(set[Airport]):
+
+class AirportCatalog(list[Airport]):
     def __contains__(self, key: str | Airport):
-        if isinstance(key, Airport):
-            return super().__contains__(key)
-        
-        for airport in self:
-            if airport.location_code == key:
+        if isinstance(key, str):
+            for airport in self:
+                if airport.location_code == key:
+                    return True
+
+        elif isinstance(key, Airport):
+            if super().__contains__(key):
                 return True
             
+            for airport in self:
+                if airport.location_code == key.location_code:
+                    return True
+        
         return False
     
     def search(self, key: str):
-        return [
-            *search.multi_opt(
+        return list(
+            search.multi_opt(
                 'name', 'location_code', 'city', 'country',
                 query=key, pool=self
             )
-        ]
+        )
     
     # def load(self):
     #     with open('app/data/airport.csv') as f:
@@ -193,24 +208,25 @@ class AirportCatalog(set[Airport]):
     #             self.add(Airport(*arg))
 
 
-class AircraftCatalog(dict[str, Aircraft]):
+class AircraftCatalog(list[Aircraft]):
     def __contains__(self, key: str | Aircraft):
         if isinstance(key, str):
-            return super().__contains__(key)
+            for aircraft in self:
+                if aircraft.model == key:
+                    return True
+                        
+        elif isinstance(key, Aircraft):
+            if super().__contains__(key):
+                return True
+            
+            for account in self:
+                if account.model == key.model:
+                    return True
         
-        return key in self.values()
-    
-    def add(self, aricraft: Aircraft):
-        self[aricraft.model] = aricraft
-    
-    def remove(self, aricraft: Aircraft):
-        del self[aricraft.model]
+        return False
     
     def search(self, model: str):
-        return [
-            self[aircraft] for aircraft in 
-            search.basic(model, self.keys())
-        ]
+        return list(search.simple('model', model, self))
         
     # def load(self):
     #     with open('app/data/aircraft.csv') as f:
@@ -219,40 +235,27 @@ class AircraftCatalog(dict[str, Aircraft]):
     #             self.add(Aircraft(*arg))
     
     
-class AccountCatalog(dict[str, Account]):
+class AccountCatalog(list[Account]):
     def __contains__(self, key: str | Account):
         if isinstance(key, str):
+            for account in self:
+                if account.username == key or account.email == key:
+                    return True
+                                
+        elif isinstance(key, Account):
             if super().__contains__(key):
                 return True
-        
-            return self.contains_email(key)
-        
-        elif isinstance(key, Account):
-            if super().__contains__(key.username):
-                return True
             
-            return self.contains_email(key.email)
+            for account in self:
+                if account.username == key.username or account.email == key.email:
+                    return True
+                
+        return False
+            
     
     # def __repr__(self):
     #     return '\n'.join(
     #         repr(account) for account in self.values()
     #     )
-        
-    def contains_email(self, email: str):
-        for account in self.values():
-            if account.email == email:
-                return True
-            
-        return False
-    
-    def add(self, account: Account):
-        self[account.username] = account
-    
-    def remove(self, account: Account):
-        del self[account.username]
-    
     def search(self, username: str):
-        return [
-            self[account] for account in 
-            search.basic(username, self.keys())
-        ]
+        return list(search.simple('username', username, self))
