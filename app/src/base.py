@@ -4,6 +4,12 @@ from ..base import *
 from .constants import *
 
 
+class Info(list[str]):
+    def __str__(self):
+        return '\n'.join(self)
+
+
+'''
 class HasReference(ABC):
     """
     base on uuid4
@@ -18,13 +24,4 @@ class HasReference(ABC):
         while 1:
             if (ref := uuid4()) not in pool:
                 return ref
-
-def daterange(days: int, start: Optional[date] = None):
-    """
-    if start is None, start = date.today()
-    
-    *include start and end
-    """
-    start = start or date.today()
-    for i in range(days + 1):
-        yield start + timedelta(i)
+'''
