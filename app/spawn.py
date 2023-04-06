@@ -2,32 +2,36 @@ from .system import *
 
 Airline()
 
-airport1 = Airport(
-    'Homad International Airport',
-    'Doh', 'Doha', 'Qatar'
-)
-airport2 = Airport(
-    'Suvarnabhumi International Airport',
-    'BKK', 'Bangkok', 'Thailand'
-)
-airport3 = Airport(
-    'London City Airport',
-    'LCY', 'London', 'United Kingdom'
-)
-airport4 = Airport(
-    'Don Mueang International Airport', 
-    'DMK', 'Bangkok', 'Thailand'
-)
-airport5 = Airport(
-    'Cairo International Airport', 
-    'CAI', 'Cairo', 'Egypt'
-)
-for airport in (
-    airport1, airport2, airport3, airport4, airport5
-):
-    Airline.airports.add(airport)
-    
-    
+airports = [
+    Airport(*attr) for attr in (
+        ('Homad International Airport', 
+            'DOH', 'Doha', 'Qatar'),
+        ('Suvarnabhumi International Airport',
+            'BKK', 'Bangkok', 'Thailand'),
+        ('London City Airport',
+            'LCY', 'London', 'United Kingdom'),
+        ('Don Mueang International Airport', 
+            'DMK', 'Bangkok', 'Thailand'),
+        ('Cairo International Airport', 
+            'CAI', 'Cairo', 'Egypt'),
+        ('Miami International Airport',
+            'MIA', 'Miami','United States'),
+        ('Taiwan Taoyuan International Airport',
+            'TPE', 'Taipei', 'Taiwan'),
+        ('Incheon International Airport',
+            'ICN', 'Seoul', 'South Korea'),
+        ('Hong Kong International Airport',
+            'HKG', 'Hong Kong', 'Hong Kong'),
+        ('Singapore Changi Airport',
+            'SIN', 'Singapore', 'Singapore'),
+        ('Sydney Kingsford Smith Airport',
+            'SYD', 'Sydney', 'Australia'),
+    )
+]
+for airport in airports:
+    Airline.airports.append(airport)
+
+
 aircraft1 = Aircraft(
     'Boeing 777', (
         Desk.generate(
@@ -69,102 +73,105 @@ aircraft2 = Aircraft(
         ),
     )
 )
-for aircraft in (
-    aircraft1, aircraft2
-):
-    Airline.aircrafts.add(aircraft)
-    
-    
-flight1 = Flight(
-    'Q0001',
-    time(8, 0), time(15, 20),
-    airport1, airport2,
-)
-flight2 = Flight(
-    'Q0002',
-    time(17, 0), time(22, 30),
-    airport2, airport3
-)
-flight3 = Flight(
-    'Q0003',
-    time(7, 0), time(12, 30),
-    airport3, airport2,
-)
-flight4 = Flight(
-    'Q0004',
-    time(16, 0), time(23, 20),
-    airport2, airport1
-)
-for flight in (
-    flight1, flight2, flight3, flight4
-):
-    Airline.flights.add(flight)
+for aircraft in aircraft1, aircraft2:
+    Airline.aircrafts.append(aircraft)
 
 
-client1 = Customer(
-    'Plum123',
-    '12345678',
-    '516516@kmitl.com',   
-    '0812345678',
-)
-Airline.accounts.add(client1)
-
-
-schedule1 = ScheduleDate()
-Airline.schedules.add(date(2023, 1, 18), schedule1)
-
-flightin1 = FlightInstance(
-    date(2023, 1, 18), flight1, 
-    aircraft1, 50_000
-)
-flightin2 = FlightInstance(
-    date(2023, 1, 18), flight2, 
-    aircraft1, 50_000
-)
-for instance in (
-    flightin1, flightin2
-):
-    schedule1.add(instance)
-
-
-schedule2 = ScheduleDate()
-Airline.schedules.add(date(2023, 1, 23), schedule2)
-
-flightin3 = FlightInstance(
-    date(2023, 1, 23), flight3, 
-    aircraft1, 50_000
-)
-flightin4 = FlightInstance(
-    date(2023, 1, 23), flight4, 
-    aircraft1, 50_000
-)
-for instance in (
-    flightin3, flightin4
-):
-    schedule2.add(instance)
-
-
-if 0:
-    passengerDetails1 = PassengerDetails(
-        'Plum', 'Arpleum',
-        date(1999, 1, 1),
-        'Thai', '254123543',
-        GenderType.MALE,
-        PassengerType.ADULT,
+flights = [
+    Flight(*attr) for attr in (
+        ('Q129', time(8, 0), time(15, 20), airports[0], airports[1]),
+        ('Q265', time(17, 0), time(22, 30), airports[1], airports[2]),
+        ('Q312', time(7, 0), time(12, 30), airports[2], airports[3]),
+        ('Q413', time(16, 0), time(23, 20), airports[3], airports[4]),
+        ('Q148', time(5, 15), time(8, 50), airports[4], airports[5]),
+        ('Q254', time(11, 20), time(14, 40), airports[5], airports[6]),
+        ('Q364', time(2, 15), time(5, 15), airports[6], airports[5]),
+        ('Q3150', time(22, 35), time(1, 10), airports[5], airports[4]),
+        ('Q404', time(0, 30), time(6, 0), airports[4], airports[3]),
+        ('Q4413', time(17, 35), time(18, 20), airports[3], airports[2]),
+        ('Q101', time(7, 25), time(9, 30), airports[2], airports[1]),
+        ('Q236', time(23, 10), time(2, 50), airports[1], airports[0]),
+        
+        ('Q1648', time(10, 55), time(13, 40), airports[0], airports[2]),
+        ('Q2103', time(9, 45), time(15, 55), airports[2], airports[3]),
+        ('Q3491', time(4, 50), time(8, 40), airports[3], airports[1]),
+        
+        ('Q4167', time(11, 30), time(13, 20), airports[0], airports[4]),
+        ('Q4169', time(14, 45), time(17, 15), airports[4], airports[1]),
     )
-    contact1 = ContactInformation(
-        passengerDetails1,
-        '+66', '0812345678',
-        '516516@kmitl.com'
+]
+for flight in flights:
+    Airline.flights.append(flight)
+
+
+plans = [
+    FlightPlan(flight, start, end, default_aircraft=aircraft, default_fare=fare) 
+    for flight, start, end, aircraft, fare in (
+        (flights[0], date(2023, 1, 1), date(2024, 1, 1), aircraft1, 28_000),
+        (flights[1], date(2023, 1, 1), date(2024, 1, 1), aircraft2, 37_000),
+        (flights[2], date(2023, 1, 1), date(2024, 1, 1), aircraft1, 42_000),
+        (flights[3], date(2023, 1, 1), date(2024, 1, 1), aircraft2, 49_000),
+        (flights[4], date(2023, 1, 1), date(2024, 1, 1), aircraft1, 24_000),
+        (flights[5], date(2023, 1, 1), date(2024, 1, 1), aircraft2, 36_000),
+        (flights[6], date(2023, 1, 1), date(2024, 1, 1), aircraft1, 21_000),
+        
+        (flights[-5], date(2023, 4, 1), date(2023, 10, 1), aircraft2, 33_000),
+        (flights[-4], date(2023, 3, 1), date(2023, 10, 1), aircraft1, 22_000),
+        (flights[-3], date(2023, 2, 1), date(2023, 10, 1), aircraft2, 39_000),
+        (flights[-2], date(2023, 8, 1), date(2023, 10, 1), aircraft1, 29_000),
+        (flights[-1], date(2023, 9 ,1), date(2023, 11, 1), aircraft2, 15_000),
     )
-    search_outbound = FlightItinerary(flightin1, flightin2)
-    search_inbound = FlightItinerary(flightin3, flightin4)
-    return_trip = [
-        Trip(search_outbound, TravelClass.ECONOMY),
-        Trip(search_inbound, TravelClass.BUSSINESS)
-    ]
-    client1.request_booking(
-        return_trip,
-        contact1,
-        passengerDetails1,
+]
+for plan in plans:
+    Airline.plans.append(plan)
+
+
+customers = [
+    Customer(*attr) for attr in (
+        ('Plum123', 'plum555', '65168516@kmitl.com', '0812345678'),
+        ('user', '123456', 'user@uwu.com', '0000'),
+        ('user1', '1234', 'user2@uwu.com', '0000'),
+        ('user2', '123456789', 'user3@uwu.com', '0000'),
+        ('use3', 'qweasd', 'user4@uwu.com', '0000'),
+    )
+]
+for customer in customers:
+    Airline.accounts.append(customer)
+
+
+admin = Admin(
+    'admin', 'admin', 'jinny@uwu.com', '0000'
+)
+Airline.accounts.append(admin)
+
+'''
+passengerDetails1 = PassengerDetails(
+    'Plum', 'Arpleum',
+    date(1999, 1, 1),
+    'Thai', '254123543',
+    GenderType.MALE,
+    PassengerType.ADULT,
+)
+contact1 = ContactInformation(
+    passengerDetails1,
+    '+66', '0812345678',
+    '516516@kmitl.com'
+)
+search_outbound = FlightItinerary(flightin1, flightin2)
+search_inbound = FlightItinerary(flightin3, flightin4)
+return_trip = [
+    Trip(search_outbound, TravelClass.ECONOMY),
+    Trip(search_inbound, TravelClass.BUSSINESS)
+]
+client1.request_booking(
+    return_trip,
+    contact1,
+    passengerDetails1,
+)
+'''
+
+if __name__ == '__main__':
+    q = Airline.search_journey(
+        airports[0], airports[1],
+        date(2023, 9, 10)
     )
