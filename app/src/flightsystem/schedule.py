@@ -111,4 +111,4 @@ class FlightPlan:
     
     def scheduled(self):
         from app.system import Airline
-        Airline.plans.add(self)
+        Airline.plans.append(self)

@@ -1,8 +1,6 @@
 from __future__ import annotations
 from ..base import *
 
-from ..information import Info
-
 
 @dataclass(slots=True, frozen=True)
 class Aircraft:
