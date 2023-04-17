@@ -6,7 +6,7 @@ https://fastapi.tiangolo.com/sq/tutorial/path-params/#working-with-python-enumer
 enum constants
 function-call syntax
 """
-from enum import IntEnum as _Enum
+from enum import IntEnum as _Enum, StrEnum as _StrEnum
 
 FlightStatus = _Enum(
     'FlightStatus', 'SCHEDULED CANCELLED IN_FLIGHT ARRIVED'
@@ -35,3 +35,7 @@ PaymentStatus = _Enum(
 PaymentMethod = _Enum(
     'PaymentMethod', 'PAYPAL INTERNETBANKING CREDITCARD'
 )
+with open('data/countries.txt') as f:
+    Country: _StrEnum = _StrEnum(
+        'Country', f.read().splitlines()
+    )
