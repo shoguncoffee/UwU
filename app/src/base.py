@@ -1,13 +1,5 @@
 from __future__ import annotations
-from ..base import *
-
-from .constants import *
-
-
-class Info(list[str]):
-    def __str__(self):
-        return '\n'.join(self)
-
+from app.base import *
 
 '''
 class HasReference(ABC):
