@@ -78,7 +78,7 @@ for aircraft in (
 flight1 = Flight(
     'Q0001',
     time(8, 0), time(15, 20),
-    airport1, airport2,
+    airport1, airport2
 )
 flight2 = Flight(
     'Q0002',
@@ -88,7 +88,7 @@ flight2 = Flight(
 flight3 = Flight(
     'Q0003',
     time(7, 0), time(12, 30),
-    airport3, airport2,
+    airport3, airport2
 )
 flight4 = Flight(
     'Q0004',
