@@ -35,7 +35,20 @@ PaymentStatus = _Enum(
 PaymentMethod = _Enum(
     'PaymentMethod', 'PAYPAL INTERNETBANKING CREDITCARD'
 )
+
 with open('data/countries.txt') as f:
     Country: _StrEnum = _StrEnum(
         'Country', f.read().splitlines()
     )
+    
+travel_class_info: dict[TravelClass, tuple[str, ...]] = {
+    TravelClass.ECONOMY: (
+        'economy',
+    ),
+    TravelClass.BUSSINESS: (
+        'bussiness',
+    ),
+    TravelClass.FIRST: (
+        'first',
+    ),
+}
