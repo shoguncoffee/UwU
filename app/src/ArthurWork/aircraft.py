@@ -41,6 +41,15 @@ class Aircraft:
             for seat in desk.get_seats_of(travel_class)
         }
         
+    def get_seat(self, number: str):
+        """
+        get seat by row and column
+        """
+        for seat in self.all_seats:
+            if seat.number == number:
+                return seat
+        raise KeyError
+        
 
 @dataclass(slots=True, frozen=True)
 class Desk:
@@ -130,7 +139,7 @@ class CabinLayout:
                 range(1, lenght+1), range(1, width+1)
             ):
                 type = SeatType.COMMON
-                info = Info()
+                info = []
                 
                 if row == 1:
                     type = SeatType.LEGROOM
@@ -144,7 +153,11 @@ class CabinLayout:
                 
                 letter = ascii_uppercase[column-1]                
                 l.append(Seat(
-                    initial_row + row, letter, column, type, info
+                    initial_row + row, 
+                    column, 
+                    letter, 
+                    type, 
+                    info
                     )
                 )
         return cls(travel_class, frozenset(l))
@@ -153,10 +166,10 @@ class CabinLayout:
 @dataclass(slots=True, frozen=True)
 class Seat:
     __row: int # type: ignore
-    __letter: str # type: ignore
     __column: int # type: ignore
+    __letter: str # type: ignore number?
     __type: SeatType # type: ignore
-    __description: Info = field(hash=False, default_factory=Info) # type: ignore
+    __description: list[str] = field(hash=False, default_factory=list) # type: ignore
     
     @property
     def row(self):
@@ -178,5 +191,6 @@ class Seat:
     def description(self):
         return self.__description
     
-    def get_number(self):
+    @property
+    def number(self):
         return str(self.row) + self.letter
