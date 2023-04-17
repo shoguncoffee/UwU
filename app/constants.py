@@ -1,7 +1,12 @@
 """
+https://docs.python.org/3/library/enum.html
+https://docs.python.org/3/howto/enum.html#functional-api
+https://fastapi.tiangolo.com/sq/tutorial/path-params/#working-with-python-enumerations
+
 enum constants
+function-call syntax
 """
-from enum import Enum as _Enum
+from enum import IntEnum as _Enum
 
 FlightStatus = _Enum(
     'FlightStatus', 'SCHEDULED CANCELLED IN_FLIGHT ARRIVED'
@@ -13,7 +18,7 @@ TravelClass = _Enum(
     'TravelClass', 'ECONOMY BUSSINESS FIRST'
 )
 AccountStatus = _Enum(
-    'AccountStatus', 'PENDING ACTIVE SUSPENDED, INACTIVE'
+    'AccountStatus', 'PENDING ACTIVE SUSPENDED INACTIVE'
 )
 BookingStatus = _Enum(
     'BookingStatus', 'FAILED INCOMPLETE PENDING COMPLETED CANCELLED'
