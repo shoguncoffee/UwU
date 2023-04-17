@@ -106,6 +106,7 @@ class ScheduleDate(list[FlightInstance]):
     
     def __contains__(self, key: str | FlightInstance):
         if isinstance(key, str):
+            key = key.upper()
             for instance in self:
                 if instance.designator == key:
                     return True
@@ -124,6 +125,7 @@ class ScheduleDate(list[FlightInstance]):
         return list(search.simple('designator', designator, self))
     
     def get(self, designator: str):
+        designator = designator.upper()
         for instance in self:
             if instance.designator == designator:
                 return instance
@@ -187,6 +189,7 @@ class FlightCatalog(list[Flight]):
 class AirportCatalog(list[Airport]):
     def __contains__(self, key: str | Airport):
         if isinstance(key, str):
+            key = key.upper()
             for airport in self:
                 if airport.location_code == key:
                     return True
@@ -210,6 +213,7 @@ class AirportCatalog(list[Airport]):
         )
         
     def get(self, key: str):
+        key = key.upper()
         for airport in self:
             if airport.location_code == key:
                 return airport
