@@ -21,8 +21,8 @@ async def pax_parameters(
     ])
     
 async def route_parameters(
-    origin: str, 
-    destination: str
+    origin: Annotated[str, Query(max_length=3)],
+    destination: Annotated[str, Query(max_length=3)]
 ):
     return [
         Airline.airports.get(code) 
@@ -40,25 +40,25 @@ async def one_way_flight(
     pax: Pax,
 ):
     """
-    - `origin`: str "xxx"
+    - `origin`: `str "xxx"`
         - origin airport code
         
-    - `destination`: str "xxx"
+    - `destination`: `str "xxx"`
         - destination airport code
         
-    - `date`: str "yyyy-mm-dd"
+    - `date`: `str "yyyy-mm-dd"`
         - departure date
         
-    - `adult`: int
-    - `child`: int
-    - `infant`: int
+    - `adult`: `int`
+    - `child`: `int`
+    - `infant`: `int`
         - passenger number for each type
     """
     results = Airline.search_journey(
         *route, date, pax
     )
     return [
-        FlightInfoBody.transforms(itinerary) 
+        FlightInfoBody.transforms(itinerary, pax) 
         for itinerary in results
     ]
 
@@ -71,21 +71,21 @@ async def return_flight(
     pax: Pax,
 ):
     """
-    - `origin`: str "xxx"
+    - `origin`: `str "xxx"`
         - origin airport code
         
-    - `destination`: str "xxx"
+    - `destination`: `str "xxx"`
         - destination airport code
     
-    - `depart_date`: str "yyyy-mm-dd"
+    - `depart_date`: `str "yyyy-mm-dd"`
         - first departure date
     
-    - `return_date`: str "yyyy-mm-dd"
+    - `return_date`: `str "yyyy-mm-dd"`
         - return date
         
-    - `adult`: int
-    - `child`: int
-    - `infant`: int
+    - `adult`: `int`
+    - `child`: `int`
+    - `infant`: `int`
         - passenger number for each type
     """
     return {
