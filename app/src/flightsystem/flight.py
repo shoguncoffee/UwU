@@ -1,144 +1,154 @@
-"""
-take care of flight system
-"""
 from __future__ import annotations
-from base import *
+from ..base import *
 
-from src.constants import FlightStatus, BookingStatus
 if TYPE_CHECKING:
-    from src import Aircraft, Airport, Seat, Booking, FlightReservation, TravelClass
-    from main import Airline
+    from app.src import FlightStatus, FlightReservation, Aircraft, Airport
 
 
-class FlightCatalog(Singleton):
-    _instance: FlightCatalog
-    
-    def __init__(self):
-        self.__record: set[Flight] = set()
-    
-    @classmethod
-    def add(cls, flight: Flight):
-        cls._instance.__record.add(flight)
-    
-    @classmethod
-    def search(cls, designator: str):
-        ...
-
-
-@dataclass
-class Flight:#(HasReference):
-    __designator: str #type: ignore
-    __departure: time #type: ignore
-    __arrival: time #type: ignore
-    __origin: Airport #type: ignore
-    __destination: Airport #type: ignore
-    __reference: Optional[UUID] = None #type: ignore
-    
-    def __post_init__(self):
-        self.__designator = self.designator.upper()
-        self.__reference = self.__reference or self.generate_reference()
-    
-    @property
-    def designator(self) -> str:
-        return self.__designator
-    
-    @property
-    def duration(self) -> timedelta:
-        crossday = timedelta(self.__arrival < self.__departure)
-        d2 = datetime.combine(date.min + crossday, self.__arrival)
-        d1 = datetime.combine(date.min, self.__departure)
-        return d2 - d1
-    
-    @classmethod
-    def generate_reference(cls):
-        return 
-    
-    
-    #getter
-    def get_origin(self):
-        return self.__origin
-    
-    def get_destination(self):
-        return self.__destination
-    
-    def get_departure(self):
-        return self.__departure
-    
-    def get_arrival(self):
-        return self.__arrival
-    
-    def calculate_duration(self):
-        pass
-    
-    
-@dataclass
-class FlightInstance:
-    __flight: Flight #type: ignore
-    __date: date #type: ignore
-    __aircraft: Aircraft #type: ignore
-    __base_price: float #type: ignore
-    __booking_record: set[FlightReservation] = field_set #type: ignore
-    __status: FlightStatus = FlightStatus.SCHEDULED #type: ignore
+@dataclass(slots=True)
+class Flight:
+    """
+    A flight template for FlightInstance
+    """
+    __designator: str # type: ignore
+    __departure: time # type: ignore
+    __arrival: time # type: ignore
+    __origin: Airport # type: ignore
+    __destination: Airport # type: ignore
     
     @property
     def designator(self):
-        return self.__flight.designator
+        return self.__designator
     
-    def update_status(self, status: FlightStatus):
-        self.__status = status
+    @property
+    def departure(self):
+        return self.__departure
     
-    def get_reserved_seats(self):
-        """
-        get all reserved seats that be paid
-        """
-        return set(
-            seat for reservation in self.get_comfirmed()
-            for seat in reservation.seats
-        )
-        
-    def get_comfirmed(self):
-        """
-        get all confirmed reservations
-        """
-        return set(
-            reservation for reservation in self.__booking_record 
-            if reservation.holder.status == BookingStatus.CONFIRMED
-        )
+    @property
+    def arrival(self):
+        return self.__arrival
     
-    #begin edit : add getter
-    def get_flight(self):
-        return self.__flight
+    @property
+    def origin(self):
+        return self.__origin
     
-    def get_aircraft(self):
-        return self.__aircraft
+    @property
+    def destination(self):
+        return self.__destination
     
-    def get_date(self):
-        return self.__date
-    
+    @property
+    def duration(self) -> timedelta:
+        crossday = timedelta(self.arrival < self.departure)
+        d2 = datetime.combine(date.min + crossday, self.arrival)
+        d1 = datetime.combine(date.min, self.departure)
+        return d2 - d1
 
-@dataclass
-class FlightItinerary:
+
+@dataclass(slots=True)
+class FlightInstance:
     """
-    collection of flight, 
+    A derivative of Flight
     """
-    __flights: list[FlightInstance] #type: ignore
+    __date: date # type: ignore
+    __flight: Flight # type: ignore
+    __aircraft: Aircraft # type: ignore
+    __base_fare: float # type: ignore
+    
+    __booking_record: list[FlightReservation] = field(init=False, default_factory=list)
+    __status: FlightStatus = field(init=False, default=FlightStatus.SCHEDULED)
     
     @property
     def flight(self):
-        return self.__flights
-    
-    def choice(self, cls: TravelClass):
-        return Trip(self.__flights, cls)
-
-
-@dataclass    
-class Trip(FlightItinerary):
-    """
-    trip segment
-    """
-    __travel_class: TravelClass #type: ignore
+        return self.__flight
     
     @property
-    def travel_class(self):
-        return self.__travel_class
+    def date(self):
+        return self.__date
     
+    @property
+    def aircraft(self):
+        return self.__aircraft
+    
+    @property
+    def booking_record(self):
+        return self.__booking_record
+    
+    @property
+    def status(self):
+        return self.__status
+    
+    @property
+    def base_fare(self):
+        return self.__base_fare
+    
+    @property
+    def designator(self):
+        return self.flight.designator
+    
+    @property
+    def origin(self):
+        return self.flight.origin
+    
+    @property
+    def destination(self):
+        return self.flight.destination
+    
+    @property
+    def all_travel_class(self):
+        return {
+            cabin.travel_class for desk in self.aircraft.desks 
+            for cabin in desk.cabins
+        }
+    
+    def cancel(self):
+        self.__status = FlightStatus.CANCELLED
+    
+    def get_seats_of(self, travel_class: TravelClass):
+        return self.aircraft.get_seats_of(travel_class)
+    
+    def get_all_comfirmed(self):
+        """
+        get all confirmed reservations of this FlightInstance
+        """
+        return [
+            reservation for reservation in self.booking_record 
+            if reservation.holder.status == BookingStatus.COMPLETED
+        ]
+    
+    def get_occupied_of(self, travel_class: TravelClass):
+        """
+        get all reserved seats that have be paid (reservation status is confirmed)
+        """
+        return {
+            seatRE.seat for flightRE in self.get_comfirmed_of(travel_class)
+            for seatRE in flightRE.reservation
+        }
+        
+    def get_comfirmed_of(self, travel_class: TravelClass):
+        """
+        get confirmed reservations that match travel_class of this FlightInstance
+        """
+        return [
+            reservation for reservation in self.get_all_comfirmed() 
+            if reservation.travel_class == travel_class
+        ]
+
+    def bookable(self, travel_class: TravelClass, pax: int):
+        """
+        if specified travel class of this FlightInstance is bookable for pax
+        """
+        free = self.get_seats_of(travel_class)
+        occupied = self.get_occupied_of(travel_class)
+        return len(free) - len(occupied) >= pax
+    
+    def bookingable(self, pax: int):
+        """
+        if any travel class of this FlightInstance bookable for pax
+        """
+        return any(
+            self.bookable(travel_class, pax) 
+            for travel_class in self.all_travel_class
+        )
+    
+    def booked(self, reservation: FlightReservation):
+        self.booking_record.append(reservation)
