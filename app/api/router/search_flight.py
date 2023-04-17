@@ -40,18 +40,19 @@ async def one_way_flight(
     pax: Pax,
 ):
     """
-    origin: xxx
-        origin airport code
-    destination: xxx
-        destination airport code
+    - `origin`: str "xxx"
+        - origin airport code
         
-    date: yyyy-mm-dd
-        string of date
+    - `destination`: str "xxx"
+        - destination airport code
         
-    adult: int
-    child: int
-    infant: int
-        passenger number for each type
+    - `date`: str "yyyy-mm-dd"
+        - departure date
+        
+    - `adult`: int
+    - `child`: int
+    - `infant`: int
+        - passenger number for each type
     """
     results = Airline.search_journey(
         *route, date, pax
@@ -70,19 +71,22 @@ async def return_flight(
     pax: Pax,
 ):
     """
-    origin: xxx
-        origin airport code
-    destination: xxx
-        destination airport code
+    - `origin`: str "xxx"
+        - origin airport code
         
-    depart_date: yyyy-mm-dd
-    return_date: yyyy-mm-dd
-        string of date
+    - `destination`: str "xxx"
+        - destination airport code
+    
+    - `depart_date`: str "yyyy-mm-dd"
+        - first departure date
+    
+    - `return_date`: str "yyyy-mm-dd"
+        - return date
         
-    adult: int
-    child: int
-    infant: int
-        passenger number for each type
+    - `adult`: int
+    - `child`: int
+    - `infant`: int
+        - passenger number for each type
     """
     return {
         'outbound': await one_way_flight(
