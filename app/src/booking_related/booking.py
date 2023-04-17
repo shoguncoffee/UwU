@@ -3,6 +3,7 @@ from ..base import *
 
 from dataclasses import InitVar
 from .reservation import FlightReservation
+from .passenger import Pax
 if TYPE_CHECKING:
     from app.src import *
 

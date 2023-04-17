@@ -95,6 +95,12 @@ class Fare:
             self.get_passenger_price(passenger_type), 
             self.get_seat_price(seat_type) if seat_type else 0
         ])
+        
+    def pax_price(self, pax: Pax):
+        return sum(
+            number * self.get_price(passenger_type)
+            for passenger_type, number in pax
+        )
 
 
 @dataclass(slots=True)

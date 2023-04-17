@@ -7,9 +7,10 @@ from ..booking_related import Pax
 
 class FlightItinerary(tuple[FlightInstance]):
     """
-    collection of FlightInstance, represent a one flight or connecting flights,
-    provide some useful methods to get information from group of flights,
-    intended to be used for summarizing information to user
+    ### collection of FlightInstance
+        - represent a one flight or connecting flights
+        - provide some useful methods to get information from group of flights
+        - intended to be used for summarizing information to user
     """
     @property
     def all_travel_class(self) -> set[TravelClass]:
@@ -44,8 +45,7 @@ class FlightItinerary(tuple[FlightInstance]):
         prices = []
         for instance in self:
             fare = instance.get_fare(travel_class)
-            for passenger_type, number in pax:
-                prices.append(
-                    number * fare.get_price(passenger_type)
-                )
+            prices.append(
+                fare.pax_price(pax)
+            )
         return sum(prices)
