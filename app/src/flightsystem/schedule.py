@@ -4,22 +4,25 @@ from __future__ import annotations
 from ..base import *
 
 if TYPE_CHECKING:
-    from app.src import Flight
+    from app.src import Flight, Aircraft, Fare
     
     
 @dataclass(slots=True)
 class Deviation:
     """
-    A exception to a FlightPlan
-
+    ### A exception to a FlightPlan
+    
+    - `weekdays`: set(int)
         - 0 <= weekday <= 6
+        
+    - `months`: set(int)
         - 1 <= month <= 12
     """
     __weekdays: set[int] = field(default_factory=set) # type: ignore
     __months: set[int] = field(default_factory=set) # type: ignore
-    __dates: set[date] = field(default_factory=set) # type: ignore
+    __dates: set[dt.date] = field(default_factory=set) # type: ignore
     
-    def __contains__(self, d: date):
+    def __contains__(self, d: dt.date):
         return (
             d.weekday() in self.weekdays
             or d.month in self.months
@@ -46,23 +49,22 @@ class FlightPlan:
     on what period of time or range of dates
     """
     __flight: Flight # type: ignore
-    __start: date # type: ignore
-    __end: date = date.max # type: ignore
+    __start: dt.date # type: ignore
+    __end: dt.date = dt.date.max # type: ignore
     __exception: Deviation = field(default_factory=Deviation) # type: ignore
     
     _: KW_ONLY
     default_aircraft: Aircraft # type: ignore
-    default_fare: float # type: ignore
+    default_fares: tuple[Fare] # type: ignore
     
-    def __contains__(self, value: date | FlightPlan):
+    def __contains__(self, value: dt.date | FlightPlan):
         """
-        value: date
-            check if it is in the range of this plan
-        
-        value: FlightPlan
-            check if it is overlapping with this plan
+        - `value`: dt.date
+            - check if it is in the range of this plan
+        - `value`: FlightPlan
+            - check if it is overlapping with this plan
         """
-        if isinstance(value, date):
+        if isinstance(value, dt.date):
             return (
                 self.start <= value <= self.end
                 and value not in self.exception
