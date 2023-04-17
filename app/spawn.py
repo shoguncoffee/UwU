@@ -1,7 +1,12 @@
 from .system import *
+from datetime import date, time
 
+
+# init system
 Airline()
 
+
+# init airports
 airports = [
     Airport(*attr) for attr in (
         ('Homad International Airport', 
@@ -32,6 +37,7 @@ for airport in airports:
     Airline.airports.append(airport)
 
 
+# init aircrafts
 aircraft1 = Aircraft(
     'Boeing 777', (
         Desk.generate(
@@ -56,7 +62,7 @@ aircraft1 = Aircraft(
     )
 )
 aircraft2 = Aircraft(
-    'Airbus 320', (
+    'Airbus A320', (
         Desk.generate(
             (TravelClass.BUSSINESS, [
                 (4, [2, 2, 2])
@@ -77,6 +83,7 @@ for aircraft in aircraft1, aircraft2:
     Airline.aircrafts.append(aircraft)
 
 
+# init flights
 flights = [
     Flight(*attr) for attr in (
         ('Q129', time(8, 0), time(15, 20), airports[0], airports[1]),
@@ -104,28 +111,111 @@ for flight in flights:
     Airline.flights.append(flight)
 
 
+# init fares
+fare0 = tuple(
+    Fare(*attr) for attr in [(
+            TravelClass.ECONOMY, [
+                (PassengerType.ADULT, 13_500),
+                (PassengerType.CHILD, 7_500),
+                (PassengerType.INFANT, 6_000),
+            ], [
+                (SeatType.COMMON, 7_000),
+                (SeatType.AISLE, 7_500),
+                (SeatType.WINDOW, 8_000),
+                (SeatType.LEGROOM, 9_000),
+            ]
+        ), (
+            TravelClass.BUSSINESS, [
+                (PassengerType.ADULT, 33_000),
+                (PassengerType.CHILD, 26_000),
+                (PassengerType.INFANT, 23_000),
+            ], [
+                (SeatType.COMMON, 20_000),
+                (SeatType.AISLE, 25_000),
+                (SeatType.WINDOW, 28_000),
+                (SeatType.LEGROOM, 30_000),
+            ]
+        ),
+    ]
+)
+fare1 = tuple(
+    Fare(*attr) for attr in [(
+            TravelClass.ECONOMY, [
+                (PassengerType.ADULT, 15_000),
+                (PassengerType.CHILD, 7_500),
+                (PassengerType.INFANT, 6_000),
+            ], [
+                (SeatType.COMMON, 7_000),
+                (SeatType.AISLE, 7_500),
+                (SeatType.WINDOW, 8_000),
+                (SeatType.LEGROOM, 9_000),
+            ]
+        ), (
+            TravelClass.BUSSINESS, [
+                (PassengerType.ADULT, 33_000),
+                (PassengerType.CHILD, 26_000),
+                (PassengerType.INFANT, 23_000),
+            ], [
+                (SeatType.COMMON, 20_000),
+                (SeatType.AISLE, 25_000),
+                (SeatType.WINDOW, 28_000),
+                (SeatType.LEGROOM, 30_000),
+            ]
+        ),
+    ]
+)
+fare2 = tuple(
+    Fare(*attr) for attr in [(
+            TravelClass.ECONOMY, [
+                (PassengerType.ADULT, 20_000),
+                (PassengerType.CHILD, 7_500),
+                (PassengerType.INFANT, 6_000),
+            ], [
+                (SeatType.COMMON, 7_000),
+                (SeatType.AISLE, 7_500),
+                (SeatType.WINDOW, 8_000),
+                (SeatType.LEGROOM, 9_000),
+            ]
+        ), (
+            TravelClass.BUSSINESS, [
+                (PassengerType.ADULT, 33_000),
+                (PassengerType.CHILD, 26_000),
+                (PassengerType.INFANT, 23_000),
+            ], [
+                (SeatType.COMMON, 20_000),
+                (SeatType.AISLE, 25_000),
+                (SeatType.WINDOW, 28_000),
+                (SeatType.LEGROOM, 30_000),
+            ]
+        ),
+    ]
+)
+
+
+# init flight plans
 plans = [
-    FlightPlan(flight, start, end, default_aircraft=aircraft, default_fare=fare) 
+    FlightPlan(flight, start, end, default_aircraft=aircraft, default_fares=fare) 
     for flight, start, end, aircraft, fare in (
-        (flights[0], date(2023, 1, 1), date(2024, 1, 1), aircraft1, 28_000),
-        (flights[1], date(2023, 1, 1), date(2024, 1, 1), aircraft2, 37_000),
-        (flights[2], date(2023, 1, 1), date(2024, 1, 1), aircraft1, 42_000),
-        (flights[3], date(2023, 1, 1), date(2024, 1, 1), aircraft2, 49_000),
-        (flights[4], date(2023, 1, 1), date(2024, 1, 1), aircraft1, 24_000),
-        (flights[5], date(2023, 1, 1), date(2024, 1, 1), aircraft2, 36_000),
-        (flights[6], date(2023, 1, 1), date(2024, 1, 1), aircraft1, 21_000),
+        (flights[0], date(2023, 1, 1), date(2024, 1, 1), aircraft1, fare0),
+        (flights[1], date(2023, 1, 1), date(2024, 1, 1), aircraft2, fare1),
+        (flights[2], date(2023, 1, 1), date(2024, 1, 1), aircraft1, fare2),
+        (flights[3], date(2023, 1, 1), date(2024, 1, 1), aircraft2, fare0),
+        (flights[4], date(2023, 1, 1), date(2024, 1, 1), aircraft1, fare2),
+        (flights[5], date(2023, 1, 1), date(2024, 1, 1), aircraft2, fare2),
+        (flights[6], date(2023, 1, 1), date(2024, 1, 1), aircraft1, fare1),
         
-        (flights[-5], date(2023, 4, 1), date(2023, 10, 1), aircraft2, 33_000),
-        (flights[-4], date(2023, 3, 1), date(2023, 10, 1), aircraft1, 22_000),
-        (flights[-3], date(2023, 2, 1), date(2023, 10, 1), aircraft2, 39_000),
-        (flights[-2], date(2023, 8, 1), date(2023, 10, 1), aircraft1, 29_000),
-        (flights[-1], date(2023, 9 ,1), date(2023, 11, 1), aircraft2, 15_000),
+        (flights[-5], date(2023, 4, 1), date(2023, 10, 1), aircraft2, fare0),
+        (flights[-4], date(2023, 3, 1), date(2023, 10, 1), aircraft1, fare1),
+        (flights[-3], date(2023, 2, 1), date(2023, 10, 1), aircraft2, fare1),
+        (flights[-2], date(2023, 8, 1), date(2023, 10, 1), aircraft1, fare0),
+        (flights[-1], date(2023, 9 ,1), date(2023, 11, 1), aircraft2, fare2),
     )
 ]
 for plan in plans:
     Airline.plans.append(plan)
 
 
+# init customers
 customers = [
     Customer(*attr) for attr in (
         ('Plum123', 'plum555', '65168516@kmitl.com', '0812345678'),
@@ -139,12 +229,23 @@ for customer in customers:
     Airline.accounts.append(customer)
 
 
-admin = Admin(
-    'admin', 'admin', 'jinny@uwu.com', '0000'
-)
-Airline.accounts.append(admin)
+# init admin
+admins = [
+    Admin(*attr) for attr in (
+        ('admin', 'admin', 'jinny@uwu.com', '0000'),
+    )
+]
+for admin in admins:
+    Airline.accounts.append(admin)
 
-'''
+
+# test
+plum = Airline.accounts.get('Plum123')
+assert isinstance(plum, Customer)
+
+qatar = Airline.airports.get('DOH')
+thailand = Airline.airports.get('BKK')
+
 passengerDetails1 = PassengerDetails(
     'Plum', 'Arpleum',
     date(1999, 1, 1),
@@ -154,24 +255,28 @@ passengerDetails1 = PassengerDetails(
 )
 contact1 = ContactInformation(
     passengerDetails1,
-    '+66', '0812345678',
-    '516516@kmitl.com'
+    '0812345678', '516516@kmitl.com'
 )
-search_outbound = FlightItinerary(flightin1, flightin2)
-search_inbound = FlightItinerary(flightin3, flightin4)
-return_trip = [
-    Trip(search_outbound, TravelClass.ECONOMY),
-    Trip(search_inbound, TravelClass.BUSSINESS)
-]
-client1.request_booking(
-    return_trip,
-    contact1,
-    passengerDetails1,
+results = Airline.search_journey(
+    qatar, thailand,
+    dt.date(2023, 9, 10)
 )
-'''
+Airline.create_booking(plum, [
+        (results[0], TravelClass.ECONOMY),
+    ], contact1, passengerDetails1,
+)
 
-if __name__ == '__main__':
-    q = Airline.search_journey(
-        airports[0], airports[1],
-        date(2023, 9, 10)
-    )
+booking = plum.bookings[0]
+reservation = booking.reservations[0]
+instance = reservation.flight
+
+seats = instance.aircraft.all_seats
+seatiter = iter(seats)
+seat1 = next(seatiter)
+seat2 = next(seatiter)
+
+Airline.select_seats(
+    reservation, [
+        (passengerDetails1, seat1)
+    ]
+)
