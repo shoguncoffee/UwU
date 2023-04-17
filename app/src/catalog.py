@@ -26,7 +26,7 @@ __all__ = [
 
 class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
     """
-    A tools to manage and organize flight in advance
+    #### A tools to manage and organize flight in advance
         - keep continuity for the flight-booking system
         - ...
     """
@@ -45,8 +45,9 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
         from app.system import Airline
         
         for date in daterange(self.advance_days):
-            schedule = Airline.schedules.search(date)
-            if schedule is None:
+            try:
+                schedule = Airline.schedules.get(date)
+            except KeyError:
                 schedule = ScheduleDate(date)
                 Airline.schedules.append(schedule)
             
@@ -55,7 +56,7 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
                     FlightInstance(date, 
                         plan.flight, 
                         plan.default_aircraft, 
-                        plan.default_fare
+                        plan.default_fares
                     )
                 )
     
@@ -68,7 +69,7 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
             self.update(plan)
     
     def on_date(self, 
-        date: date, 
+        date: dt.date, 
         plans: Optional[Sequence[FlightPlan]] = None
     ):
         for plan in plans or self:
@@ -76,7 +77,7 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
                 yield plan
     
     def search(self,
-        date: Optional[date] = None,
+        date: Optional[dt.date] = None,
         flight: Optional[Flight] = None,
     ) -> list[FlightPlan]:
         """
@@ -96,7 +97,7 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
 
 
 class ScheduleDate(list[FlightInstance]):
-    def __init__(self, date: date):
+    def __init__(self, date: dt.date):
         self.__date = date
     
     @property
@@ -122,6 +123,12 @@ class ScheduleDate(list[FlightInstance]):
     def search(self, designator: str):  
         return list(search.simple('designator', designator, self))
     
+    def get(self, designator: str):
+        for instance in self:
+            if instance.designator == designator:
+                return instance
+        raise KeyError
+    
     def route_search(self,
         origin: Airport,
         destination: Airport,
@@ -133,7 +140,7 @@ class ScheduleDate(list[FlightInstance]):
         ]
     
     def append(self, instance: FlightInstance):
-        if instance.date == self.date:
+        if instance.date == self.date and instance not in self:
             super().append(instance)
         
 
@@ -146,18 +153,19 @@ class ScheduleCatalog(list[ScheduleDate]):
     def last(self):
         return max(self, key=lambda schedule: schedule.date)
     
-    def search(self, date: date):
+    def get(self, date: dt.date):
         for schedule in self:
             if schedule.date == date:
                 return schedule
+        raise KeyError
     
-    def clear_history(self, _date: Optional[date] = None):
+    def clear_history(self, _date: Optional[dt.date] = None):
         """
         remove all schedules before the given date (today by default)
         """
-        delta = (_date or date.today()) - self.first.date
+        delta = (_date or dt.date.today()) - self.first.date
         for day in daterange(delta.days - 1, self.first.date):
-            if schedule := self.search(day):
+            if schedule := self.get(day):
                 self.remove(schedule)
 
 
@@ -196,10 +204,16 @@ class AirportCatalog(list[Airport]):
     def search(self, key: str):
         return list(
             search.multi_opt(
-                'name', 'location_code', 'city', 'country',
+                *Airport.__annotations__.keys(),
                 query=key, pool=self
             )
         )
+        
+    def get(self, key: str):
+        for airport in self:
+            if airport.location_code == key:
+                return airport
+        raise KeyError
     
     # def load(self):
     #     with open('app/data/airport.csv') as f:
@@ -227,7 +241,14 @@ class AircraftCatalog(list[Aircraft]):
     
     def search(self, model: str):
         return list(search.simple('model', model, self))
-        
+    
+    
+    def get(self, model: str):
+        for aircraft in self:
+            if aircraft.model == model:
+                return aircraft
+        raise KeyError
+    
     # def load(self):
     #     with open('app/data/aircraft.csv') as f:
     #         data = ...
@@ -259,3 +280,9 @@ class AccountCatalog(list[Account]):
     #     )
     def search(self, username: str):
         return list(search.simple('username', username, self))
+    
+    def get(self, key: str):
+        for account in self:
+            if account.username == key:
+                return account
+        raise KeyError
