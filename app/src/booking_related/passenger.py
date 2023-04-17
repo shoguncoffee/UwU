@@ -49,6 +49,9 @@ class PassengerDetails:
         
 
 class Pax(tuple[tuple[PassengerType, int], ...]):
+    """
+    (PassengerType, number)
+    """
     def get(self, passenger_type: PassengerType):
         for type, number in self:
             if type == passenger_type:

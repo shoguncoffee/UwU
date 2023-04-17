@@ -12,10 +12,10 @@ class Deviation:
     """
     ### A exception to a FlightPlan
     
-    - `weekdays`: set(int)
+    - `weekdays`: `set(int)`
         - 0 <= weekday <= 6
         
-    - `months`: set(int)
+    - `months`: `set(int)`
         - 1 <= month <= 12
     """
     __weekdays: set[int] = field(default_factory=set) # type: ignore
@@ -59,9 +59,9 @@ class FlightPlan:
     
     def __contains__(self, value: dt.date | FlightPlan):
         """
-        - `value`: dt.date
+        - `value`: `dt.date`
             - check if it is in the range of this plan
-        - `value`: FlightPlan
+        - `value`: `FlightPlan`
             - check if it is overlapping with this plan
         """
         if isinstance(value, dt.date):

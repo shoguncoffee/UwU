@@ -14,7 +14,6 @@ from string import ascii_uppercase
 
 # from moneyed import Money
 from math import ceil, floor
-from random import randint
 from itertools import (
     product,
     repeat, 
@@ -39,4 +38,5 @@ from typing import (
     Collection,
     Iterable,
     Annotated,
+    Literal,
 )
