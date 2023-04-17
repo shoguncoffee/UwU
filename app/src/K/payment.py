@@ -1,12 +1,31 @@
 from ..base import *
 
 class Payment(ABC):
+    def __init__(self, 
+        total_price: int,
+        transaction_id: Optional[UUID] = None,
+    ):
+        self._total_price = total_price
+        self._transaction_id = transaction_id or uuid4()
+        self._datetime = dt.datetime.now()
+        self._status = PaymentStatus.PENDING
     
-    def __init__(self,transaction_id,payment_time,status) :
-        self._transaction_id = transaction_id
-        self._payment_time = payment_time
-        self._status = status
-        
+    @property
+    def total_price(self):
+        return self._total_price
+    
+    @property
+    def transaction_id(self):
+        return self._transaction_id
+    
+    @property
+    def datetime(self):
+        return self._datetime
+    
+    @property
+    def status(self):
+        return self._status
+    
     @abstractmethod
     def pay(self) :
         pass
