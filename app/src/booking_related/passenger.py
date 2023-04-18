@@ -74,8 +74,8 @@ class PassengerDetails:
     def fullname(self):
         return f'{self.forename} {self.surname}'
 
-    #def change_forename(self, name: str):
-    #    self.__forename = name
+    def change_forename(self, name: str):
+        self.__forename = name
     
     
 class Pax(tuple[tuple[PassengerType, int], ...]):
