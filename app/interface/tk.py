@@ -310,9 +310,24 @@ def fun7():
 
 
     def fun71():
-        b = l1.get()
-        if b=="":
-            messagebox.showerror("Error","Please enter Booking ID")
+        fn = l1.get()
+        ln = l2.get()
+        dob = l3.get()
+        nat = l4.get()
+        pp = l5.get()
+        ppe = l6.get()
+        td = l7.get()
+        cor = l8.get()
+        pn = l9.get()
+        ea = l10.get()
+        mr = chk1.get()
+        mrs = chk2.get()
+        ms = chk3.get()
+        m = chk4.get()
+        f = chk5.get()
+
+        if fn=="" or ln=="" or dob=="" or nat=="" or pn=="" or ea=="" or mr==False and mrs==False and ms==False or m==False and f==False:
+            messagebox.showerror("Error","Please Fill All the Fields")
         else:
             #algorithm for viewing passenger details
             root14.destroy()
@@ -320,7 +335,8 @@ def fun7():
             root15.title("Passenger Details")
             Label(root15,text="Passenger Details").pack()
             root15.mainloop()
-    Bc=Button(root14,text="View",bg='green',command=fun71).grid(row=18,column=1)
+        
+    Bc=Button(root14,text="Start Booking",bg='green',command=fun71).grid(row=18,column=1)
     root14.mainloop()
 
 B1=Button(root,text="Search Flight",command=fun1).pack()
