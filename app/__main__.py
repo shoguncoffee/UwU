@@ -9,9 +9,11 @@ for individual submodule in this package:
 - `\UwU> python -m app.<module>`
 """
 
+from multiprocessing import Process
 from .system import *
 import uvicorn
 import pickle
+
 
 if 0:
     path = 'app/data/...'
@@ -23,9 +25,17 @@ if 0:
     with open(path, 'wb') as f:
         pickle.dump(airline, f)
         
-    # python -m uvicorn app.api:app --reload    
-    os.system('python3 -m app.api')
-    os.system('python3 -m app.interface')
+    os.system('python3.11 -m uvicorn app.api:web --reload')
+    os.system('python3.11 -m app.interface')
     
 
-uvicorn.run('app.api:web', reload=True)
+Process(
+    target=uvicorn.run, 
+    args=('app.api:web',),
+    kwargs={'reload': True}
+).start()
+
+Process(
+    target=__import__, 
+    args=('app.interface',)
+).start()
