@@ -123,11 +123,11 @@ class FlightInfoBody(BaseModel):
     
     @classmethod
     def transforms(cls, objs: Sequence[src.FlightInstance], pax: src.Pax):
-        return [{
-            'flights': cls.transform(obj, pax),
-            'class_of_travel': ClassBody.init(obj, pax)
-            } for obj in objs
-        ]
+        return {
+            'flights': [cls.transform(obj, pax) for obj in objs],
+            'class_of_travel': ClassBody.init(objs[0], pax) #!
+        } 
+        
     
     
 class ContactInfoBody(BaseModel):

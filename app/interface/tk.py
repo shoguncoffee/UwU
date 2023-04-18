@@ -4,20 +4,23 @@ import json
 import requests
 
 API_ENDPOINT1 = "http://127.0.0.1:8000/search/one-way"
+API_DATA1 = "http://127.0.0.1:8000/data/airports"
 
 root = Tk()
 Tk.geometry(root,"500x500")
 Label(root,text="Qatar Airways",font="Bold 20").pack()
+airports = requests.get(API_DATA1).json()
+airports_code = [airport["location_code"] for airport in airports]
 
 def fun1():
     root.destroy()
     root2=Tk()
     root2.title("Search Flight")
     Label(root2,text="FROM").grid(row=0,column=0)
-    l1 = ttk.Combobox(root2,height=5,width=15,values=["BKK","DOH","Dallas","San Francisco"]) #need to change to airport
+    l1 = ttk.Combobox(root2,height=5,width=15,values=airports_code) #need to change to airport
     l1.grid(row=1,column=0)
     Label(root2,text="TO").grid(row=0,column=1)
-    l2 = ttk.Combobox(root2,height=5,width=15,values=["BKK","DOH","Dallas","San Francisco"]) #need to change to airport
+    l2 = ttk.Combobox(root2,height=5,width=15,values=airports_code) #need to change to airport
     l2.grid(row=1,column=1)
     Label(root2,text="Trip").grid(row=0,column=2)
     l3 = ttk.Combobox(root2,height=5,width=15,values=["One Way"]) #delete Round Trip
@@ -29,7 +32,7 @@ def fun1():
     l42 = ttk.Combobox(root2,height=5,width=15,values=list(range(1, 13)))
     l42.grid(row=2,column=3)
     l42.insert(0,"Month")
-    l43 = ttk.Combobox(root2,height=5,width=15,values=list(range(2023, 2026)))
+    l43 = ttk.Combobox(root2,height=5,width=15,values=['2023']) #need to add more year
     l43.grid(row=3,column=3)
     l43.insert(0,"Year")
     '''Label(root2,text="Return Date").grid(row=0,column=4)
@@ -103,19 +106,23 @@ def fun1():
                 Label(root3,text="Business").grid(row=0,column=6)
                 Label(root3,text="First").grid(row=0,column=7)
                 #print(r.json)
-                for itinerary in r.json() :
-                    departure = itinerary[0]['departure']
-                    arrival = itinerary[-1]['arrival']
-                    origin = itinerary[0]['origin']
-                    destination = itinerary[-1]['destination']
+                result = r.json() 
+                for n, itinerary in enumerate(result) :
+                    first_flight = itinerary['flights'][0]
+                    last_flight = itinerary['flights'][-1]
+
+                    departure = first_flight['departure']
+                    arrival = last_flight['arrival']
+                    origin = first_flight['origin']
+                    destination = last_flight['destination']
                     '''economy = itinerary[0]['fare']['economy']
                     business = itinerary[0]['fare']['business']
                     first = itinerary[0]['fare']['first']'''
 
-                    Label(root3,text=origin).grid(row=1,column=0)
-                    Label(root3,text=destination).grid(row=1,column=1)
-                    Label(root3,text=departure).grid(row=1,column=2)
-                    Label(root3,text=arrival).grid(row=1,column=3)
+                    Label(root3,text=origin).grid(row=n+1,column=0)
+                    Label(root3,text=destination).grid(row=n+1,column=1)
+                    Label(root3,text=departure).grid(row=n+1,column=2)
+                    Label(root3,text=arrival).grid(row=n+1,column=3)
                     '''Label(root3,text=economy).grid(row=1,column=6)
                     Label(root3,text=business).grid(row=1,column=7)
                     Label(root3,text=first).grid(row=1,column=8)'''
@@ -329,13 +336,19 @@ def fun7():
         if fn=="" or ln=="" or dob=="" or nat=="" or pn=="" or ea=="" or mr==False and mrs==False and ms==False or m==False and f==False:
             messagebox.showerror("Error","Please Fill All the Fields")
         else:
-            #algorithm for viewing passenger details
+            
             root14.destroy()
             root15=Tk()
             root15.title("Passenger Details")
+
+            #STORE THE DETAILS IN THE DATABASE (need to fix this)
+            
+
             Label(root15,text="Passenger Details").pack()
             root15.mainloop()
         
+    #PROCEED TO BOOKING (need to fix this)
+
     Bc=Button(root14,text="Start Booking",bg='green',command=fun71).grid(row=18,column=1)
     root14.mainloop()
 
