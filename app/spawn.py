@@ -283,11 +283,18 @@ Airline.select_seats(
 
 
 #Testing Start Here
+client1 = plum
+
 #View Booking Use Case
-client1.add_booking(Booking(client1, return_trip, contact1, [passengerDetails1]))
+Airline.create_booking(plum, [
+        (results[0], TravelClass.ECONOMY),
+    ], contact1, passengerDetails1,
+)
+# booking1 = Booking(client1, return_trip, contact1, (passengerDetails1,))
+# client1.add_booking(booking1)
 
 def test_viewbooking(): #Manually Create adn Add a Booking
-    my_list = client1.view_booking(client1.select_booking(1))
+    my_list = client1.view_booking(client1.get_booking(booking.id))
 
 #booking = client1.select_booking(1)
 #booking2 = client1.select_booking(2)
@@ -297,16 +304,15 @@ def test_viewbooking(): #Manually Create adn Add a Booking
 #Testing Modify Booking
 #Airline.modify_booking(client1, 1)
 
-from typing import Union
-
 from fastapi import FastAPI
 
 app = FastAPI()
 
 @app.get("/booking_info", tags=['booking'])
-async def view_booking(booking_no: int) -> dict:
-    book = client1.select_booking(booking_no)
+async def view_booking(booking_no: UUID) -> dict:
+    book = client1.get_booking(booking_no)
     return {"my_list" : client1.view_booking(book)}
 
 @app.put("/booking_info", tags=['booking'])
 async def update_booking() -> dict:
+    ...

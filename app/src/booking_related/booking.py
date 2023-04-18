@@ -66,6 +66,10 @@ class Booking:
         return self.__datetime
     
     @property
+    def id(self):
+        return self.__reference
+    
+    @property
     def pax(self):
         return Pax.init(self.passengers)
     
