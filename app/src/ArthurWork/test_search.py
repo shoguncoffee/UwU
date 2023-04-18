@@ -1,5 +1,5 @@
 from rapidfuzz import process
-from .airport import Airport
+from ..airport import Airport
 
 airports = [
     Airport("Suvarnabhumi Airport", "BKK", "Bangkok", "Thailand"),
