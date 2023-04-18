@@ -1,10 +1,15 @@
 # UwU
 
-python >= 3.11
+python 3.11
 
-install 
 ```
-pip3 install -r requirements
+pip install -r requirements
 ```
 
-csv separator = ;
+```
+\UwU\..> python UwU
+```
+
+```
+\UwU> python .
+```

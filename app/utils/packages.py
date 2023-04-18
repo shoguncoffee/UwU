@@ -2,13 +2,26 @@
 necessary packages
 """
 import os, sys
-#import tqdm
-import numpy, itertools
-import asyncio
+import numpy
 import csv, json
-#from moneyed import Money
-from datetime import datetime, date, time
-from dataclasses import dataclass, field
+import asyncio
+import datetime as dt
+# import tqdm
+
+from dataclasses import dataclass, field, replace, KW_ONLY, asdict
+from uuid import UUID, uuid4
+from string import ascii_uppercase
+
+# from moneyed import Money
+from math import ceil, floor
+from itertools import (
+    product,
+    repeat, 
+    islice, 
+    count, 
+    cycle
+)
+from abc import ABC, abstractmethod
 from types import ModuleType
 from typing import (
     ItemsView, 
@@ -20,5 +33,10 @@ from typing import (
     TypeVar, 
     Sequence, 
     Optional,
-    ClassVar
+    ClassVar,
+    Self,
+    Collection,
+    Iterable,
+    Annotated,
+    Literal,
 )
