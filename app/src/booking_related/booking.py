@@ -3,42 +3,51 @@ from ..base import *
 
 from dataclasses import InitVar
 from .reservation import FlightReservation
+from .passenger import Pax
 if TYPE_CHECKING:
     from app.src import *
 
 
 @dataclass(slots=True)
 class Booking:
-    __datetime: datetime = field(init=False, default_factory=datetime.now)
+    __datetime: dt.datetime = field(init=False, default_factory=dt.datetime.now)
     
     __creator: Customer # type: ignore
-    __journey: InitVar[list[Trip]] # type: ignore
+    journey: InitVar[list[tuple[FlightItinerary, TravelClass]]]
     __contactinfo: ContactInformation # type: ignore
-    #ATTENTION ATTENTION ATTENTION!!!!!!!!!!!!!!!
-    #Changing tuple to list to fix some problem until create booking is done
-    __passenger: list[PassengerDetails, ...] # type: ignore
+    __passengers: tuple[PassengerDetails, ...] # type: ignore
     
-    __reservation: tuple[FlightReservation, ...] = field(init=False)
+    __reference: UUID = field(init=False, default_factory=uuid4) # undone
+    __reservations: tuple[FlightReservation, ...] = field(init=False)
     __payment: Optional[Payment] = field(init=False, default=None)
     __status: BookingStatus = field(init=False, default=BookingStatus.INCOMPLETE)
 
-    def __post_init__(self, journey: list[Trip]):
-        self.__reservation = tuple(
-            FlightReservation(flight, trip.travel_class, self) 
-            for trip in journey for flight in trip.flights
+    def __post_init__(self, journey: list[tuple[FlightItinerary, TravelClass]]):
+        self.__reservations = tuple(
+            FlightReservation(flight, travel_class, self) 
+            for itinerary, travel_class in journey 
+            for flight in itinerary
         )
-
+    
+    @property
+    def datetime(self):
+        return self.__datetime
+    
     @property
     def creator(self):
         return self.__creator
                 
     @property
-    def reservation(self):
-        return self.__reservation
+    def reservations(self):
+        return self.__reservations
     
     @property
-    def passenger(self):
-        return self.__passenger
+    def passengers(self):
+        return self.__passengers
+    
+    @property
+    def reference(self):
+        return self.__reference
     
     @property
     def contactinfo(self):
@@ -53,20 +62,36 @@ class Booking:
         return self.__status
     
     @property
-    def creation_datetime(self):
+    def creation_time(self):
         return self.__datetime
-    
-    
-    @property
-    def is_completed(self):
-        return self.status == BookingStatus.COMPLETED
     
     @property
     def pax(self):
-        return len(self.passenger)
+        return Pax.init(self.passengers)
     
     def cancel(self):
         self.__status = BookingStatus.CANCELLED
         
     def pending(self):
         self.__status = BookingStatus.PENDING
+        
+    def complete(self):
+        self.__status = BookingStatus.COMPLETED
+        
+    def get_price(self):
+        prices = []
+        for reservation in self.reservations:
+            fare = reservation.flight.get_fare(reservation.travel_class)
+            if reservation.selected:
+                prices.extend(
+                    fare.get_price(
+                        selected.passenger.type, 
+                        selected.seat and selected.seat.type
+                    ) for selected in reservation.selected
+                )
+            else:
+                prices.extend(
+                    fare.get_price(passenger.type) 
+                    for passenger in self.passengers
+                )   
+        return sum(prices)

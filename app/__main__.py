@@ -6,20 +6,36 @@ for this package:
 
 
 for individual submodule in this package:
-- ``\UwU> python -m app.<module>`
+- `\UwU> python -m app.<module>`
 """
 
-import pickle
+from multiprocessing import Process
 from .system import *
+import uvicorn
+import pickle
 
 
-path = 'app/data/...'
+if 0:
+    path = 'app/data/...'
 
-with open(path, 'rb') as f:
-    airline = pickle.load(f)
+    with open(path, 'rb') as f:
+        airline = pickle.load(f)
 
-# 
-from app import api
+
+    with open(path, 'wb') as f:
+        pickle.dump(airline, f)
+        
+    os.system('python3.11 -m uvicorn app.api:web --reload')
+    os.system('python3.11 -m app.interface')
     
-with open(path, 'wb') as f:
-    pickle.dump(airline, f)
+
+Process(
+    target=uvicorn.run, 
+    args=('app.api:web',),
+    kwargs={'reload': True}
+).start()
+
+Process(
+    target=__import__, 
+    args=('app.interface',)
+).start()

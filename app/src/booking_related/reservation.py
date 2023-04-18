@@ -7,44 +7,38 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class FlightReservation:
-    __flight: FlightInstance # type: ignore
+    __instance: FlightInstance # type: ignore
     __travel_class: TravelClass # type: ignore
     __holder: Booking # type: ignore
     
-    __reservation: Optional[tuple[SeatReservation]] = field(init=False, default=None)
+    __selected: Optional[tuple[SeatReservation]] = field(init=False, default=None)
 
     @property
     def flight(self):
-        return self.__flight
+        return self.__instance
     
     @property
     def travel_class(self):
-        if self.__travel_class == TravelClass.ECONOMY:
-            return 'Economy Class'
-        elif self.__travel_class == TravelClass.BUSINESS:
-            return 'Business Class'
-        else:
-            return 'First Class'
+        return self.__travel_class
     
     @property
     def holder(self):
         return self.__holder
     
     @property
-    def reservation(self):
-        return self.__reservation or ()
-
-    @property
-    def is_selected(self):
+    def selected(self):
         """
-        True if seats has been selected
+        selected seats
         """
-        return self.reservation is not None
+        return self.__selected
     
-    
-    def select_seat(self, selected: tuple[SeatReservation]):
-        if self.holder and len(selected) == self.holder.pax:
-            self.__reservation = selected
+    def select_seats(self, selected: Iterable[SeatReservation]):
+        selected = tuple(selected)
+        passengers = {
+            select.passenger for select in selected
+        }
+        if passengers == set(self.holder.passengers):
+            self.__selected = selected
             return True
 
 

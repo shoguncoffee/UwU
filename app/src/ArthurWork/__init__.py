@@ -1,4 +1,3 @@
 from .aircraft import Aircraft, Desk, CabinLayout, Seat
-from .itinerary import FlightItinerary, Trip
+from .itinerary import FlightItinerary
 from .airport import Airport
-from .seat_price import SeatPrice

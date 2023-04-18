@@ -2,15 +2,15 @@ from __future__ import annotations
 from ..base import *
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, unsafe_hash=True)
 class PassengerDetails:
     __forename: str # type: ignore
     __surname: str # type: ignore
-    __birthdate: date # type: ignore
+    __birthdate: dt.date # type: ignore
     __nationality: str # type: ignore
     __passport_id: str # type: ignore
     __gender: GenderType # type: ignore
-    __passenger_type: PassengerType # type: ignore
+    __type: PassengerType # type: ignore
     
     @property #Getter
     def forename(self):
@@ -29,11 +29,11 @@ class PassengerDetails:
         self.__surname = new_value
     
     @property #Getter
-    def birthday(self):
-        return self.__birthdate.strftime('%d-%B-%Y')
+    def birthdate(self):
+        return self.__birthdate
     
-    @birthday.setter #Setter
-    def birthday(self, new_value):
+    @birthdate.setter #Setter
+    def birthdate(self, new_value):
         self.__birthdate = new_value
     
     @property #Getter
@@ -45,36 +45,30 @@ class PassengerDetails:
         self.__nationality = new_value
 
     @property #Getter
-    def passport(self):
+    def passport_id(self):
         return self.__passport_id
     
-    @passport.setter #Setter
-    def passport(self, new_value):
+    @passport_id.setter #Setter
+    def passport_id(self, new_value):
         self.__passport_id = new_value
 
     @property #Getter
     def gender(self):
-        if self.__gender == GenderType.MALE:
-            return 'Male'
-        else:
-            return 'Female'
+        return self.__gender
+
     
     @gender.setter #Setter
     def gender(self, new_value):
         self.__gender = new_value
 
     @property #Getter
-    def passenger_type(self):
-        if self.__passenger_type == PassengerType.ADULT:
-            return 'Adult'
-        elif self.__passenger_type == PassengerType.CHILD:
-            return 'Child'
-        else:
-            return 'Infant'
+    def type(self):
+        return self.__type
+
     
-    @passenger_type.setter #Setter
-    def passenger_type(self, new_value):
-        self.__passenger_type = new_value
+    @type.setter #Setter
+    def type(self, new_value):
+        self.__type = new_value
 
     @property
     def fullname(self):
@@ -82,3 +76,32 @@ class PassengerDetails:
 
     #def change_forename(self, name: str):
     #    self.__forename = name
+    
+    
+class Pax(tuple[tuple[PassengerType, int], ...]):
+    """
+    (PassengerType, number)
+    """
+    def get(self, passenger_type: PassengerType):
+        for type, number in self:
+            if type == passenger_type:
+                return number
+        raise KeyError
+    
+    @property
+    def total_capable(self):
+        """
+        non-infant passengers
+        """
+        return sum(
+            number for type, number in self 
+            if type is not PassengerType.INFANT
+        )
+    
+    @classmethod 
+    def init(cls, passengers: Sequence[PassengerDetails]):
+        types = [passenger.type for passenger in passengers]
+        return cls(
+            (type, types.count(type)) 
+            for type in PassengerType if type in types
+        )

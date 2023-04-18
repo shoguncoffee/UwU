@@ -9,7 +9,6 @@ if TYPE_CHECKING:
 class ContactInformation:
     __passenger: PassengerDetails  # type: ignore
     __phone: str # type: ignore
-    __phone_country: str # type: ignore
     __email: str # type: ignore
     
     @property #Getter
@@ -31,15 +30,6 @@ class ContactInformation:
 
 
     @property #Getter
-    def phone_country(self):
-        return self.__phone_country
-    
-    @phone_country.setter #Setter
-    def phone_country(self, new_value):
-        self.__phone_country = new_value
-
-
-    @property #Getter
     def email(self):
         return self.__email
     
@@ -51,9 +41,3 @@ class ContactInformation:
     @property
     def name(self):
         return self.passenger.fullname
-    
-    def request_contact():
-        pass
-
-    def modify_contact():
-        pass

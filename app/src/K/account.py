@@ -2,7 +2,7 @@ from __future__ import annotations
 from ..base import *
 
 if TYPE_CHECKING:
-    from app.src import Booking, Trip, ContactInformation, PassengerDetails
+    from app.src import Booking
 
 @dataclass(slots=True)
 class Account:
@@ -10,7 +10,7 @@ class Account:
     _password: str
     _email: str
     _phone: str
-    _status: AccountStatus = field(init=False, compare=False, default=AccountStatus.PENDING)
+    _status: AccountStatus = field(init=False, default=AccountStatus.PENDING)
     # __reference: str = field(init=False)
     
     @property
@@ -22,14 +22,19 @@ class Account:
         return self._email
     
     @property
-    def password(self):
-        return self._password
+    def phone(self):
+        return self._phone
     
     @property
     def status(self):
         return self._status
-    
-    
+
+
+@dataclass(slots=True)
+class Admin(Account):
+    ...
+
+
 @dataclass(slots=True)
 class Customer(Account):
     __bookings: list[Booking] = field(init=False, default_factory=list)
@@ -38,34 +43,16 @@ class Customer(Account):
     def bookings(self):
         return self.__bookings
 
-
-    def request_booking(self,
-        journey: list[Trip],
-        contact: ContactInformation,
-        *passenger: PassengerDetails,
-    ):
-        if self.status != AccountStatus.PENDING:
-            from app.system import Airline
-            Airline.create_booking(
-                self, 
-                journey, 
-                contact, 
-                *passenger, 
-            )
-
     def add_booking(self, booking: Booking):
-        print("Status Report : Add Booking Completed") #Delete later
-        self.__bookings.append(booking)            
+        if booking.creator == self:
+            self.bookings.append(booking)
     
-
-    def select_booking(self, num):
-        if (int(num) > len(self.__bookings) or int(num) <= 0):
-            print("This booking doesn't exist.")
-        else:
-            print("Status Report : Select Booking Completed") #Delete later
-            return self.__bookings[int(num) - 1]
-            
-            
+    def get_booking(self, id: UUID):
+        for booking in self.bookings:
+            if booking.reference == id:
+                return booking
+        raise KeyError
+    
     def view_booking(self, booking):
         info_list = []
         #Flight Infos
@@ -108,12 +95,3 @@ class Customer(Account):
             booking.contactinfo.email,
         ])
         return info_list #return list
-
-    def modify_booking(self):
-        pass
-    
-    
-@dataclass(slots=True)
-class Admin(Account):
-    def request(self):
-        ...

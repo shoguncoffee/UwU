@@ -3,11 +3,15 @@ system
 """
 from __future__ import annotations
 from .base import *
-
 from .src import *
 
-
 class Airline:
+    """
+    ### represent the system of this project
+    
+    init system
+    >>> Airline()
+    """
     name = 'Qatar Airways'
     designator = 'QR'
     
@@ -57,102 +61,145 @@ class Airline:
     @classmethod
     def create_booking(cls,
         creator: Customer,
-        journey: list[Trip],
+        journey: list[tuple[FlightItinerary, TravelClass]],
         contact: ContactInformation,
         *passengers: PassengerDetails,
     ):
-        pax = len(passengers)
-        if all(trip.bookable(pax) for trip in journey):
+        pax = Pax.init(passengers)
+        if all(
+            itinerary.bookable(pax, travel_class) 
+            for itinerary, travel_class in journey
+        ):
             booking = Booking(
                 creator,
                 journey,
                 contact,
                 passengers,
             )
-            for reserved in booking.reservation:
-                flight = reserved.flight
-                if flight.bookable(reserved.travel_class, pax):
-                    flight.booked(reserved)
-                else: break
+            for reservation in booking.reservations:
+                flight = reservation.flight
+                flight.booked(reservation)
                 
-            else:
-                creator.add_booking(booking)
-                booking.pending()       
+            creator.add_booking(booking)
+            booking.pending()
+            return True
+    
+    
+    @classmethod
+    def select_seats(cls, 
+        reservation: FlightReservation,
+        selected: list[tuple[PassengerDetails, Seat]],
+    ):
+        instance = reservation.flight
+        occupied = instance.get_occupied_of(
+            reservation.travel_class
+        )
+        if not occupied.intersection(seat for _, seat in selected):
+            return reservation.select_seats(
+                SeatReservation(*select) for select in selected
+            )
+    
+    
+    @classmethod
+    def pay(cls, 
+        booking: Booking,
+        payment: Payment,
+    ):
+        
+        return ...
+    
     
     @classmethod
     def register(cls, account: Account):
         if account not in cls.accounts:
-            cls.accounts.add(account)
+            cls.accounts.append(account)
             return True
         
         return False
-
-
-    @classmethod
-    def search_segment(cls,
-        origin: Airport, 
-        destination: Airport, 
-        date: date,
-        pax: int,
-    ):
-        result = cls.schedules[date].route_search(
-            origin, destination, 
-        )
-        return [
-            flight for flight in result
-            if flight.bookingable(pax)
-        ]
+    
     
     @classmethod
     def search_journey(cls,
-        stops: list[Airport], 
-        date: date,
-        pax: int,
-        daylimit: int = 2,
-    ): 
-        possible = [
-            cls.search_segment(
-                org, dst, date, pax
-            ) for org, dst in zip(stops, stops[1:])
-        ]
-        for result in product(*possible):
-            ...
-            
-        results = ...
-        return
-    
-    @classmethod
-    def search_return(cls, 
         origin: Airport, 
         destination: Airport, 
-        dates: tuple[date, date],
-        pax: int,
-    ):  
-        return search_multicity(
-            
+        date: dt.date,
+        pax: Pax = Pax(),
+        duration_cutoff: dt.timedelta = dt.timedelta(hours=17),
+    ): 
+        """
+        return a list of FlightItinerary by any possible FlightInstance
+        that can take from origin to destination in limit duration
+        """
+        possible_instance: list[FlightInstance] = []
+        for _date in daterange(duration_cutoff.days, date):
+            schedule = Airline.schedules.get(_date)
+            possible_instance.extend(schedule or [])
+        
+        possible_itinerary = _path_algorithm(
+            start = origin,
+            target = destination,
+            depature = date,
+            pool = possible_instance,
+            limit = duration_cutoff
         )
-        ...
-        
-    @classmethod
-    def search_multicity(cls, 
-        origin: Airport, 
-        destinations: tuple[date, Airport], 
-        pax: int,
-    ):  
-        return [
-            cls.search_journey([origin, destination], date, pax)
-            for date in dates
+        result = [
+            itinerary for itinerary in possible_itinerary 
+            if itinerary.bookable(pax)
         ]
-        ...
+        result.sort(
+            key = lambda itinerary: itinerary.lowest_fare()
+        )
+        return result
+        
+        
+        #Booking Features Branch Begins Here
+        @classmethod
+        def modify_booking(cls, customer: Customer, booking_no):
+            booking = customer.select_booking(booking_no)
+            passenger = booking.passenger
+            contact = booking.contactinfo
+            
+            for i in passenger:
+                pass
+        #What you going to do now is that customer(Frontend) will request modify through Airline, passing current Customer Account
+        
+        
+def _path_algorithm(
+    *path: FlightInstance, 
+    start: Airport,
+    target: Airport,
+    pool: Sequence[FlightInstance],
+    limit: dt.timedelta,
+    depature: Optional[dt.date] = None,
+) -> Generator[FlightItinerary, None, None]:
+    
+    cumulative_time = sum(
+        [inst.flight.duration for inst in path], 
+        start = dt.timedelta()
+    )
+    for instance in pool:
+        if instance not in path and instance.origin is start:
+            this_flight = instance.flight
+            time_taken = cumulative_time + this_flight.duration
+            if path:
+                prev_flight = path[-1].flight
+                transit_time = difference_time(
+                    prev_flight.arrival, this_flight.departure
+                )
+                time_taken += transit_time
+            elif instance.date != depature:
+                continue
+            
+            if time_taken < limit:
+                dest = instance.destination
+                if dest is target:
+                    yield FlightItinerary([*path, instance])
 
-    #Booking Features Branch Begins Here
-    @classmethod
-    def modify_booking(cls, customer: Customer, booking_no):
-        booking = customer.select_booking(booking_no)
-        passenger = booking.passenger
-        contact = booking.contactinfo
-        
-        for i in passenger:
-            pass
-        
-    #What you going to do now is that customer(Frontend) will request modify through Airline, passing current Customer Account
+                else:
+                    yield from _path_algorithm(
+                        *path, instance, 
+                        start = dest,
+                        target = target, 
+                        pool = pool, 
+                        limit = limit
+                    )
