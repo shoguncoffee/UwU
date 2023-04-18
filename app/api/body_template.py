@@ -108,7 +108,6 @@ class FlightInfoBody(BaseModel):
     arrival: dt.time
     date: dt.date
     aircraft_model: str
-    class_of_travel: list[ClassBody]
     
     @classmethod
     def transform(cls, obj: src.FlightInstance, pax: src.Pax):
@@ -120,13 +119,14 @@ class FlightInfoBody(BaseModel):
             arrival=obj.flight.arrival,
             date=obj.date,
             aircraft_model=obj.aircraft.model,
-            class_of_travel=ClassBody.init(obj, pax)
         )
     
     @classmethod
     def transforms(cls, objs: Sequence[src.FlightInstance], pax: src.Pax):
-        return [
-            cls.transform(obj, pax) for obj in objs
+        return [{
+            'flights': cls.transform(obj, pax),
+            'class_of_travel': ClassBody.init(obj, pax)
+            } for obj in objs
         ]
     
     
