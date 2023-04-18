@@ -1,8 +1,8 @@
 from __future__ import annotations
-from ..base import *
+from .base import *
 
-from ..flightsystem import FlightInstance
-from ..booking_related import Pax
+from .flight import FlightInstance
+from .passenger import Pax
 
 
 class FlightItinerary(tuple[FlightInstance]):

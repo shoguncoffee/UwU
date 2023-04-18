@@ -1,5 +1,7 @@
 from __future__ import annotations
-from ..base import *
+from .base import *
+
+from string import ascii_uppercase
 
 
 @dataclass(slots=True, frozen=True)

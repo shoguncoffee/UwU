@@ -1,4 +1,6 @@
-from .ArthurWork import *
+from .aircraft import Aircraft, Desk, CabinLayout, Seat
+from .itinerary import FlightItinerary
+from .airport import Airport
 from .payment import Payment, CreditClassPayment, InternetBankingPayment, PaypalPayment
 from .account import Account, Customer, Admin
 from .booking import Booking
