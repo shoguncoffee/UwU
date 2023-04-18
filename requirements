@@ -4,3 +4,4 @@ geopy
 py-moneyed
 tdqm
 rapidfuzz
+requests

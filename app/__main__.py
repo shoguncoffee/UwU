@@ -28,4 +28,6 @@ if 0:
     os.system('python3 -m app.interface')
     
 
-uvicorn.run('app.api:web', reload=True)
+#os.system('python3.11 -m uvicorn app.api:web --reload')
+#os.system('python3.11 -m app.interface.tk')
+#uvicorn.run('app.api:web', reload=True)
