@@ -7,9 +7,8 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class ContactInformation:
-    __passenger: PassengerDetails  # type: ignore
+    __passenger: PassengerDetails # type: ignore
     __phone: str # type: ignore
-    __phone_country: str # type: ignore
     __email: str # type: ignore
     
     @property
@@ -21,20 +20,9 @@ class ContactInformation:
         return self.__phone
 
     @property
-    def phone_country(self):
-        return self.__phone_country
-
-    @property
     def email(self):
         return self.__email
-
 
     @property
     def name(self):
         return self.passenger.fullname
-    
-    def request_contact():
-        pass
-
-    def modify_contact():
-        pass

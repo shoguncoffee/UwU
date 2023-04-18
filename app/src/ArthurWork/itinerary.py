@@ -1,59 +1,51 @@
 from __future__ import annotations
 from ..base import *
 
-if TYPE_CHECKING:
-    from app.src import FlightInstance
+from ..flightsystem import FlightInstance
+from ..booking_related import Pax
 
 
-@dataclass(init=False, slots=True, unsafe_hash=True)
-class FlightItinerary:
+class FlightItinerary(tuple[FlightInstance]):
     """
-    collection of flight
+    ### collection of FlightInstance
+        - represent a one flight or connecting flights
+        - provide some useful methods to get information from group of flights
+        - intended to be used for summarizing information to user
     """
-    __flights: tuple[FlightInstance, ...]
-    
-    def __init__(self, *flight: FlightInstance):
-        self.__flights = flight
-    
     @property
-    def flights(self):
-        return self.__flights
+    def all_travel_class(self) -> set[TravelClass]:
+        return {
+            travel_class for instance in self
+            for travel_class in instance.all_travel_class 
+        }
     
-    def choice(self, cls: TravelClass):
-        return Trip(self, cls)
-    
-    def bookable(self, pax: int):
+    def bookable(self, 
+        pax: Pax, 
+        travel_class: Optional[TravelClass] = None
+    ):
         """
-        check if this itinerary is bookable by any travel class
+        check if this itinerary is bookable by any travel class for pax (number of passenger)
         """
-        return all(
-            flight.bookable(travel_class, pax) 
-            for flight in self.flights
-            for travel_class in flight.all_travel_class
+        if travel_class:
+            return all(
+                flight.bookable(pax, travel_class) for flight in self
+            )
+        return all(any(
+                flight.bookable(pax, cls) for cls in flight.all_travel_class
+            ) for flight in self
         )
-
-
-@dataclass(slots=True, frozen=True)
-class Trip:
-    """
-    trip segment, just a ...
-    """
-    __itinerary: FlightItinerary # type: ignore
-    __travel_class: TravelClass # type: ignore
-    
-    @property
-    def flights(self):
-        return self.__itinerary.flights
-    
-    @property
-    def travel_class(self):
-        return self.__travel_class
-    
-    def bookable(self, pax: int):
-        """
-        check if this trip is bookable
-        """
-        return all(
-            flight.bookable(self.travel_class, pax) 
-            for flight in self.flights
+        
+    def lowest_fare(self):
+        return self.get_price(
+            Pax([(PassengerType.ADULT, 1)]), 
+            TravelClass.ECONOMY
         )
+        
+    def get_price(self, pax: Pax, travel_class: TravelClass):
+        prices = []
+        for instance in self:
+            fare = instance.get_fare(travel_class)
+            prices.append(
+                fare.pax_price(pax)
+            )
+        return sum(prices)
