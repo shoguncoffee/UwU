@@ -6,6 +6,8 @@ from .base import *
 from .router import *
 import app.spawn
 
+from . import addFlight_fastAPI, login_fastAPI
+
 web = FastAPI()
 
 for module in (
@@ -14,6 +16,8 @@ for module in (
     user,
     booking,
     payment,
+    addFlight_fastAPI,
+    login_fastAPI
 ):
     web.include_router(module.router)
 

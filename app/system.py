@@ -117,6 +117,10 @@ class Airline:
         
         return False
     
+    @classmethod
+    def login(cls, username: str, password: str):
+        account = cls.accounts.get(username)
+        return account.hash_password == hash(password)
     
     @classmethod
     def search_journey(cls,

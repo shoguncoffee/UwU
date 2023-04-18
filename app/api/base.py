@@ -3,3 +3,5 @@ from app.system import Airline
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, Query, Body
 
 import app.src as src
+
+from app.spawn import *

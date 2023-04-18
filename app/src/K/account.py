@@ -29,6 +29,9 @@ class Account:
     def status(self):
         return self._status
 
+    @property
+    def hash_password(self):
+        return hash(self._password)
 
 @dataclass(slots=True)
 class Admin(Account):
