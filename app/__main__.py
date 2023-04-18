@@ -25,10 +25,17 @@ if 0:
     with open(path, 'wb') as f:
         pickle.dump(airline, f)
         
-    # python -m uvicorn app.api:app --reload    
-    os.system('python3 -m app.api')
-    os.system('python3 -m app.interface')
+    os.system('python3.11 -m uvicorn app.api:web --reload')
+    os.system('python3.11 -m app.interface')
     
 
-Process(target=lambda: uvicorn.run('app.api:web', reload=True)).start()
-Process(target=lambda: __import__('app.interface')).start()
+Process(
+    target=uvicorn.run, 
+    args=('app.api:web',),
+    kwargs={'reload': True}
+).start()
+
+Process(
+    target=__import__, 
+    args=('app.interface',)
+).start()
