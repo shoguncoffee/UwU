@@ -1,1 +1,1 @@
-from . import login_registor_tk, booking_tk, addFlight_tk
+from . import booking_tk, addFlight_tk, main_tk

@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk,messagebox
+from tkinter import ttk, messagebox, BooleanVar
 import requests
 
 API_EndPoint1 = "http://127.0.0.1:8000/account/createAccount"
@@ -194,7 +194,6 @@ class SearchFlightWindow:
     def __init__(self, master):
         self.master = master
         master.title("Search Flight")
-        self.master.geometry("700x200")
         self.airports = requests.get(API_Data1).json()
         self.airports_code = [airport["location_code"] for airport in self.airports]
         
@@ -238,9 +237,9 @@ class SearchFlightWindow:
         self.passenger_infant_combobox.grid(row=3,column=5)
         self.passenger_infant_combobox.insert(0, "Infant")
 
-        self.search_button = tk.Button(master, text="Search", command=self.search_flight).grid(row=5, column=3)
+        self.search_button = tk.Button(master, text="Search", command=self.search_flight).grid(row=5, column=2)
 
-        self.back_button = tk.Button(master, text="Back to Main", command=self.open_main).grid(row=6, column=3)
+        self.back_button = tk.Button(master, text="Back to Main", command=self.open_main).grid(row=6, column=2)
 
     def search_flight(self):
         origin = self.from_combobox.get()
@@ -257,7 +256,7 @@ class SearchFlightWindow:
             messagebox.showerror("Error","Please fill all the fields")
         else:
             if origin == destination:
-                messagebox.showerror("Error","Source and Destination cannot be same")
+                messagebox.showerror("Error","Origin and Destination cannot be same")
             else:
                 data = {
                     "origin": origin,
@@ -289,7 +288,6 @@ class SearchFlightResultWindow:
     def __init__(self, master, response: requests.Response):
         self.master = master
         master.title("Search Flight Result")
-        self.master.geometry("500x200")
 
         self.origin_label = tk.Label(master, text="Origin").grid(row=0, column=0)
         self.destination_label = tk.Label(master, text="Destination").grid(row=0, column=1)
@@ -298,9 +296,12 @@ class SearchFlightResultWindow:
         self.economy_label = tk.Label(master, text="Economy").grid(row=0, column=5)
         self.business_label = tk.Label(master, text="Business").grid(row=0, column=6)
         self.first_label = tk.Label(master, text="First").grid(row=0, column=7)
-
+        
         self.back_button = tk.Button(master, text="SearchFlight", command=self.open_search_flight).grid(row=0, column=8)
+        self.book_button = tk.Button(master, text="Book", command=self.open_passenger_details).grid(row=0, column=9)
 
+
+        print(response.text)
         result = response.json()
         for n, itinerary in enumerate(result) :
             first_flight = itinerary['flights'][0]
@@ -311,10 +312,10 @@ class SearchFlightResultWindow:
             origin = first_flight['origin']
             destination = last_flight['destination']
 
-            tk.Label(master,text=origin).grid(row=n+1,column=0)
-            tk.Label(master,text=destination).grid(row=n+1,column=1)
-            tk.Label(master,text=departure).grid(row=n+1,column=2)
-            tk.Label(master,text=arrival).grid(row=n+1,column=3)
+            self.origin_result_label = tk.Label(master,text=origin).grid(row=n+1,column=0)
+            self.destination_result_label = tk.Label(master,text=destination).grid(row=n+1,column=1)
+            self.departure_result_label = tk.Label(master,text=departure).grid(row=n+1,column=2)
+            self.arrival_result_label = tk.Label(master,text=arrival).grid(row=n+1,column=3)
 
     def open_search_flight(self):
         # Close the login window
@@ -322,8 +323,116 @@ class SearchFlightResultWindow:
 
         # Open the searchflight window
         root = tk.Tk()
-        main_window = SearchFlightWindow(root)
-        root.mainloop() 
+        searchFlight_window = SearchFlightWindow(root)
+        root.mainloop()
+
+    def open_passenger_details(self):
+        # Close the login window
+        self.master.destroy()
+
+        # Open the passenger details window
+        root = tk.Tk()
+        fillPassengerDetails_window = FillPassengerDetail(root)
+        root.mainloop()
+
+class FillPassengerDetail:
+    def __init__(self, master):
+        self.master = master
+        master.title("Fill Passenger Details")
+        master.geometry("500x500")
+
+        self.header_lable = tk.Label(master, text="Title").grid(row=0, column=0)
+
+        self.mr_check = BooleanVar()
+        self.mrs_check = BooleanVar()
+        self.ms_check = BooleanVar()
+        self.male_check = BooleanVar()
+        self.female_check = BooleanVar()
+
+        self.mr_checkbutton = tk.Checkbutton(master, text="Mr.", variable=self.mr_check).grid(row=1, column=0)
+        self.mrs_checkbutton = tk.Checkbutton(master, text="Mrs.", variable=self.mrs_check).grid(row=1, column=1)
+        self.ms_checkbutton = tk.Checkbutton(master, text="Ms.", variable=self.ms_check).grid(row=1, column=2)
+
+        self.firstname_lable = tk.Label(master, text="First Name").grid(row=2, column=0)
+        self.firstname_entry = tk.Entry(master)
+        self.firstname_entry.grid(row=3, column=0)
+        self.lastname_lable = tk.Label(master, text="Last Name").grid(row=2, column=1)
+        self.lastname_entry = tk.Entry(master)
+        self.lastname_entry.grid(row=3, column=1)
+        self.birth_lable = tk.Label(master, text="Date of Birth (DD/MM/YYYY)").grid(row=4, column=0)
+        self.birth_entry = tk.Entry(master)
+        self.birth_entry.grid(row=5, column=0)
+
+        self.nationality_combobox = ttk.Combobox(master, height=5, width=15, values=["Thailand","India","China"])
+        self.nationality_combobox.grid(row=5, column=1)
+        self.nationality_combobox.insert(0, "Nationality")
+
+        self.lable1 = tk.Label(master, text="").grid(row=6, column=1)
+
+        self.male_checkbutton = tk.Checkbutton(master, text="MALE", variable=self.male_check).grid(row=7, column=0)
+        self.female_checkbutton = tk.Checkbutton(master, text="FEMALE", variable=self.female_check).grid(row=7, column=1)
+
+        self.lable2 = tk.Label(master, text="").grid(row=8, column=1)
+
+        self.passport_detail_lable = tk.Label(master, text="Passport details (Optional)").grid(row=9, column=0)
+        self.passport_detail_entry = tk.Entry(master)
+        self.passport_detail_entry.grid(row=10, column=0)
+        self.passport_expiry_lable = tk.Label(master, text="Passport expiry date (Optional)").grid(row=9, column=1)
+        self.passport_expiry_entry = tk.Entry(master)
+        self.passport_expiry_entry.grid(row=10, column=1)
+
+        self.travel_type_lable = tk.Label(master, text="Travel document (Optional)").grid(row=11, column=0)
+        self.travel_type_combobox = ttk.Combobox(master, height=5, width=15, values=["Passport", "Green Card", "Visa"])
+        self.travel_type_combobox.grid(row=12, column=0)
+        self.travel_type_combobox.insert(0, "Travel Document Type")
+
+        self.residence_country_lable = tk.Label(master, text="Country of residence (Optional").grid(row=11, column=1)
+        self.residence_country_combobox = ttk.Combobox(master, height=5, width=15, values=["Thailand","India","China"])
+        self.residence_country_combobox.grid(row=12, column=1)
+        self.residence_country_combobox.insert(0, "Select Country")
+
+        self.lable3 = tk.Label(master, text="").grid(row=13, column=1)
+
+        self.contact_detail_lable = tk.Label(master, text="Contact details").grid(row=15, column=0)
+        self.phone_entry = tk.Entry(master)
+        self.phone_entry.grid(row=16, column=0)
+        self.phone_entry.insert(0, "Phone number")
+        self.email_entry = tk.Entry(master)
+        self.email_entry.grid(row=16, column=1)
+        self.email_entry.insert(0, "Email address")
+
+        self.lable4 = tk.Label(master, text="").grid(row=17, column=1)
+
+        self.back_button = tk.Button(master, text="SearchFlight", command=self.open_search_flight).grid(row=18, column=0)
+        self.back_button = tk.Button(master, text="Book", command=self.create_booking).grid(row=18, column=1)
+
+    def create_booking(self):
+        mr = self.mr_check.get()
+        mrs = self.mrs_check.get()
+        ms = self.ms_check.get()
+        firstname = self.firstname_entry.get()
+        lastname = self.lastname_entry.get()
+        date_of_birth = self.birth_entry.get()
+        nationality = self.nationality_combobox.get()
+        male = self.male_check.get()
+        female = self.female_check.get()
+        passport_detail = self.passport_detail_entry.get()
+        passport_expiry = self.passport_expiry_entry.get()
+        travel_document = self.travel_type_combobox.get()
+        country_of_residence = self.residence_country_combobox.get()
+        phone_number = self.phone_entry.get()
+        email_address = self.email_entry.get()
+
+    def open_search_flight(self):
+        # Close the login window
+        self.master.destroy()
+
+        # Open the searchflight window
+        root = tk.Tk()
+        searchFlight_window = SearchFlightWindow(root)
+        root.mainloop()
+
+
 
 root = tk.Tk()
 login_window = MainWindow(root)
