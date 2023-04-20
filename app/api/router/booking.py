@@ -1,10 +1,12 @@
 from .base import *
+from ..body_template import BookingBody
 
 router = APIRouter(
     prefix='/account',
     tags=["booking"],
 )
 
+print(BookingBody)
 
 @router.get("{username}/{booking_id}")
 async def view_booking(username: str, booking_id: UUID): # vs get_bookings?

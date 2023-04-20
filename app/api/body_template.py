@@ -3,7 +3,6 @@ https://fastapi.tiangolo.com/tutorial/body
 """
 from telnetlib import STATUS
 
-from app.api.router import booking
 from .base import *
 from pydantic import BaseModel
 
@@ -77,7 +76,12 @@ class FlightInstanceBody(BaseModel):
         return src.FlightItinerary(
             obj.convert() for obj in objs
         )
-
+journey = [
+    (
+        [{'date': '', 'designator': ''}, {'date': '', 'designator': ''}], 
+        TravelClass.ECONOMY
+    ),
+]
 
 class ClassBody(BaseModel):
     travel_class: TravelClass

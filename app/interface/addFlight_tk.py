@@ -6,53 +6,67 @@ import datetime as dt
 API_EndPoint1 = "http://127.0.0.1:8000/flight/get_flight"
 API_EndPoint2 = "http://127.0.0.1:8000/flight/add_flight"
 
+
 class Application(tk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, master):
         super().__init__(master)
         self.master = master
+        self.master.title("Flight Management")
+        self.master.geometry("400x450")
+        self.master.resizable(False, False)
         self.pack()
         self.create_widgets()
 
     def create_widgets(self):
+        # Designator input
         self.designator_label = tk.Label(self, text="Designator:")
-        self.designator_label.pack()
+        self.designator_label.grid(row=0, column=0, sticky="w")
         self.designator_entry = tk.Entry(self)
-        self.designator_entry.pack()
+        self.designator_entry.grid(row=0, column=1)
 
+        # Departure input
         self.departure_label = tk.Label(self, text="Departure time (HH:MM):")
-        self.departure_label.pack()
+        self.departure_label.grid(row=1, column=0, sticky="w")
         self.departure_entry = tk.Entry(self)
-        self.departure_entry.pack()
+        self.departure_entry.grid(row=1, column=1)
 
+        # Arrival input
         self.arrival_label = tk.Label(self, text="Arrival time (HH:MM):")
-        self.arrival_label.pack()
+        self.arrival_label.grid(row=2, column=0, sticky="w")
         self.arrival_entry = tk.Entry(self)
-        self.arrival_entry.pack()
+        self.arrival_entry.grid(row=2, column=1)
 
+        # Origin airport input
         self.origin_label = tk.Label(self, text="Origin airport:")
-        self.origin_label.pack()
+        self.origin_label.grid(row=3, column=0, sticky="w")
         self.origin_entry = tk.Entry(self)
-        self.origin_entry.pack()
+        self.origin_entry.grid(row=3, column=1)
 
+        # Destination airport input
         self.destination_label = tk.Label(self, text="Destination airport:")
-        self.destination_label.pack()
+        self.destination_label.grid(row=4, column=0, sticky="w")
         self.destination_entry = tk.Entry(self)
-        self.destination_entry.pack()
+        self.destination_entry.grid(row=4, column=1)
 
+        # Add flight button
         self.add_flight_button = tk.Button(self, text="Add Flight", command=self.add_flight)
-        self.add_flight_button.pack()
+        self.add_flight_button.grid(row=5, column=0, pady=(20, 0), sticky="w")
 
+        # Get flights button
         self.get_flights_button = tk.Button(self, text="Get Flights", command=self.get_flights)
-        self.get_flights_button.pack()
+        self.get_flights_button.grid(row=5, column=1, pady=(20, 0), sticky="e")
 
+        # Quit button
         self.quit_button = tk.Button(self, text="Quit", command=self.master.quit)
-        self.quit_button.pack()
+        self.quit_button.grid(row=6, column=1, pady=(20, 0), sticky="e")
 
-        self.status_label = tk.Label(self, text="")
-        self.status_label.pack()
+        # Status label
+        self.status_label = tk.Label(self, text="", fg="green")
+        self.status_label.grid(row=7, columnspan=2, pady=(20, 0))
 
+        # Flights listbox
         self.flights_listbox = tk.Listbox(self)
-        self.flights_listbox.pack()
+        self.flights_listbox.grid(row=8, columnspan=2, padx=(10, 0), pady=(20, 0))
 
     def add_flight(self):
         designator = self.designator_entry.get()
@@ -76,9 +90,9 @@ class Application(tk.Frame):
             "destination": destination
         })
         if response.status_code == 200:
-            self.status_label.config(text="New flight added")
+            self.status_label.config(text="New flight added", fg="green")
         else:
-            self.status_label.config(text="Error adding flight")
+            self.status_label.config(text="Error adding flight", fg="red")
 
     def get_flights(self):
         response = requests.get(API_EndPoint1)
