@@ -1,0 +1,14 @@
+[
+    {
+        "key": "f9",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Python Top",
+        "when": "config.workspaceKeybindings.myAwesomeTask.enabled"
+    },
+    {
+        "key": "f10",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Python Module",
+        "when": "config.workspaceKeybindings.myAwesomeTask.enabled"
+    }
+]
