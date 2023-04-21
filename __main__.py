@@ -1,5 +1,5 @@
 r"""
-top-level interface of this project
+top-level package interface of this project
 
 - `\UwU> python .`
 - `\UwU\..> python UwU`

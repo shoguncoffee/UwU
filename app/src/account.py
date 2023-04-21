@@ -2,7 +2,8 @@ from __future__ import annotations
 from .base import *
 
 if TYPE_CHECKING:
-    from app.src import Booking
+    from app.src import *
+    
 
 @dataclass(slots=True)
 class Account:
@@ -42,13 +43,10 @@ class Customer(Account):
     @property
     def bookings(self):
         return self.__bookings
-
-    def add_booking(self, booking: Booking):
-        if booking.creator == self:
-            self.bookings.append(booking)
     
     def get_booking(self, id: UUID):
         for booking in self.bookings:
             if booking.reference == id:
                 return booking
+            
         raise KeyError

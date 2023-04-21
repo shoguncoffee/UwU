@@ -1,18 +1,12 @@
 """
 Catalog
 """
-from __future__ import annotations
+# from __future__ import annotations
 from .base import *
 
 from app.utils import search
-from app.src import (
-    Account,
-    Airport,
-    Aircraft,
-    Flight,
-    FlightPlan,
-    FlightInstance
-)
+from . import *
+
 __all__ = [
     'AccountCatalog',
     'AirportCatalog',
@@ -56,7 +50,7 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
                     FlightInstance(date, 
                         plan.flight, 
                         plan.default_aircraft, 
-                        plan.default_fares
+                        deepcopy(plan.default_fares)
                     )
                 )
     
@@ -87,7 +81,7 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
         if flight:
             results = [
                 plan for plan in results
-                if plan.flight == flight
+                if plan.flight is flight
             ]
         if date:
             results = list(
@@ -129,6 +123,7 @@ class ScheduleDate(list[FlightInstance]):
         for instance in self:
             if instance.designator == designator:
                 return instance
+            
         raise KeyError
     
     def route_search(self,
@@ -136,9 +131,8 @@ class ScheduleDate(list[FlightInstance]):
         destination: Airport,
     ):
         return [
-            instance for instance in self
-            if (instance.origin, instance.destination
-            ) == (origin, destination)
+            instance for instance in self if 
+            (instance.flight.origin, instance.flight.destination) == (origin, destination)
         ]
     
     def append(self, instance: FlightInstance):
@@ -159,13 +153,14 @@ class ScheduleCatalog(list[ScheduleDate]):
         for schedule in self:
             if schedule.date == date:
                 return schedule
+            
         raise KeyError
     
-    def clear_history(self, _date: Optional[dt.date] = None):
+    def clear_history(self, date: Optional[dt.date] = None):
         """
         remove all schedules before the given date (today by default)
         """
-        delta = (_date or dt.date.today()) - self.first.date
+        delta = (date or dt.date.today()) - self.first.date
         for day in daterange(delta.days - 1, self.first.date):
             if schedule := self.get(day):
                 self.remove(schedule)
@@ -217,6 +212,7 @@ class AirportCatalog(list[Airport]):
         for airport in self:
             if airport.location_code == key:
                 return airport
+            
         raise KeyError
     
     # def load(self):
@@ -251,6 +247,7 @@ class AircraftCatalog(list[Aircraft]):
         for aircraft in self:
             if aircraft.model == model:
                 return aircraft
+            
         raise KeyError
     
     # def load(self):
@@ -274,14 +271,9 @@ class AccountCatalog(list[Account]):
             for account in self:
                 if account.username == key.username or account.email == key.email:
                     return True
-                
+
         return False
-            
     
-    # def __repr__(self):
-    #     return '\n'.join(
-    #         repr(account) for account in self.values()
-    #     )
     def search(self, username: str):
         return list(search.simple('username', username, self))
     
@@ -289,4 +281,5 @@ class AccountCatalog(list[Account]):
         for account in self:
             if account.username == key:
                 return account
+            
         raise KeyError
