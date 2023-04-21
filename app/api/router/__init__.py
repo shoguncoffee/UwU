@@ -2,7 +2,7 @@
 https://fastapi.tiangolo.com/tutorial/bigger-applications
 """
 from . import (
-    get_data,
+    basic,
     search_flight,
     user,
     booking,
