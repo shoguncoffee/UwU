@@ -1,7 +1,6 @@
 from app.base import *
-from app.system import Airline
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, Query, Body
 
+from app.system import Airline
 import app.src as src
 
-from app.spawn import *
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, Query, Body

@@ -1,7 +1,0 @@
-<button id="button">Click me</button>
-<py-script>
-from pyodide import create_proxy
-def button_click(event):
-    print('I clicked a button')
-document.getElementById("button").addEventListener("click", create_proxy(button_click))
-</py-script>

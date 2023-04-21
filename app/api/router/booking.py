@@ -14,13 +14,14 @@ async def view_booking(username: str, booking_id: UUID): # vs get_bookings?
     assert isinstance(customer, src.Customer)
     
     booking = customer.get_booking(booking_id)
-    return BookingBody.transform(booking)
+    return BookingBody(booking)
 
 
 @router.post("{username}/{booking_id}/select-seat")
 async def select_seat(username: str,
     booking_id: UUID,
-    index: int,
+    segment_index: int,
+    reservation_index: int,
     selected: list[str],
 ):
     """
@@ -37,8 +38,8 @@ async def select_seat(username: str,
     booking = customer.get_booking(booking_id)
     assert len(booking.passengers) == len(selected)
     
-    reservation = booking.reservations[index]
-    aircraft = reservation.flight.aircraft
+    reservation = booking.reservations[segment_index][reservation_index]
+    aircraft = reservation.provider.host.aircraft
     return Airline.select_seats(
         reservation, [
             (passenger, aircraft.get_seat(seat_number)) 

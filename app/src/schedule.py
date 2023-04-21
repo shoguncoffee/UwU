@@ -1,10 +1,10 @@
 """
 """
 from __future__ import annotations
-from ..base import *
+from .base import *
 
 if TYPE_CHECKING:
-    from app.src import Flight, Aircraft, Fare
+    from app.src import *
     
     
 @dataclass(slots=True)
@@ -22,11 +22,14 @@ class Deviation:
     __months: set[int] = field(default_factory=set) # type: ignore
     __dates: set[dt.date] = field(default_factory=set) # type: ignore
     
-    def __contains__(self, d: dt.date):
+    def __contains__(self, date: dt.date):
+        """
+        check if date overlapping with this Deviation
+        """
         return (
-            d.weekday() in self.weekdays
-            or d.month in self.months
-            or d in self.dates
+            date.weekday() in self.weekdays
+            or date.month in self.months
+            or date in self.dates
         )
     
     @property
@@ -54,8 +57,8 @@ class FlightPlan:
     __exception: Deviation = field(default_factory=Deviation) # type: ignore
     
     _: KW_ONLY
-    default_aircraft: Aircraft # type: ignore
-    default_fares: tuple[Fare] # type: ignore
+    default_aircraft: Aircraft
+    default_fares: fares_param 
     
     def __contains__(self, value: dt.date | FlightPlan):
         """
@@ -77,12 +80,11 @@ class FlightPlan:
                 return False
             
             base = set(self.get_dates())
-            for _date in value.get_dates():
-                if _date in base:
+            for date in value.get_dates():
+                if date in base:
                     return True
                 
             return False
-    
     
     @property
     def flight(self):
@@ -109,8 +111,3 @@ class FlightPlan:
         for date in daterange(days, self.start):
             if date not in self.exception:
                 yield date
-    
-    
-    def scheduled(self):
-        from app.system import Airline
-        Airline.plans.append(self)

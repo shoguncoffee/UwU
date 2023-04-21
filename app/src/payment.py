@@ -1,4 +1,4 @@
-from ..base import *
+from .base import *
 
 class Payment(ABC):
     def __init__(self, 

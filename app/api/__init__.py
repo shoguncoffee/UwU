@@ -4,14 +4,12 @@ https://fastapi.tiangolo.com/tutorial/bigger-applications
 """
 from .base import *
 from .router import *
-import app.spawn
 
-from . import addFlight_fastAPI, login_fastAPI, registor_fastAPI
 
 web = FastAPI()
 
 for module in (
-    get_data,
+    basic,
     search_flight,
     user,
     booking,
@@ -28,5 +26,4 @@ async def root():
     return 'Hello'
 
 
-##from uvicorn import run
-##run('app.api:app')
+import app.spawn
