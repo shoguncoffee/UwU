@@ -46,32 +46,83 @@ class PassengerDetails:
 
     def change_forename(self, name: str):
         self.__forename = name
-        
+
+
+@dataclass(slots=True)
+class ContactInformation:
+    __passenger: PassengerDetails # type: ignore
+    __phone: str # type: ignore
+    __email: str # type: ignore
+    
+    @property
+    def passenger(self):
+        return self.__passenger
+
+    @property
+    def phone(self):
+        return self.__phone
+
+    @property
+    def email(self):
+        return self.__email
+
+    @property
+    def name(self):
+        return self.passenger.fullname
+
 
 class Pax(tuple[tuple[PassengerType, int], ...]):
     """
-    (PassengerType, number)
+    ### number of passengers for each type
+        `tuple` of 
+        (<PassengerType>, <int>) `->` "type of passenger", "number of passengers"
+    
+    ### example:
+        >>> ...
+        
     """
+    def __len__(self):
+        """
+        total number of all passengers, including infants
+        """
+        return sum(
+            number_of_passengers 
+            for _, number_of_passengers in self
+        )
+    
     def get(self, passenger_type: PassengerType):
-        for type, number in self:
-            if type == passenger_type:
-                return number
+        """
+        get number of passengers for a given type
+        """
+        for type, number_of_passengers in self:
+            if type is passenger_type:
+                return number_of_passengers
+            
         raise KeyError
     
     @property
-    def total_capable(self):
+    def total(self):
         """
-        non-infant passengers
+        total number of non-infant passengers
         """
         return sum(
             number for type, number in self 
             if type is not PassengerType.INFANT
         )
     
-    @classmethod 
-    def init(cls, passengers: Sequence[PassengerDetails]):
+    @classmethod
+    def init(cls, passengers: Iterable[PassengerDetails]):
+        """
+        initialize Pax from a group of PassengerDetails
+        """
         types = [passenger.type for passenger in passengers]
         return cls(
-            (type, types.count(type)) 
-            for type in PassengerType if type in types
+            (type, types.count(type)) for type in set(types)
         )
+        
+    @classmethod
+    def minimum(cls):
+        """
+        minimum Pax, with only one adult
+        """
+        return cls([(PassengerType.ADULT, 1)])
