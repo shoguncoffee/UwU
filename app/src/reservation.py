@@ -1,29 +1,31 @@
 from __future__ import annotations
 from .base import *
 
-if TYPE_CHECKING:
-    from app.src import FlightInstance, Booking, PassengerDetails, Seat
-
 
 @dataclass(slots=True)
 class FlightReservation:
-    __instance: FlightInstance # type: ignore
-    __travel_class: TravelClass # type: ignore
     __holder: Booking # type: ignore
+    __provider: FlightClass # type: ignore
     
-    __selected: Optional[tuple[SeatReservation]] = field(init=False, default=None)
+    __selected: tuple[SeatReservation, ...] = field(init=False)
+    __is_assigned: bool = field(init=False, default=False)
 
-    @property
-    def flight(self):
-        return self.__instance
-    
-    @property
-    def travel_class(self):
-        return self.__travel_class
+    def __post_init__(self):
+        self.__selected = tuple(
+            SeatReservation(passenger) for passenger in self.holder.passengers
+        )
     
     @property
     def holder(self):
         return self.__holder
+    
+    @property
+    def provider(self):
+        return self.__provider
+    
+    @property
+    def is_assigned(self):
+        return self.__is_assigned
     
     @property
     def selected(self):
@@ -32,20 +34,23 @@ class FlightReservation:
         """
         return self.__selected
     
-    def select_seats(self, selected: Iterable[SeatReservation]):
-        selected = tuple(selected)
+    def assign_seats(self, 
+        selected: Optional[Iterable[SeatReservation]] = None
+    ):
+        selected = tuple(selected) if selected else self.selected
         passengers = {
             select.passenger for select in selected
         }
         if passengers == set(self.holder.passengers):
             self.__selected = selected
+            self.__is_assigned = True
             return True
 
 
 @dataclass(slots=True)
 class SeatReservation:
     __passenger: PassengerDetails # type: ignore
-    __seat: Optional[Seat] # type: ignore
+    __seat: Optional[Seat] = None # type: ignore
 
     @property
     def passenger(self):
