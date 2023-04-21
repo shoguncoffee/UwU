@@ -1,15 +1,16 @@
 """
 system
 """
-from __future__ import annotations
 from .base import *
 from .src import *
+from .src.catalog import *
+from .utils import algorithm
 
 class Airline:
     """
     ### represent the system of this project
     
-    init system
+    initialize system by:
     >>> Airline()
     """
     name = 'Qatar Airways'
@@ -58,12 +59,13 @@ class Airline:
     def plans(cls):
         return cls._instance.__plans
     
+    
     @classmethod
     def create_booking(cls,
         creator: Customer,
-        journey: list[tuple[FlightItinerary, TravelClass]],
+        journey: journey_param,
         contact: ContactInformation,
-        *passengers: PassengerDetails,
+        passengers: Sequence[PassengerDetails],
     ):
         pax = Pax.init(passengers)
         if all(
@@ -74,13 +76,13 @@ class Airline:
                 creator,
                 journey,
                 contact,
-                passengers,
+                tuple(passengers),
             )
-            for reservation in booking.reservations:
-                flight = reservation.flight
-                flight.booked(reservation)
-                
-            creator.add_booking(booking)
+            for reservation in booking.all_reservations:
+                flightclass = reservation.provider
+                flightclass.booked(reservation)
+            
+            creator.bookings.append(booking)
             booking.pending()
             return True
     
@@ -90,23 +92,25 @@ class Airline:
         reservation: FlightReservation,
         selected: list[tuple[PassengerDetails, Seat]],
     ):
-        instance = reservation.flight
-        occupied = instance.get_occupied_of(
-            reservation.travel_class
-        )
-        if not occupied.intersection(seat for _, seat in selected):
-            return reservation.select_seats(
-                SeatReservation(*select) for select in selected
-            )
+        flightclass = reservation.provider
+        
+        if flightclass.bookable(reservation.holder.pax):
+            occupied = flightclass.get_occupied_seats()
+            
+            if not occupied.intersection(seat for _, seat in selected):
+                return reservation.assign_seats(
+                    SeatReservation(*select) for select in selected
+                )
     
     
     @classmethod
-    def pay(cls, 
+    def payment(cls, 
         booking: Booking,
-        payment: Payment,
+        payment_method: PaymentMethod,
     ):
-        
-        return ...
+        if not booking.payment:
+            payment = payment_map[payment_method].pay(booking)
+            ...
     
     
     @classmethod
@@ -114,9 +118,7 @@ class Airline:
         if account not in cls.accounts:
             cls.accounts.append(account)
             return True
-        
-        return False
-    
+            
     
     @classmethod
     def search_journey(cls,
@@ -130,64 +132,22 @@ class Airline:
         return a list of FlightItinerary by any possible FlightInstance
         that can take from origin to destination in limit duration
         """
-        possible_instance: list[FlightInstance] = []
-        for _date in daterange(duration_cutoff.days, date):
-            schedule = Airline.schedules.get(_date)
-            possible_instance.extend(schedule or [])
-        
-        possible_itinerary = _path_algorithm(
-            start = origin,
-            target = destination,
-            depature = date,
-            pool = possible_instance,
-            limit = duration_cutoff
-        )
-        result = [
-            itinerary for itinerary in possible_itinerary 
-            if itinerary.bookable(pax)
+        pool = [
+            instance for day in daterange(duration_cutoff.days, date)
+            for instance in Airline.schedules.get(day)
         ]
-        result.sort(
-            key = lambda itinerary: itinerary.lowest_fare()
+        possible_itinerarys = (
+            FlightItinerary(instances)
+            for first in Airline.schedules.get(date) 
+                if first.flight.origin is origin
+                    for instances in algorithm.conjugate(
+                        first,
+                        target=destination,
+                        pool=pool,
+                        limit=duration_cutoff,
+                    ) 
         )
-        return result
-        
-        
-def _path_algorithm(
-    *path: FlightInstance, 
-    start: Airport,
-    target: Airport,
-    pool: Sequence[FlightInstance],
-    limit: dt.timedelta,
-    depature: Optional[dt.date] = None,
-) -> Generator[FlightItinerary, None, None]:
-    
-    cumulative_time = sum(
-        [inst.flight.duration for inst in path], 
-        start = dt.timedelta()
-    )
-    for instance in pool:
-        if instance not in path and instance.origin is start:
-            this_flight = instance.flight
-            time_taken = cumulative_time + this_flight.duration
-            if path:
-                prev_flight = path[-1].flight
-                transit_time = difference_time(
-                    prev_flight.arrival, this_flight.departure
-                )
-                time_taken += transit_time
-            elif instance.date != depature:
-                continue
-            
-            if time_taken < limit:
-                dest = instance.destination
-                if dest is target:
-                    yield FlightItinerary([*path, instance])
-
-                else:
-                    yield from _path_algorithm(
-                        *path, instance, 
-                        start = dest,
-                        target = target, 
-                        pool = pool, 
-                        limit = limit
-                    )
+        return sorted(
+            [itinerary for itinerary in possible_itinerarys if itinerary.bookable(pax)], 
+            key=lambda itinerary: itinerary.lowest_fare()
+        )
