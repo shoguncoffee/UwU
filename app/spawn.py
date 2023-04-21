@@ -112,8 +112,8 @@ for flight in flights:
 
 
 # init fares
-fare0 = tuple(
-    Fare(*attr) for attr in [(
+fare0 = [
+    (travel_class, Fare(*attr)) for travel_class, *attr in [(
             TravelClass.ECONOMY, [
                 (PassengerType.ADULT, 13_500),
                 (PassengerType.CHILD, 7_500),
@@ -135,11 +135,11 @@ fare0 = tuple(
                 (SeatType.WINDOW, 28_000),
                 (SeatType.LEGROOM, 30_000),
             ]
-        ),
+        )
     ]
-)
-fare1 = tuple(
-    Fare(*attr) for attr in [(
+]
+fare1 = [
+    (travel_class, Fare(*attr)) for travel_class, *attr in [(
             TravelClass.ECONOMY, [
                 (PassengerType.ADULT, 15_000),
                 (PassengerType.CHILD, 7_500),
@@ -161,11 +161,11 @@ fare1 = tuple(
                 (SeatType.WINDOW, 28_000),
                 (SeatType.LEGROOM, 30_000),
             ]
-        ),
+        )
     ]
-)
-fare2 = tuple(
-    Fare(*attr) for attr in [(
+]
+fare2 = [
+    (travel_class, Fare(*attr)) for travel_class, *attr in [(
             TravelClass.ECONOMY, [
                 (PassengerType.ADULT, 20_000),
                 (PassengerType.CHILD, 7_500),
@@ -187,9 +187,9 @@ fare2 = tuple(
                 (SeatType.WINDOW, 28_000),
                 (SeatType.LEGROOM, 30_000),
             ]
-        ),
+        )
     ]
-)
+]
 
 
 # init flight plans
@@ -261,14 +261,17 @@ results = Airline.search_journey(
     qatar, thailand,
     dt.date(2023, 9, 10)
 )
-Airline.create_booking(plum, [
-        (results[0], TravelClass.ECONOMY),
-    ], contact1, passengerDetails1,
+Airline.create_booking(
+    plum, 
+    [
+        (results[0], TravelClass.ECONOMY)
+    ], 
+    contact1, [passengerDetails1],
 )
 
 booking = plum.bookings[0]
-reservation = booking.reservations[0]
-instance = reservation.flight
+reservation = next(booking.all_reservations)
+instance = reservation.provider.host
 
 seats = instance.aircraft.all_seats
 seatiter = iter(seats)

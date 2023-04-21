@@ -126,7 +126,7 @@ class Airline:
         destination: Airport, 
         date: dt.date,
         pax: Pax = Pax(),
-        duration_cutoff: dt.timedelta = dt.timedelta(hours=17),
+        duration_cutoff: dt.timedelta = dt.timedelta(hours=18),
     ): 
         """
         return a list of FlightItinerary by any possible FlightInstance
