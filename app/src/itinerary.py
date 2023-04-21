@@ -13,39 +13,45 @@ class FlightItinerary(tuple[FlightInstance]):
         - intended to be used for summarizing information to user
     """
     @property
-    def all_travel_class(self) -> set[TravelClass]:
-        return {
-            travel_class for instance in self
-            for travel_class in instance.all_travel_class 
-        }
+    def all_travel_class(self):
+        classes = set(TravelClass)
+        for instance in self:
+            classes.intersection_update(
+                instance.all_travel_class
+            )
+        return classes
+   
     
-    def bookable(self, 
-        pax: Pax, 
-        travel_class: Optional[TravelClass] = None
-    ):
+    def bookable(self, pax: Pax, travel_class: Optional[TravelClass] = None):
         """
-        check if this itinerary is bookable by any travel class for pax (number of passenger)
-        """
+        check if this itinerary is bookable by any (or specified) travel class for pax
+        """ 
         if travel_class:
             return all(
-                flight.bookable(pax, travel_class) for flight in self
+                instance.get_class(travel_class).bookable(pax) 
+                for instance in self
             )
-        return all(any(
-                flight.bookable(pax, cls) for cls in flight.all_travel_class
-            ) for flight in self
+        return all(
+            any(
+                instance.get_class(cls).bookable(pax) 
+                for cls in instance.all_travel_class
+            ) for instance in self
         )
         
     def lowest_fare(self):
         return self.get_price(
-            Pax([(PassengerType.ADULT, 1)]), 
+            Pax.minimum(), 
             TravelClass.ECONOMY
         )
         
+    def get_seats_left(self, travel_class: TravelClass):
+        return min(
+            instance.get_class(travel_class).get_seats_left()
+            for instance in self
+        )
+        
     def get_price(self, pax: Pax, travel_class: TravelClass):
-        prices = []
-        for instance in self:
-            fare = instance.get_fare(travel_class)
-            prices.append(
-                fare.pax_price(pax)
-            )
-        return sum(prices)
+        return sum(
+            instance.get_class(travel_class).fare.pax_price(pax)
+            for instance in self
+        )
