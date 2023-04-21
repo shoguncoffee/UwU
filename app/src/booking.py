@@ -10,23 +10,23 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Booking:
-    __datetime: dt.datetime = field(init=False, default_factory=dt.datetime.now)
-    
     __creator: Customer # type: ignore
-    journey: InitVar[list[tuple[FlightItinerary, TravelClass]]]
-    __contactinfo: ContactInformation # type: ignore
+    journey: InitVar[journey_param]
+    __contact: ContactInformation # type: ignore
     __passengers: tuple[PassengerDetails, ...] # type: ignore
     
+    __reservations: tuple[tuple[FlightReservation, ...], ...] = field(init=False)
+    __datetime: dt.datetime = field(init=False, default_factory=dt.datetime.now)
     __reference: UUID = field(init=False, default_factory=uuid4) # undone
-    __reservations: tuple[FlightReservation, ...] = field(init=False)
     __payment: Optional[Payment] = field(init=False, default=None)
     __status: BookingStatus = field(init=False, default=BookingStatus.INCOMPLETE)
 
-    def __post_init__(self, journey: list[tuple[FlightItinerary, TravelClass]]):
+    def __post_init__(self, journey: journey_param):
         self.__reservations = tuple(
-            FlightReservation(flight, travel_class, self) 
-            for itinerary, travel_class in journey 
-            for flight in itinerary
+            tuple(
+                FlightReservation(self, instance.get_class(travel_class)) 
+                for instance in itinerary
+            ) for itinerary, travel_class in journey 
         )
     
     @property
@@ -42,6 +42,11 @@ class Booking:
         return self.__reservations
     
     @property
+    def all_reservations(self):
+        for segment in self.reservations:
+            yield from segment
+    
+    @property
     def passengers(self):
         return self.__passengers
     
@@ -50,8 +55,8 @@ class Booking:
         return self.__reference
     
     @property
-    def contactinfo(self):
-        return self.__contactinfo
+    def contact(self):
+        return self.__contact
         
     @property
     def payment(self):
@@ -80,18 +85,12 @@ class Booking:
         
     def get_price(self):
         prices = []
-        for reservation in self.reservations:
-            fare = reservation.flight.get_fare(reservation.travel_class)
-            if reservation.selected:
-                prices.extend(
-                    fare.get_price(
-                        selected.passenger.type, 
-                        selected.seat and selected.seat.type
-                    ) for selected in reservation.selected
-                )
-            else:
-                prices.extend(
-                    fare.get_price(passenger.type) 
-                    for passenger in self.passengers
-                )   
+        for reservation in self.all_reservations:
+            fare = reservation.provider.fare
+            prices.extend(
+                fare.get_price(
+                    selected.passenger.type, 
+                    selected.seat and selected.seat.type
+                ) for selected in reservation.selected
+            )
         return sum(prices)
