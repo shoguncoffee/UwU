@@ -28,27 +28,24 @@ class MainWindow:
         self.search_button.pack()
 
     def open_login(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
-
         # Open the login window
         root = tk.Tk()
         login_window = LoginWindow(root)
         root.mainloop()
 
     def open_register(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
-
         # Open the registration window
         root = tk.Tk()
         register_window = RegisterWindow(root)
         root.mainloop()
 
     def open_search(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
-
         # Open the search window
         root = tk.Tk()
         search_window = SearchFlightWindow(root)
@@ -104,18 +101,16 @@ class LoginWindow:
             self.response_label.config(text="Error: " + response.json()["detail"], fg="red")
 
     def open_registration(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
-
         # Open the registration window
         root = tk.Tk()
         registration_window = RegisterWindow(root)
         root.mainloop()
 
     def open_main(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
-
         # Open the Main window
         root = tk.Tk()
         main_window = MainWindow(root)
@@ -180,9 +175,8 @@ class RegisterWindow:
         self.response_label.pack()
 
     def go_to_login(self):
-        # Close the registration window
+        # Close the window
         self.master.destroy()
-        
         # Open the login window
         root = tk.Tk()
         login_window = LoginWindow(root)
@@ -276,9 +270,8 @@ class SearchFlightWindow:
                 root.mainloop()
 
     def open_main(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
-
         # Open the Main window
         root = tk.Tk()
         main_window = MainWindow(root)
@@ -318,19 +311,17 @@ class SearchFlightResultWindow:
             self.arrival_result_label = tk.Label(master,text=arrival).grid(row=n+1,column=3)
 
     def open_search_flight(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
-
         # Open the searchflight window
         root = tk.Tk()
         searchFlight_window = SearchFlightWindow(root)
         root.mainloop()
 
     def open_passenger_details(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
-
-        # Open the passenger details window
+        # Open the fill passenger details window
         root = tk.Tk()
         fillPassengerDetails_window = FillPassengerDetail(root)
         root.mainloop()
@@ -341,7 +332,7 @@ class FillPassengerDetail:
         master.title("Fill Passenger Details")
         master.geometry("500x500")
 
-        self.header_lable = tk.Label(master, text="Title").grid(row=0, column=0)
+        self.title_label = tk.Label(master, text="Title").grid(row=0, column=0)
 
         self.mr_check = BooleanVar()
         self.mrs_check = BooleanVar()
@@ -353,13 +344,13 @@ class FillPassengerDetail:
         self.mrs_checkbutton = tk.Checkbutton(master, text="Mrs.", variable=self.mrs_check).grid(row=1, column=1)
         self.ms_checkbutton = tk.Checkbutton(master, text="Ms.", variable=self.ms_check).grid(row=1, column=2)
 
-        self.firstname_lable = tk.Label(master, text="First Name").grid(row=2, column=0)
+        self.firstname_label = tk.Label(master, text="First Name").grid(row=2, column=0)
         self.firstname_entry = tk.Entry(master)
         self.firstname_entry.grid(row=3, column=0)
-        self.lastname_lable = tk.Label(master, text="Last Name").grid(row=2, column=1)
+        self.lastname_label = tk.Label(master, text="Last Name").grid(row=2, column=1)
         self.lastname_entry = tk.Entry(master)
         self.lastname_entry.grid(row=3, column=1)
-        self.birth_lable = tk.Label(master, text="Date of Birth (DD/MM/YYYY)").grid(row=4, column=0)
+        self.birth_label = tk.Label(master, text="Date of Birth (DD/MM/YYYY)").grid(row=4, column=0)
         self.birth_entry = tk.Entry(master)
         self.birth_entry.grid(row=5, column=0)
 
@@ -367,33 +358,33 @@ class FillPassengerDetail:
         self.nationality_combobox.grid(row=5, column=1)
         self.nationality_combobox.insert(0, "Nationality")
 
-        self.lable1 = tk.Label(master, text="").grid(row=6, column=1)
+        self.label1 = tk.Label(master, text="").grid(row=6, column=1)
 
         self.male_checkbutton = tk.Checkbutton(master, text="MALE", variable=self.male_check).grid(row=7, column=0)
         self.female_checkbutton = tk.Checkbutton(master, text="FEMALE", variable=self.female_check).grid(row=7, column=1)
 
-        self.lable2 = tk.Label(master, text="").grid(row=8, column=1)
+        self.label2 = tk.Label(master, text="").grid(row=8, column=1)
 
-        self.passport_detail_lable = tk.Label(master, text="Passport details (Optional)").grid(row=9, column=0)
+        self.passport_detail_label = tk.Label(master, text="Passport details (Optional)").grid(row=9, column=0)
         self.passport_detail_entry = tk.Entry(master)
         self.passport_detail_entry.grid(row=10, column=0)
-        self.passport_expiry_lable = tk.Label(master, text="Passport expiry date (Optional)").grid(row=9, column=1)
+        self.passport_expiry_label = tk.Label(master, text="Passport expiry date (Optional)").grid(row=9, column=1)
         self.passport_expiry_entry = tk.Entry(master)
         self.passport_expiry_entry.grid(row=10, column=1)
 
-        self.travel_type_lable = tk.Label(master, text="Travel document (Optional)").grid(row=11, column=0)
+        self.travel_type_label = tk.Label(master, text="Travel document (Optional)").grid(row=11, column=0)
         self.travel_type_combobox = ttk.Combobox(master, height=5, width=15, values=["Passport", "Green Card", "Visa"])
         self.travel_type_combobox.grid(row=12, column=0)
         self.travel_type_combobox.insert(0, "Travel Document Type")
 
-        self.residence_country_lable = tk.Label(master, text="Country of residence (Optional").grid(row=11, column=1)
+        self.residence_country_label = tk.Label(master, text="Country of residence (Optional").grid(row=11, column=1)
         self.residence_country_combobox = ttk.Combobox(master, height=5, width=15, values=["Thailand","India","China"])
         self.residence_country_combobox.grid(row=12, column=1)
         self.residence_country_combobox.insert(0, "Select Country")
 
-        self.lable3 = tk.Label(master, text="").grid(row=13, column=1)
+        self.label3 = tk.Label(master, text="").grid(row=13, column=1)
 
-        self.contact_detail_lable = tk.Label(master, text="Contact details").grid(row=15, column=0)
+        self.contact_detail_label = tk.Label(master, text="Contact details").grid(row=15, column=0)
         self.phone_entry = tk.Entry(master)
         self.phone_entry.grid(row=16, column=0)
         self.phone_entry.insert(0, "Phone number")
@@ -401,10 +392,10 @@ class FillPassengerDetail:
         self.email_entry.grid(row=16, column=1)
         self.email_entry.insert(0, "Email address")
 
-        self.lable4 = tk.Label(master, text="").grid(row=17, column=1)
+        self.label4 = tk.Label(master, text="").grid(row=17, column=1)
 
         self.back_button = tk.Button(master, text="SearchFlight", command=self.open_search_flight).grid(row=18, column=0)
-        self.back_button = tk.Button(master, text="Book", command=self.create_booking).grid(row=18, column=1)
+        self.booking_button = tk.Button(master, text="Book", command=self.create_booking).grid(row=18, column=1)
 
     def create_booking(self):
         mr = self.mr_check.get()
@@ -423,8 +414,15 @@ class FillPassengerDetail:
         phone_number = self.phone_entry.get()
         email_address = self.email_entry.get()
 
+        # Close the window
+        self.master.destroy()
+        # Open the bookingSummary window
+        root = tk.Tk()
+        searchFlight_window = BookingSummaryWindow(root)
+        root.mainloop()
+
     def open_search_flight(self):
-        # Close the login window
+        # Close the window
         self.master.destroy()
 
         # Open the searchflight window
@@ -432,7 +430,69 @@ class FillPassengerDetail:
         searchFlight_window = SearchFlightWindow(root)
         root.mainloop()
 
+class BookingSummaryWindow:
+    def __init__(self, master):
+        self.master = master
+        master.title("Booking Summary")
 
+        self.trip_summary_label = tk.Label(master, text="Trip Summary").grid(row=0, column=0)
+        self.origin_summary_labbel = tk.Label(master, text="Origin").grid(row=1, column=0)
+        self.departure_summary_label = tk.Label(master, text="Departuer").grid(row=1, column=1)
+        self.destination_summary_label = tk.Label(master, text="Destination").grid(row=1, column=2)
+        self.arrival_summary_label = tk.Label(master, text="Arrival").grid(row=1, column=3)
+        self.class_summary_label = tk.Label(master, text="Class").grid(row=1, column=4)
+        
+        #need to get trip data
+
+        self.label1 = tk.Label(master, text="").grid(row=3, column=1)
+
+        self.passenger_detail_summary_label = tk.Label(master, text="Passenger details").grid(row=4, column=0)
+        self.passenger_name_summary_label = tk.Label(master, text="Passenger name").grid(row=5, column=0)
+        self.date_of_birth_summary_label = tk.Label(master, text="Date of birth").grid(row=5, column=1)
+        self.type_summary_label = tk.Label(master, text="Type").grid(row=5, column=2)
+
+        #need to get passenger details data
+
+        self.label2 = tk.Label(master, text="").grid(row=7, column=1)
+
+        self.contact_detail_label = tk.Label(master, text="Contact details").grid(row=8, column=0)
+        self.passenger_name_contact_label = tk.Label(master, text="Passenger name").grid(row=9, column=0)
+        self.email_contact_label = tk.Label(master, text="E-mail").grid(row=9, column=1)
+        self.phone_contact_label = tk.Label(master, text="Phone number").grid(row=9, column=2)
+
+        #need to get contact details data
+
+        self.label3 = tk.Label(master, text="").grid(row=11, column=1)
+
+        self.total_price_label = tk.Label(master, text="Total price").grid(row=12, column=0)
+        self.payable_amount_label = tk.Label(master, text="Payable amount").grid(row=13, column=0)
+
+        #need to get total price data
+
+        self.label4 = tk.Label(master, text="").grid(row=14, column=1)
+
+        self.choose_how_to_pay_label = tk.Label(master, text="Choose how to pay").grid(row=15, column=0)
+
+        self.pay_now_check = BooleanVar()
+        self.hold_my_booking_check = BooleanVar()
+        self.pay_now_checkbutton = tk.Checkbutton(master, text="Pay now", variable=self.pay_now_check).grid(row=16, column=0)
+        self.hold_my_booking_checkbutton = tk.Checkbutton(master, text="Hold my booking", variable=self.hold_my_booking_check).grid(row=16, column=1)
+
+        self.label5 = tk.Label(master, text="").grid(row=17, column=1)
+
+        self.cancel_button = tk.Button(master, text="Cancel", command=self.open_search_flight).grid(row=18, column=0)
+        self.purchase_button = tk.Button(master, text="Purchase", command=self.open_payment).grid(row=18, column=1)
+
+    def open_search_flight(self):
+        # Close the window
+        self.master.destroy()
+        # Open the searchflight window
+        root = tk.Tk()
+        searchFlight_window = SearchFlightWindow(root)
+        root.mainloop()
+
+    def open_payment(self):
+        ...
 
 root = tk.Tk()
 login_window = MainWindow(root)
