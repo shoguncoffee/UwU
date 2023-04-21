@@ -418,7 +418,7 @@ class FillPassengerDetail:
         self.master.destroy()
         # Open the bookingSummary window
         root = tk.Tk()
-        searchFlight_window = BookingSummaryWindow(root)
+        booking_summary_window = BookingSummaryWindow(root)
         root.mainloop()
 
     def open_search_flight(self):
@@ -492,7 +492,32 @@ class BookingSummaryWindow:
         root.mainloop()
 
     def open_payment(self):
-        ...
+        # Close the window
+        self.master.destroy()
+        # Open the payment window
+        root = tk.Tk()
+        payment_window = PaymentWindow(root)
+        root.mainloop()
+
+class PaymentWindow:
+    def __init__(self, master):
+        self.master = master
+        master.title("Payment")
+
+        self.payment_label = tk.Label(master, text="Select your preferred payment method").grid(row=0, column=0)
+        
+        #need to create input and get data
+
+        self.back_button = tk.Button(master, text="Back", command=self.open_booking_summary).grid(row=2, column=0)
+
+    def open_booking_summary(self):
+        # Close the window
+        self.master.destroy()
+        # Open the booking summary window
+        root = tk.Tk()
+        booking_summary_window = BookingSummaryWindow(root)
+        root.mainloop()
+
 
 root = tk.Tk()
 login_window = MainWindow(root)
