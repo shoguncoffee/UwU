@@ -1,9 +1,14 @@
-"""
+r"""
 https://fastapi.tiangolo.com/tutorial/body
-"""
-from telnetlib import STATUS
 
-from app.api.router import booking
+not confuse with class in app\src,
+these class is used for converting json to pydantic model 
+and transforming back src to pydantic model, 
+which done automatically by fastapi (read more in link above)
+...
+with these implementation, we can use pydantic model as a type hint and know specified attribute which can't done by raw dict
+"""
+
 from .base import *
 from pydantic import BaseModel
 
@@ -14,13 +19,20 @@ class AccountBody(BaseModel):
     phone: str
     status: AccountStatus
     
-    @classmethod
-    def transform(cls, obj: src.Account):
-        return cls(
+    def __init__(self, obj: src.Account):
+        super().__init__(
             username=obj.username,
             email=obj.email,
             phone=obj.phone,
             status=obj.status,
+        )
+    
+    def convert(cls, password: str):
+        return src.Account(
+            cls.username,
+            password,
+            cls.email,
+            cls.phone,
         )
 
 
@@ -33,6 +45,17 @@ class PassengerBody(BaseModel):
     gender: GenderType
     type: PassengerType
     
+    def __init__(self, obj: src.PassengerDetails):
+        super().__init__(
+            forename=obj.forename,
+            surname=obj.surname,
+            birthdate=obj.birthdate,
+            nationality=obj.nationality,
+            passport_id=obj.passport_id,
+            gender=obj.gender,
+            type=obj.type,
+        )    
+        
     def convert(self):
         return src.PassengerDetails(*vars(self).values())
     
@@ -42,24 +65,6 @@ class PassengerBody(BaseModel):
             obj.convert() for obj in objs
         ]
     
-    @classmethod
-    def transform(cls, obj: src.PassengerDetails):
-        return cls(
-            forename=obj.forename,
-            surname=obj.surname,
-            birthdate=obj.birthdate,
-            nationality=obj.nationality,
-            passport_id=obj.passport_id,
-            gender=obj.gender,
-            type=obj.type,
-        )
-    
-    @classmethod
-    def transforms(cls, objs: Sequence[src.PassengerDetails]):
-        return [
-            cls.transform(obj) for obj in objs
-        ]
-
 
 class FlightInstanceBody(BaseModel):
     """
@@ -79,24 +84,17 @@ class FlightInstanceBody(BaseModel):
         )
 
 
-class ClassBody(BaseModel):
-    travel_class: TravelClass
-    seat_left: int
-    fare: int
-    info: tuple[str, ...]
-    
-    @classmethod
-    def init(cls, obj: src.FlightInstance, pax: src.Pax):
-        return [
-            cls(
-                travel_class=travel_class,
-                seat_left=len(obj.get_seats_left(travel_class)),
-                fare=obj.get_fare(travel_class).pax_price(pax),
-                info=travel_class_info[travel_class]
-            ) for travel_class in obj.all_travel_class
-        ]
-
-    
+travel_class_info: dict[TravelClass, tuple[str, ...]] = {
+    TravelClass.ECONOMY: (
+        'economy',
+    ),
+    TravelClass.BUSSINESS: (
+        'bussiness',
+    ),
+    TravelClass.FIRST: (
+        'first',
+    ),
+}
 class FlightInfoBody(BaseModel):
     """
     Flightinstance for transform to json
@@ -109,25 +107,34 @@ class FlightInfoBody(BaseModel):
     date: dt.date
     aircraft_model: str
     
-    @classmethod
-    def transform(cls, obj: src.FlightInstance, pax: src.Pax):
-        return cls(
+    def __init__(self, obj: src.FlightInstance):
+        flight = obj.flight
+        super().__init__(
             designator=obj.designator,
-            origin=obj.origin.location_code,
-            destination=obj.destination.location_code,
-            departure=obj.flight.departure,
-            arrival=obj.flight.arrival,
+            origin=flight.origin.location_code,
+            destination=flight.destination.location_code,
+            departure=flight.departure,
+            arrival=flight.arrival,
             date=obj.date,
             aircraft_model=obj.aircraft.model,
         )
     
     @classmethod
-    def transforms(cls, objs: Sequence[src.FlightInstance], pax: src.Pax):
-        return [{
-            'flights': cls.transform(obj, pax),
-            'class_of_travel': ClassBody.init(obj, pax)
-            } for obj in objs
-        ]
+    def transforms(cls, objs: src.FlightItinerary, pax: src.Pax):
+        return {
+            'flights': [
+                cls(obj) for obj in objs
+            ],
+            'classes': [
+                {
+                    'travel_class': travel_class,
+                    'seat_left': objs.get_seats_left(travel_class),
+                    'price': objs.get_price(pax, travel_class),
+                    'info': travel_class_info[travel_class],
+                } 
+                for travel_class in objs.all_travel_class
+            ]
+        }
     
     
 class ContactInfoBody(BaseModel):
@@ -135,75 +142,68 @@ class ContactInfoBody(BaseModel):
     phone: str
     email: str
     
-    def convert(self, passengers: Sequence[src.PassengerDetails]):
-        return src.ContactInformation(
-            passengers[self.index], 
-            self.phone, self.email,
-        )
-        
-    @classmethod
-    def transform(cls, 
+    def __init__(self, 
         obj: src.ContactInformation, 
         passengers: Sequence[src.PassengerDetails]
     ):
-        return cls(
+        super().__init__(
             index=passengers.index(obj.passenger),
-            phone=obj.phone, email=obj.email,
+            phone=obj.phone, 
+            email=obj.email,
+        )   
+    
+    def convert(self, passengers: Sequence[src.PassengerDetails]):
+        return src.ContactInformation(
+            passengers[self.index], 
+            self.phone, 
+            self.email,
         )
      
      
 class SeatBody(BaseModel):
     row: int
     column: int
-    letter: str
+    number: str
     type: SeatType
-    description: list[str]
+    descriptions: list[str]
     
-    @classmethod
-    def transform(cls, obj: src.Seat | None):
-        if obj:
-            return cls(
-                row=obj.row, 
-                column=obj.column,
-                letter=obj.letter,
-                type=obj.type,
-                description=obj.description,
-            )
+    def __init__(self, obj: src.Seat):
+        super().__init__(
+            row=obj.row, 
+            column=obj.column,
+            number=obj.number,
+            type=obj.type,
+            descriptions=obj.descriptions,
+        )
             
     @classmethod
-    def reservation_transforms(cls, 
-        reservations: Sequence[src.SeatReservation] | None
+    def transforms(cls, 
+        selected: Sequence[src.SeatReservation]
     ):
-        if reservations:
-            return [
-                cls.transform(reservation.seat) 
-                for reservation in reservations
-            ]
-     
-    @classmethod
-    def transforms(cls, objs: Iterable[src.Seat]) -> list[Self]:
         return [
-            cls.transform(obj) for obj in objs # type: ignore
+            cls(select.seat) if select.seat else None 
+            for select in selected
         ]
-
-
+     
+     
 class FlightReservationBody(BaseModel):
     travel_class: TravelClass
-    selected: Optional[list[SeatBody | None]] # optional?
+    selected: list[SeatBody | None]
+    is_assigned: bool
     flight: FlightInfoBody
     
-    @classmethod
-    def transform(cls, obj: src.FlightReservation, pax: src.Pax):
-        return cls(
-            travel_class=obj.travel_class,
-            selected=SeatBody.reservation_transforms(obj.selected),
-            flight=FlightInfoBody.transform(obj.flight, pax),
+    def __init__(self, obj: src.FlightReservation):
+        super().__init__(
+            travel_class=obj.provider.travel_class,
+            selected=SeatBody.transforms(obj.selected),
+            is_assigned=obj.is_assigned,
+            flight=FlightInfoBody(obj.provider.host),
         )
         
     @classmethod
-    def transforms(cls, objs: Sequence[src.FlightReservation], pax: src.Pax):
+    def transforms(cls, journey: Sequence[Sequence[src.FlightReservation]]):
         return [
-            cls.transform(obj, pax) for obj in objs
+            [cls(obj) for obj in segment] for segment in journey
         ]
 
 
@@ -213,15 +213,14 @@ class PaymentBody(BaseModel):
     total_price: int
     status: PaymentStatus
     
-    @classmethod
-    def transform(cls, obj: src.Payment | None):
-        if obj:
-            return cls(
-                transaction_id=obj.transaction_id,
-                payment_time=obj.datetime,
-                total_price=obj.total_price,
-                status=obj.status,
-            )
+    
+    def __init__(cls, obj: src.Payment):
+        super().__init__(
+            transaction_id=obj.transaction_id,
+            payment_time=obj.datetime,
+            total_price=obj.total_price,
+            status=obj.status,
+        )
     
     
 class BookingBody(BaseModel):
@@ -231,21 +230,22 @@ class BookingBody(BaseModel):
     payment: Optional[PaymentBody]
     contact: ContactInfoBody
     passengers: list[PassengerBody]
-    reservations: list[FlightReservationBody]
+    segments: list[list[FlightReservationBody]]
         
-    @classmethod
-    def transform(cls, obj: src.Booking):
-        return cls(
+    def __init__(self, obj: src.Booking):
+        super().__init__(
             datetime=obj.datetime,
             reference=obj.reference,
             status=obj.status,
-            payment=PaymentBody.transform(obj.payment),
-            contact=ContactInfoBody.transform(obj.contactinfo, obj.passengers),
-            passengers=PassengerBody.transforms(obj.passengers),
-            reservations=FlightReservationBody.transforms(obj.reservations, obj.pax),
+            payment=PaymentBody(obj.payment) if obj.payment else None,
+            contact=ContactInfoBody(obj.contact, obj.passengers),
+            segments=FlightReservationBody.transforms(obj.reservations),
+            passengers=[
+                PassengerBody(passenger) for passenger in obj.passengers
+            ],
         )
-        
-        
+    
+    
 class PaxBody(BaseModel):
     pax: list[tuple[PassengerType, int]]
     
@@ -257,31 +257,30 @@ class CabinBody(BaseModel):
     travel_class: TravelClass
     seats: list[SeatBody]
     
+    def __init__(self, obj: src.Cabin):
+        super().__init__(
+            travel_class=obj.travel_class,
+            seats=obj.seats,
+        )
+    
     @classmethod
-    def transform(cls, desk: src.Desk):
+    def transforms(cls, objs: Sequence[src.Cabin]):
         return [
-            cls(
-                travel_class=cabin.travel_class,
-                seats=SeatBody.transforms(cabin.seats)
-            ) for cabin in desk.cabins
+            cls(cabin) for cabin in objs
         ]
         
-    @classmethod
-    def transforms(cls, desks: Sequence[src.Desk]):
-        return [
-            cls.transform(desk) for desk in desks
-        ]
     
     
 class AircraftBody(BaseModel):
     model: str
     desks: list[list[CabinBody]]
     
-    @classmethod
-    def transform(cls, obj: src.Aircraft):
-        return cls(
+    def __init__(self, obj: src.Aircraft):
+        super().__init__(
             model=obj.model,
-            desks=CabinBody.transforms(obj.desks)
+            desks=[
+                CabinBody.transforms(desk) for desk in obj.desks
+            ]
         )
       
         
@@ -291,17 +290,10 @@ class AirportBody(BaseModel):
     city: str
     country: str
     
-    @classmethod
-    def transform(cls, obj: src.Airport):
-        return cls(
+    def __init__(self, obj: src.Airport):
+        super().__init__(
             location_code=obj.location_code,
             name=obj.name,
             city=obj.city,
             country=obj.country,
         )
-        
-    @classmethod
-    def transforms(cls, objs: Sequence[src.Airport]):
-        return [
-            cls.transform(obj) for obj in objs
-        ]
