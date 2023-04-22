@@ -283,3 +283,4 @@ Airline.select_seats(
         (passengerDetails1, seat1)
     ]
 )
+print(len(results))

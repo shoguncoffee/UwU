@@ -130,15 +130,13 @@ class FlightInfoBody(BaseModel):
             'flights': [
                 cls(obj) for obj in objs
             ],
-            'classes': [
-                {
-                    'travel_class': travel_class,
+            'classes': {
+                travel_class: {
                     'seat_left': objs.get_seats_left(travel_class),
                     'price': objs.get_price(pax, travel_class),
                     'info': travel_class_info[travel_class],
-                } 
-                for travel_class in objs.all_travel_class
-            ]
+                } for travel_class in objs.all_travel_class
+            }
         }
     
     

@@ -1,4 +1,4 @@
-from .base import *
+from ..base import *
 
 router = APIRouter(
     prefix='/account',
@@ -7,6 +7,6 @@ router = APIRouter(
 
 @router.post("/createAccount")
 def create_account(username: str, password: str, email: str, phone: str):
-    account = Account(username, password, email, phone)
+    account = src.Account(username, password, email, phone)
     if Airline.register(account):
         return {"message": "New account created!", "account": account.username}

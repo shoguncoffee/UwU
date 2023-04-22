@@ -31,7 +31,7 @@ class Payment(ABC):
         pass
 
 
-class CreditClassPayment(Payment) :
+class CreditCardPayment(Payment) :
     #def __init__(self, securtity_code):
     #    self.security_code = securtity_code
 
@@ -56,3 +56,5 @@ class PaypalPayment(Payment) :
         print("TRANSACTION ID :",self._transaction_id)
         print("TOTAL FARE :",total_fare,"THB")
         self._status = PaymentStatus.COMPLETED
+
+payment_map = {}

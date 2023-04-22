@@ -1,4 +1,4 @@
-from .base import *
+from ..base import *
 
 router = APIRouter(
     prefix='/flight',
@@ -34,5 +34,3 @@ async def create_flight(
     )
     Airline.flights.append(flight1)
     return {"Data": "create new flight successful."}
-
-print(len(Airline.flights))

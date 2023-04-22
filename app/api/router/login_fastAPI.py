@@ -1,4 +1,4 @@
-from .base import *
+from ..base import *
 
 router = APIRouter(
     prefix='/account',
