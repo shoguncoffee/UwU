@@ -1,5 +1,14 @@
+from turtle import circle
 from rapidfuzz import process
-from ..airport import Airport
+from dataclasses import dataclass
+
+@dataclass
+class Airport:
+    name: str
+    code: str
+    city: str
+    country: str
+    
 
 airports = [
     Airport("Suvarnabhumi Airport", "BKK", "Bangkok", "Thailand"),
