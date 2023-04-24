@@ -2,7 +2,7 @@ from __future__ import annotations
 from app.base import *
 
 if TYPE_CHECKING:
-    from . import *
+    from . import Booking
     
 
 @dataclass(slots=True)
@@ -12,7 +12,7 @@ class Account:
     _email: str
     _phone: str
     _status: AccountStatus = field(init=False, default=AccountStatus.PENDING)
-    # __reference: str = field(init=False)
+    # _reference: str = field(init=False)
     
     @property
     def username(self):

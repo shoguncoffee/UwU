@@ -4,7 +4,8 @@ from __future__ import annotations
 from app.base import *
 
 if TYPE_CHECKING:
-    from . import *
+    from . import Aircraft, Flight
+    from app.type_alias import fares_param
     
     
 @dataclass(slots=True)

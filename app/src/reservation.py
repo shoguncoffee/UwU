@@ -1,6 +1,9 @@
 from __future__ import annotations
 from app.base import *
 
+if TYPE_CHECKING:
+    from . import Booking, FlightClass, Passenger, Seat
+
 
 @dataclass(slots=True)
 class FlightReservation:

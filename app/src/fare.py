@@ -2,7 +2,7 @@ from __future__ import annotations
 from app.base import *
 
 if TYPE_CHECKING:
-    from . import *
+    from . import Pax
 
 
 @dataclass(slots=True, frozen=True)
