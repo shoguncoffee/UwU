@@ -47,13 +47,12 @@ async def book(username: str,
     _passengers = PassengerBody.converts(passengers)
     _journey = [
         (
-            FlightInstanceBody.converts(itinerary), 
-            travel_class
+            FlightInstanceBody.converts(itinerary), travel_class
         ) for itinerary, travel_class in journey
     ]
     return Airline.create_booking(
         customer,
-        _journey,
         contact.convert(_passengers),
-        _passengers
+        _passengers,
+        _journey,
     )

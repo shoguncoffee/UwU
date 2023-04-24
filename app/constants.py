@@ -3,46 +3,94 @@ https://docs.python.org/3/library/enum.html
 https://docs.python.org/3/howto/enum.html#functional-api
 https://fastapi.tiangolo.com/sq/tutorial/path-params/#working-with-python-enumerations
 
-enum constants
 function-call syntax
+first argument must match the name
 """
-from typing import Type as _Type
-from enum import (
-    IntEnum as _Enum, 
-    StrEnum as _StrEnum
+from enum import *
+
+__all__ = (
+    'FlightStatus',
+    'PassengerType',
+    'TravelClass',
+    'AccountStatus',
+    'BookingStatus',
+    'SeatType',
+    'GenderType',
+    'PaymentStatus',
+    'PaymentMethod',
+    'Country',
 )
 
-FlightStatus = _Enum(
-    'FlightStatus', 'SCHEDULED CANCELLED IN_FLIGHT ARRIVED'
-)
-PassengerType = _Enum(
-    'PassengerType', 'ADULT CHILD INFANT'
-)
 
+FlightStatus = IntEnum(
+    'FlightStatus', (
+        'SCHEDULED', 
+        'CANCELLED', 
+        'IN_FLIGHT', 
+        'ARRIVED',
+    )
+)
+PassengerType = IntEnum(
+    'PassengerType', (
+        'ADULT', 
+        'CHILD', 
+        'INFANT',
+    )
+)
 # must sort by priority
-TravelClass = _Enum(
-    'TravelClass', 'ECONOMY BUSSINESS FIRST'
+TravelClass = IntEnum(
+    'TravelClass', (
+        'ECONOMY', 
+        'BUSSINESS', 
+        'FIRST',
+    )
 )
-AccountStatus = _Enum(
-    'AccountStatus', 'PENDING ACTIVE SUSPENDED INACTIVE'
+AccountStatus = IntEnum(
+    'AccountStatus', (
+        'PENDING', 
+        'ACTIVE', 
+        'SUSPENDED', 
+        'INACTIVE',
+    )
 )
-BookingStatus = _Enum(
-    'BookingStatus', 'FAILED INCOMPLETE PENDING COMPLETED CANCELLED'
+BookingStatus = IntEnum(
+    'BookingStatus', (
+        'FAILED', 
+        'INCOMPLETE', 
+        'PENDING', 
+        'COMPLETED', 
+        'CANCELLED',
+    )
 )
-SeatType = _Enum(
-    'SeatType', 'LEGROOM WINDOW AISLE COMMON'
+SeatType = Flag(
+    'SeatType', (
+        'COMMON', 
+        'AISLE', 
+        'WINDOW', 
+        'LEGROOM',
+    )
 )
-GenderType = _Enum(
-    'GenderType', 'MALE FEMALE'
+GenderType = IntEnum(
+    'GenderType', (
+        'MALE', 
+        'FEMALE',
+    )
 )
-PaymentStatus = _Enum(
-    'PaymentStatus', 'PENDING FAILED COMPLETED'
+PaymentStatus = IntEnum(
+    'PaymentStatus', (
+        'PENDING', 
+        'FAILED', 
+        'COMPLETED',
+    )
 )
-PaymentMethod = _Enum(
-    'PaymentMethod', 'PAYPAL INTERNET_BANKING CREDIT_CARD'
+PaymentMethod = IntEnum(
+    'PaymentMethod', (
+        'PAYPAL', 
+        'INTERNET_BANKING',
+        'CREDIT_CARD',
+    )
 )
-
 with open('data/countries.txt') as _f:
-    Country: _Type[_StrEnum] = _StrEnum(
+    Country = StrEnum(
         'Country', _f.read().splitlines()
     )

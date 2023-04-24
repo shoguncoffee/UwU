@@ -9,7 +9,8 @@ router = APIRouter(
 @router.get("/airports")
 async def get_all_airports():
     return [
-        AirportBody(airport) for airport in Airline.airports
+        AirportBody.transform(airport) 
+        for airport in Airline.airports
     ]
 
 
