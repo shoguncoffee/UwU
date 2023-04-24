@@ -5,13 +5,16 @@ from .flight import FlightInstance
 from .passenger import Pax
 
 
-class FlightItinerary(tuple[FlightInstance]):
+class FlightItinerary(tuple[FlightInstance, ...]):
     """
     ### collection of FlightInstance
         - represent a one flight or connecting flights
         - provide some useful methods to get information from group of flights
         - intended to be used for summarizing information to user
     """
+    def __lt__(self, other: Self):
+        return self.lowest_fare() < other.lowest_fare()
+    
     @property
     def all_travel_class(self):
         classes = set(TravelClass)
@@ -20,7 +23,38 @@ class FlightItinerary(tuple[FlightInstance]):
                 instance.all_travel_class
             )
         return classes
+
+    @property
+    def departure(self):
+        return self[0].departure
+    
+    @property
+    def origin(self):
+        return self[0].flight.origin
    
+    @property
+    def arrival(self):
+        return self[-1].arrival
+    
+    @property
+    def destination(self):
+        return self[-1].flight.destination
+   
+    @property
+    def duration(self):
+        return self.flight_time() + self.transit_time()
+    
+    def transit_time(self: Sequence[FlightInstance]):
+        return sum(
+            [prev.transit_time(next) for prev, next in pairwise(self)], 
+            dt.timedelta()
+        )
+    
+    def flight_time(self: Sequence[FlightInstance]):
+        return sum(
+            [instance.duration for instance in self], 
+            dt.timedelta()
+        )
     
     def bookable(self, pax: Pax, travel_class: Optional[TravelClass] = None):
         """
@@ -41,7 +75,7 @@ class FlightItinerary(tuple[FlightInstance]):
     def lowest_fare(self):
         return self.get_price(
             Pax.minimum(), 
-            TravelClass.ECONOMY
+            min(self.all_travel_class)
         )
         
     def get_seats_left(self, travel_class: TravelClass):
