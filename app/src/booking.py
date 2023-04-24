@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 from dataclasses import InitVar
 from .reservation import FlightReservation

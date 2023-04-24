@@ -3,7 +3,7 @@ https://docs.python.org/3/library/enum.html#enum.Flag
 https://docs.python.org/3/howto/enum.html#flag
 """
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 from string import ascii_uppercase
 

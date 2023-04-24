@@ -8,11 +8,9 @@ for this package:
 for individual submodule in this package:
 - `\UwU> python -m app.<module>`
 """
-
+from app.system import *
 from multiprocessing import Process
-from .system import *
 import uvicorn
-import pickle
 
 if 0:
     def run_server():
@@ -27,7 +25,6 @@ if 0:
     if __name__ == '__main__':
         for func in run_server, run_interface:
             Process(target=func).start()
-
 
 Process(
     target=uvicorn.run, 

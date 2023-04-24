@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 from .flight import FlightInstance
 from .passenger import Pax

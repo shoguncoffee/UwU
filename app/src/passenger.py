@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 
 @dataclass(slots=True, unsafe_hash=True)

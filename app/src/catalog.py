@@ -1,7 +1,7 @@
 """
 Catalog
 """
-from .base import *
+from app.base import *
 
 from app.utils import search
 from . import *

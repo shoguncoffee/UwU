@@ -1,20 +1,21 @@
 """
 system
 """
-from .base import *
-from .src import *
-from .src.catalog import *
-from .utils import algorithm
+from __future__ import annotations
+from app.base import *
+from app.src import *
+
 
 class Airline:
     """
     ### represent the system of this project
     
-    initialize system by:
-    >>> Airline()
+        initialize system by:
+        >>> Airline()
     """
     name = 'Qatar Airways'
     designator = 'QR'
+    path = '/app/data'
     
     def __new__(cls):
         if not hasattr(cls, '_instance'):
@@ -59,13 +60,26 @@ class Airline:
     def plans(cls):
         return cls._instance.__plans
     
+    @classmethod
+    def dump(cls):
+        """
+        """
+        with open(cls.path, 'wb') as f:
+            pickle.dump(cls._instance, f)
+    
+    @classmethod
+    def load(cls):
+        """
+        """
+        with open(cls.path, 'rb') as f:
+            pickle.load(f)
     
     @classmethod
     def create_booking(cls,
         creator: Customer,
-        journey: journey_param,
         contact: ContactInformation,
-        passengers: Sequence[PassengerDetails],
+        passengers: Sequence[Passenger],
+        journey: journey_param
     ):
         pax = Pax.init(passengers)
         if all(
@@ -74,9 +88,9 @@ class Airline:
         ):
             booking = Booking(
                 creator,
-                journey,
                 contact,
                 tuple(passengers),
+                journey,
             )
             for reservation in booking.all_reservations:
                 flightclass = reservation.provider
@@ -90,7 +104,7 @@ class Airline:
     @classmethod
     def select_seats(cls, 
         reservation: FlightReservation,
-        selected: list[tuple[PassengerDetails, Seat]],
+        selected: list[tuple[Passenger, Seat]],
     ):
         flightclass = reservation.provider
         
@@ -126,28 +140,31 @@ class Airline:
         destination: Airport, 
         date: dt.date,
         pax: Pax = Pax(),
-        duration_cutoff: dt.timedelta = dt.timedelta(hours=18),
     ): 
         """
         return a list of FlightItinerary by any possible FlightInstance
         that can take from origin to destination in limit duration
+            - limit: `datetime.timedelta`
+                - maximum flight time of the path (not including transit time)
         """
-        pool = [
-            instance for day in daterange(duration_cutoff.days, date)
-            for instance in Airline.schedules.get(day)
+        from .utils import algorithm
+        
+        searcher = algorithm.SearchHelper(
+            origin, destination, date, [
+                *chain.from_iterable(
+                    cls.schedules.get(day) for day in daterange(2, date)
+                )
+            ],
+        )
+        filtered = [
+            *filter(lambda i: i.bookable(pax), searcher)
         ]
-        possible_itinerarys = (
-            FlightItinerary(instances)
-            for first in Airline.schedules.get(date) 
-                if first.flight.origin is origin
-                    for instances in algorithm.conjugate(
-                        first,
-                        target=destination,
-                        pool=pool,
-                        limit=duration_cutoff,
-                    ) 
-        )
-        return sorted(
-            [itinerary for itinerary in possible_itinerarys if itinerary.bookable(pax)], 
-            key=lambda itinerary: itinerary.lowest_fare()
-        )
+        unique_departure = {
+            itinerary.departure for itinerary in filtered
+        }
+        per_departure = [
+            sorted(
+                filter(lambda i: i.departure == departure, filtered)
+            ) for departure in unique_departure
+        ]
+        return sorted(cheaper for cheaper, *_ in per_departure)
