@@ -3,7 +3,8 @@ from app.base import *
 
 from dataclasses import InitVar
 if TYPE_CHECKING:
-    from . import *
+    from . import Aircraft, Airport, Pax, FlightReservation, Fare
+    from app.type_alias import fares_param
 
 
 @dataclass(slots=True)

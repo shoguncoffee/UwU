@@ -5,7 +5,8 @@ from dataclasses import InitVar
 from .reservation import FlightReservation
 from .passenger import Pax
 if TYPE_CHECKING:
-    from . import *
+    from . import Customer, ContactInformation, Passenger, Payment
+    from app.type_alias import journey_param
 
 
 @dataclass(slots=True)
@@ -84,7 +85,7 @@ class Booking:
         self.__status = BookingStatus.COMPLETED
         
     def get_price(self):
-        prices = []
+        prices: list[int] = []
         for reservation in self.all_reservations:
             fare = reservation.provider.fare
             prices.extend(

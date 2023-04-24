@@ -3,7 +3,9 @@ system
 """
 from __future__ import annotations
 from app.base import *
+
 from app.src import *
+from app.type_alias import journey_param
 
 
 class Airline:
@@ -15,7 +17,7 @@ class Airline:
     """
     name = 'Qatar Airways'
     designator = 'QR'
-    path = '/app/data'
+    path = 'test-run'
     
     def __new__(cls):
         if not hasattr(cls, '_instance'):
