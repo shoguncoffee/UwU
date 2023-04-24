@@ -12,5 +12,4 @@
     },
     "git.autofetch": true,
     "git.autofetchPeriod": 60,
-    "workspaceKeybindings.myAwesomeTask.enabled": true
 }
