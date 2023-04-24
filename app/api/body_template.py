@@ -103,7 +103,7 @@ class FlightInfoBody(BaseModel):
     def transform(cls, obj: src.FlightInstance):
         flight = obj.flight
         return cls(
-            designator=obj.designator,
+            designator=flight.designator,
             origin=flight.origin.location_code,
             destination=flight.destination.location_code,
             departure=flight.departure,

@@ -9,11 +9,12 @@ router = APIRouter(
 @router.get("/airports")
 async def get_all_airports():
     return [
-        AirportBody(airport) for airport in Airline.airports
+        AirportBody.transform(airport) 
+        for airport in Airline.airports
     ]
 
 
 @router.get("/aircraft/{model}}")
 async def get_aircraft(model: str):
     aircraft = Airline.aircrafts.get(model)
-    return AircraftBody(aircraft)
+    return AircraftBody.transform(aircraft)

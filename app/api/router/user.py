@@ -10,7 +10,7 @@ router = APIRouter(
 @router.get("{username}/my-account")
 async def get_account(username: str):
     account = Airline.accounts.get(username)
-    return AccountBody(account)
+    return AccountBody.transform(account)
 
 
 @router.get("{username}/my-bookings")
@@ -18,7 +18,8 @@ async def get_bookings(username: str):
     customer = Airline.accounts.get(username)
     assert isinstance(customer, src.Customer)
     return [
-        BookingBody(booking) for booking in customer.bookings
+        BookingBody.transform(booking) 
+        for booking in customer.bookings
     ]
 
 
@@ -41,13 +42,12 @@ async def book(username: str,
     _passengers = PassengerBody.converts(passengers)
     _journey = [
         (
-            FlightInstanceBody.converts(itinerary), 
-            travel_class
+            FlightInstanceBody.converts(itinerary), travel_class
         ) for itinerary, travel_class in journey
     ]
     return Airline.create_booking(
         customer,
-        _journey,
         contact.convert(_passengers),
-        _passengers
+        _passengers,
+        _journey,
     )
