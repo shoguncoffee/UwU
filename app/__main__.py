@@ -14,20 +14,20 @@ from .system import *
 import uvicorn
 import pickle
 
-
 if 0:
-    path = 'app/data/...'
-
-    with open(path, 'rb') as f:
-        airline = pickle.load(f)
-
-
-    with open(path, 'wb') as f:
-        pickle.dump(airline, f)
+    def run_server():
+        Airline.load()            
+        uvicorn.run('app.api:web', reload=True)
         
-    os.system('python3.11 -m uvicorn app.api:web --reload')
-    os.system('python3.11 -m app.interface')
+        
+    def run_interface():
+        import app.interface
     
+    
+    if __name__ == '__main__':
+        for func in run_server, run_interface:
+            Process(target=func).start()
+
 
 Process(
     target=uvicorn.run, 
