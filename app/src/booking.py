@@ -5,21 +5,21 @@ from dataclasses import InitVar
 from .reservation import FlightReservation
 from .passenger import Pax
 if TYPE_CHECKING:
-    from app.src import *
+    from . import *
 
 
 @dataclass(slots=True)
 class Booking:
     __creator: Customer # type: ignore
-    journey: InitVar[journey_param]
     __contact: ContactInformation # type: ignore
-    __passengers: tuple[PassengerDetails, ...] # type: ignore
+    __passengers: tuple[Passenger, ...] # type: ignore
+    journey: InitVar[journey_param]
     
     __reservations: tuple[tuple[FlightReservation, ...], ...] = field(init=False)
-    __datetime: dt.datetime = field(init=False, default_factory=dt.datetime.now)
-    __reference: UUID = field(init=False, default_factory=uuid4) # undone
     __payment: Optional[Payment] = field(init=False, default=None)
+    __datetime: dt.datetime = field(init=False, default_factory=dt.datetime.now)
     __status: BookingStatus = field(init=False, default=BookingStatus.INCOMPLETE)
+    __reference: UUID = field(init=False, default_factory=uuid4) #!
 
     def __post_init__(self, journey: journey_param):
         self.__reservations = tuple(

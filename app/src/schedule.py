@@ -4,7 +4,7 @@ from __future__ import annotations
 from .base import *
 
 if TYPE_CHECKING:
-    from app.src import *
+    from . import *
     
     
 @dataclass(slots=True)
@@ -60,7 +60,7 @@ class FlightPlan:
     default_aircraft: Aircraft
     default_fares: fares_param 
     
-    def __contains__(self, value: dt.date | FlightPlan):
+    def __contains__(self, value: dt.date | Self):
         """
         - `value`: `dt.date`
             - check if it is in the range of this plan

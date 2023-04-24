@@ -2,7 +2,7 @@ from __future__ import annotations
 from .base import *
 
 if TYPE_CHECKING:
-    from app.src import *
+    from . import *
 
 
 @dataclass(slots=True, frozen=True)
