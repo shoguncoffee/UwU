@@ -1,3 +1,7 @@
+"""
+https://docs.python.org/3/library/enum.html#enum.Flag
+https://docs.python.org/3/howto/enum.html#flag
+"""
 from __future__ import annotations
 from .base import *
 
@@ -9,8 +13,10 @@ class Seat:
     __row: int # type: ignore
     __column: int # type: ignore
     __number: str # type: ignore
-    __type: SeatType # type: ignore
-    __descriptions: list[str] = field(hash=False, default_factory=list) # type: ignore
+    __type: SeatType = SeatType(0) # type: ignore
+    
+    def __lt__(self, other: Self):
+        return (self.row, self.column) < (other.row, other.column)
     
     @property
     def row(self):
@@ -27,10 +33,6 @@ class Seat:
     @property
     def type(self):
         return self.__type
-    
-    @property
-    def descriptions(self):
-        return self.__descriptions
 
 
 @dataclass(slots=True, frozen=True)
@@ -50,47 +52,39 @@ class Cabin:
     def generate(cls, 
         travel_class: TravelClass,
         initial_row: int,
-        *layout: tuple[int, Sequence[int]],
+        layouts: Sequence[Sequence[int]],
     ):
         """
-        generate a `Cabin`, for use in spawn.py
+        generate a `Cabin`, for using in spawn.py
         """
         seats = []
-        for lenght, column_config in layout:
+        relative_row = 0
+        
+        for lenght, *config in layouts:
+            width = sum(config)
+            gaps = len(config) - 1
             aisle_columns = {
-                sum(column_config[:column]) - i
-                for column in range(1, len(column_config)) 
-                for i in range(2)
+                sum(config[:column+1]) - i
+                for column, i in product(range(gaps), range(2)) 
             }
-            width = sum(column_config)
-            for row, column in product(
-                range(1, lenght + 1), range(1, width + 1)
-            ):
-                type = SeatType.COMMON
-                info = []
-                
-                if column in aisle_columns:
-                    type = SeatType.AISLE
-                    info.append('Seat has direct access to the aisle')
-                    
-                elif column in (1, width):
-                    type = SeatType.WINDOW
-                    info.append('Seat has access to the window')
-                
-                if row == 1:
-                    type = SeatType.LEGROOM
-                    info.append('Seat has more legroom')
-                
-                absolute_row = initial_row + row
-                seats.append(
-                    Seat(
-                        absolute_row, 
-                        column, 
-                        ascii_uppercase[column-1] + str(absolute_row), 
-                        type, 
-                        info
-                    )
+            for row, column in product(range(lenght), range(width)):
+                conditions = {
+                    SeatType.AISLE: column in aisle_columns,
+                    SeatType.WINDOW: column in (0, width-1),
+                    SeatType.LEGROOM: relative_row + row == 0,
+                }
+                type = reduce(
+                    operator.or_, 
+                    compress(conditions, conditions.values()), 
+                    SeatType(0)
                 )
+                absolute_row = initial_row + relative_row + row
+                seat_number = f'{ascii_uppercase[column]}{1 + absolute_row}'
+                seats.append(
+                    Seat(absolute_row, column, seat_number, type)
+                )
+            relative_row += lenght
+            
         return cls(travel_class, frozenset(seats))
 
 
@@ -105,20 +99,20 @@ class Desk(tuple[Cabin, ...]):
     
     @classmethod
     def generate(cls,
-        *cabin_layout: tuple[
-            TravelClass, Sequence[tuple[int, Sequence[int]]]
-        ]
+        cabin_layout: Iterable[tuple[
+            TravelClass, Sequence[Sequence[int]]
+        ]]
     ):
         """
         generate a `Desk`, for use in spawn.py
         """
         cabins = []
-        row = 1
+        row = 0
         for travel_class, layout in cabin_layout:
             cabins.append(
-                Cabin.generate(travel_class, row, *layout)
+                Cabin.generate(travel_class, row, layout)
             )
-            row += sum(lenght for lenght, _ in layout) 
+            row += sum(lenght for lenght, *_ in layout) 
             
         return cls(cabins)
         
