@@ -14,7 +14,7 @@ async def view_booking(username: str, booking_id: UUID): # vs get_bookings?
     assert isinstance(customer, src.Customer)
     
     booking = customer.get_booking(booking_id)
-    return BookingBody(booking)
+    return BookingBody.transform(booking)
 
 
 @router.post("{username}/{booking_id}/select-seat")

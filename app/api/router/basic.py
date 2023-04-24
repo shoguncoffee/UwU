@@ -17,4 +17,4 @@ async def get_all_airports():
 @router.get("/aircraft/{model}}")
 async def get_aircraft(model: str):
     aircraft = Airline.aircrafts.get(model)
-    return AircraftBody(aircraft)
+    return AircraftBody.transform(aircraft)

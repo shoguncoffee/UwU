@@ -536,7 +536,7 @@ class FillPassengerDetail:
         import json
         print(json.dumps(data, indent=4))
 
-        response = requests.post(url=API_EndPoint4, params=username, data=data)
+        response = requests.post(url=API_EndPoint4, json=data)
         
         print(response.text)
 

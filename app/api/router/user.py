@@ -11,7 +11,7 @@ router = APIRouter(
 async def get_account(username: str):
     if username in Airline.accounts:
         account = Airline.accounts.get(username)
-        return AccountBody(account)
+        return AccountBody.transform(account)
     else:
         raise HTTPException(status_code=404, detail="Account not found")
 
@@ -22,7 +22,7 @@ async def get_bookings(username: str):
         customer = Airline.accounts.get(username)
         assert isinstance(customer, src.Customer)
         return [
-            BookingBody(booking) for booking in customer.bookings
+            BookingBody.transform(booking) for booking in customer.bookings
         ]
     else:
         raise HTTPException(status_code=404, detail="Account not found")

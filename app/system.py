@@ -74,7 +74,10 @@ class Airline:
         """
         """
         with open(cls.path, 'rb') as f:
-            pickle.load(f)
+            obj = pickle.load(f)
+
+        print(obj)
+        cls._instance = obj
     
     @classmethod
     def create_booking(cls,
@@ -134,7 +137,11 @@ class Airline:
         if account not in cls.accounts:
             cls.accounts.append(account)
             return True
-            
+    
+    @classmethod
+    def login(cls, username: str, password: str):
+        account = cls.accounts.get(username)
+        return account.hash_password == hash(password)
     
     @classmethod
     def search_journey(cls,

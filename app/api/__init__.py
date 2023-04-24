@@ -26,4 +26,5 @@ async def root():
     return 'Hello'
 
 
-import app.spawn
+from app.system import Airline
+Airline.load()

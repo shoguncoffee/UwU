@@ -20,8 +20,9 @@ class AccountBody(BaseModel):
     phone: str
     status: AccountStatus = AccountStatus.PENDING
     
-    def __init__(self, obj: src.Account):
-        super().__init__(
+    @classmethod
+    def transform(cls, obj: src.Account):
+        return cls(
             username=obj.username,
             email=obj.email,
             phone=obj.phone,
@@ -118,7 +119,7 @@ class FlightInfoBody(BaseModel):
                 cls.transform(obj) for obj in objs
             ],
             'classes': {
-                'travel_class': {
+                travel_class: {
                     'seat_left': objs.get_seats_left(travel_class),
                     'price': objs.get_price(pax, travel_class),
                     'info': descriptions.travel_class[travel_class],
@@ -137,7 +138,7 @@ class ContactInfoBody(BaseModel):
         obj: src.ContactInformation, 
         passengers: Sequence[src.Passenger]
     ):
-        super().__init__(
+        return cls(
             index=passengers.index(obj.passenger),
             phone=obj.phone, 
             email=obj.email,
@@ -254,12 +255,6 @@ class CabinBody(BaseModel):
     travel_class: TravelClass
     seats: list[SeatBody]
     
-    def __init__(self, obj: src.Cabin):
-        super().__init__(
-            travel_class=obj.travel_class,
-            seats=obj.seats,
-        )
-    
     @classmethod
     def transform(cls, obj: src.Cabin):
         return cls(
@@ -280,8 +275,9 @@ class AircraftBody(BaseModel):
     model: str
     desks: list[list[CabinBody]]
     
-    def __init__(self, obj: src.Aircraft):
-        super().__init__(
+    @classmethod
+    def transform(cls, obj: src.Aircraft):
+        return cls(
             model=obj.model,
             desks=[
                 CabinBody.transforms(desk) for desk in obj.desks
@@ -294,8 +290,9 @@ class AirportBody(BaseModel):
     name: str
     country: str
     
-    def __init__(self, obj: src.Airport):
-        super().__init__(
+    @classmethod
+    def transform(cls, obj: src.Airport):
+        return cls(
             location_code=obj.location_code,
             name=obj.name,
             country=obj.country,
