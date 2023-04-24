@@ -1,21 +1,10 @@
 """
 Catalog
 """
-# from __future__ import annotations
 from .base import *
 
 from app.utils import search
 from . import *
-
-__all__ = [
-    'AccountCatalog',
-    'AirportCatalog',
-    'AircraftCatalog',
-    'FlightCatalog',
-    'FlightScheduling',
-    'ScheduleCatalog',
-    'ScheduleDate',
-]
 
 
 class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
@@ -102,7 +91,7 @@ class ScheduleDate(list[FlightInstance]):
         if isinstance(key, str):
             key = key.upper()
             for instance in self:
-                if instance.designator == key:
+                if instance.flight.designator == key:
                     return True
         
         elif isinstance(key, FlightInstance):
@@ -110,7 +99,7 @@ class ScheduleDate(list[FlightInstance]):
                 return True
             
             for instance in self:
-                if instance.designator == key.designator:
+                if instance.flight.designator == key.flight.designator:
                     return True
         
         return False
@@ -121,7 +110,7 @@ class ScheduleDate(list[FlightInstance]):
     def get(self, designator: str):
         designator = designator.upper()
         for instance in self:
-            if instance.designator == designator:
+            if instance.flight.designator == designator:
                 return instance
             
         raise KeyError
