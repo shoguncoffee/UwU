@@ -7,4 +7,7 @@ from . import (
     user,
     booking,
     payment,
+    login_fastAPI,
+    addFlight_fastAPI,
+    registor_fastAPI
 )

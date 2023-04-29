@@ -1,5 +1,8 @@
 from __future__ import annotations
-from .base import *
+from app.base import *
+
+if TYPE_CHECKING:
+    from . import Booking, FlightClass, Passenger, Seat
 
 
 @dataclass(slots=True)
@@ -12,7 +15,8 @@ class FlightReservation:
 
     def __post_init__(self):
         self.__selected = tuple(
-            SeatReservation(passenger) for passenger in self.holder.passengers
+            SeatReservation(passenger) 
+            for passenger in self.holder.passengers
         )
     
     @property
@@ -49,7 +53,7 @@ class FlightReservation:
 
 @dataclass(slots=True)
 class SeatReservation:
-    __passenger: PassengerDetails # type: ignore
+    __passenger: Passenger # type: ignore
     __seat: Optional[Seat] = None # type: ignore
 
     @property

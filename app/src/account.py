@@ -1,8 +1,8 @@
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 if TYPE_CHECKING:
-    from app.src import *
+    from . import Booking
     
 
 @dataclass(slots=True)
@@ -12,7 +12,7 @@ class Account:
     _email: str
     _phone: str
     _status: AccountStatus = field(init=False, default=AccountStatus.PENDING)
-    # __reference: str = field(init=False)
+    # _reference: str = field(init=False)
     
     @property
     def username(self):
@@ -30,6 +30,9 @@ class Account:
     def status(self):
         return self._status
 
+    @property
+    def hash_password(self):
+        return hash(self._password)
 
 @dataclass(slots=True)
 class Admin(Account):

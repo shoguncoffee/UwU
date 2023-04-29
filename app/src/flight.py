@@ -1,9 +1,10 @@
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 from dataclasses import InitVar
 if TYPE_CHECKING:
-    from app.src import *
+    from . import Aircraft, Airport, Pax, FlightReservation, Fare
+    from app.type_alias import fares_param
 
 
 @dataclass(slots=True)
@@ -38,10 +39,6 @@ class Flight:
     @property
     def destination(self):
         return self.__destination
-    
-    @property
-    def duration(self):
-        return difference_time(self.departure, self.arrival)
 
 
 @dataclass(slots=True)
@@ -74,7 +71,9 @@ class FlightInstance:
     
     def __post_init__(self, fares: fares_param):
         self.__components = tuple(
-            FlightClass(self, *args) for args in fares
+            FlightClass(self, travel_class, fare) 
+            for travel_class, fare in fares
+            if travel_class in self.all_travel_class
         )
     
     @property
@@ -94,12 +93,18 @@ class FlightInstance:
         return self.__status
     
     @property
-    def components(self):
-        return self.__components
+    def departure(self):
+        return dt.datetime.combine(self.date, self.flight.departure)
     
     @property
-    def designator(self):
-        return self.flight.designator
+    def arrival(self):
+        arrival_time = self.flight.arrival
+        crossday = dt.timedelta(arrival_time < self.flight.departure)
+        return dt.datetime.combine(self.date + crossday, arrival_time)
+    
+    @property
+    def duration(self):
+        return self.arrival - self.departure
     
     @property
     def all_travel_class(self):
@@ -109,11 +114,14 @@ class FlightInstance:
         }
         
     def get_class(self, travel_class: TravelClass):
-        for component in self.components:
+        for component in self.__components:
             if component.travel_class is travel_class:
                 return component
             
         raise KeyError
+        
+    def transit_time(self, next: Self):
+        return next.departure - self.arrival
         
     def cancel(self):
         self.__status = FlightStatus.CANCELLED
@@ -124,18 +132,18 @@ class FlightInstance:
         """
         return any(
             component.bookable(pax)
-            for component in self.components
+            for component in self.__components
         )
     
 
 @dataclass(slots=True)
 class FlightClass:
     """
-        - One flight (instance) provides a service on different `TravelClass`, each `TravelClass` is independent of each other.
-        - Before customers book a flight they have to choose a `TravelClass` that is available, so they will not interfere with other `TravelClass`.
-        - `FlightClass` represent that one travel class service section.
-        - Most of the communication between customer and `FlightInstance` involve with specific `TravelClass`, 
-        it is convenient to sperate `FlightClass`, get them by `TravelClass` and use its method instead of passing `TravelClass` to every `FlightInstance` method.
+        - One `FlightInstance` provides a service on different `TravelClass`, and each `TravelClass` is independent of each other.
+        - Before customers book a flight they have to choose the `TravelClass` that was available, so they won't interfere with others `TravelClass`.
+        - `FlightClass` represents the travel class service section of `FlighInstance`.
+        - Most of the booking process involves with specific `TravelClass`. It is suitable to sperate `FlightClass` from `FlighInstance` and get them later by `TravelClass`.
+            So we can use `FlightClass`'s methods directly instead of passing `TravelClass` to every `FlightInstance`'s methods.
     """
     __host: FlightInstance # type: ignore
     __travel_class: TravelClass # type: ignore
@@ -157,8 +165,8 @@ class FlightClass:
     @fare.setter
     def fare(self, value: Fare):
         """
-        in case we want to update the price in this `Fare` which was shared with other flights (`FlightClass`), 
-        but we want to change only for this flight
+            in case we want to update the price in this `Fare` which was shared with other flights (`FlightClass`), 
+            but we want to change only for this flight
         """
         self.__fare = value
     
@@ -168,7 +176,7 @@ class FlightClass:
         
     def get_comfirmed(self):
         """
-        get all confirmed reservations
+            get all confirmed reservations
         """
         for reservation in self.booking_record:
             if reservation.holder.status is BookingStatus.COMPLETED:
@@ -176,7 +184,7 @@ class FlightClass:
         
     def get_occupied_seats(self):
         """
-        get all reserved seats that have be paid (reservation status is confirmed)
+            get all reserved seats that have be paid (reservation status is confirmed)
         """
         return {
             selected.seat for reservation in self.get_comfirmed()
@@ -185,7 +193,7 @@ class FlightClass:
         
     def get_remain_seats(self):
         """
-        seats that have not been selected by any reservation
+            seats that have not been selected by any reservation
         """
         all = self.host.aircraft.get_seats_of(self.travel_class)
         occupied = self.get_occupied_seats()
@@ -193,8 +201,8 @@ class FlightClass:
     
     def get_seats_left(self):
         """
-        not same as `get_occupied_seats`, it return as int which include a number of seats 
-        that may not specified position in reservation
+            not same as `get_occupied_seats`, it return as int which include a number of seats 
+            that may not specified position in reservation
         """
         all_seats = self.host.aircraft.get_seats_of(self.travel_class)
         return len(all_seats) - sum(

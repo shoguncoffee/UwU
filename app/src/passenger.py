@@ -1,9 +1,9 @@
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 
 @dataclass(slots=True, unsafe_hash=True)
-class PassengerDetails:
+class Passenger:
     __forename: str # type: ignore
     __surname: str # type: ignore
     __birthdate: dt.date # type: ignore
@@ -50,7 +50,7 @@ class PassengerDetails:
 
 @dataclass(slots=True)
 class ContactInformation:
-    __passenger: PassengerDetails # type: ignore
+    __passenger: Passenger # type: ignore
     __phone: str # type: ignore
     __email: str # type: ignore
     
@@ -111,9 +111,9 @@ class Pax(tuple[tuple[PassengerType, int], ...]):
         )
     
     @classmethod
-    def init(cls, passengers: Iterable[PassengerDetails]):
+    def init(cls, passengers: Iterable[Passenger]):
         """
-        initialize Pax from a group of PassengerDetails
+        initialize Pax from a group of Passenger
         """
         types = [passenger.type for passenger in passengers]
         return cls(
@@ -123,6 +123,6 @@ class Pax(tuple[tuple[PassengerType, int], ...]):
     @classmethod
     def minimum(cls):
         """
-        minimum Pax, with only one adult
+        minimum Pax, by only one adult
         """
         return cls([(PassengerType.ADULT, 1)])

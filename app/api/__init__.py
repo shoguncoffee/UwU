@@ -14,6 +14,9 @@ for module in (
     user,
     booking,
     payment,
+    addFlight_fastAPI,
+    login_fastAPI,
+    registor_fastAPI
 ):
     web.include_router(module.router)
 
@@ -23,4 +26,5 @@ async def root():
     return 'Hello'
 
 
-import app.spawn
+from app.system import Airline
+Airline.load()

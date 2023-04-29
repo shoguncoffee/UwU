@@ -12,5 +12,9 @@
     },
     "git.autofetch": true,
     "git.autofetchPeriod": 60,
-    "workspaceKeybindings.myAwesomeTask.enabled": true
+    "code-runner.executorMap": {
+        "python": "(cls || clear) && python -c \"__import__('os').system('python3.11 -u -m ' + r'$fullFileName'.removesuffix('.py').removeprefix(r'$workspaceRoot').replace(__import__('os').sep, '.').removeprefix('.'))\""
+    },
+    "code-runner.runInTerminal": true,
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
 }

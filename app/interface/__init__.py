@@ -1,3 +1,1 @@
-from .base import *
-
-print(2)
+from . import booking_tk, addFlight_tk, main_tk

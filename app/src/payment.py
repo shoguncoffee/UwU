@@ -1,4 +1,9 @@
-from .base import *
+from __future__ import annotations
+from app.base import *
+
+if TYPE_CHECKING:
+    from . import Booking
+
 
 class Payment(ABC):
     def __init__(self, 
@@ -9,6 +14,9 @@ class Payment(ABC):
         self._transaction_id = transaction_id or uuid4()
         self._datetime = dt.datetime.now()
         self._status = PaymentStatus.PENDING
+    
+    def __bool__(self):
+        return self._status is PaymentStatus.COMPLETED
     
     @property
     def total_price(self):
@@ -26,33 +34,46 @@ class Payment(ABC):
     def status(self):
         return self._status
     
+    @classmethod
     @abstractmethod
-    def pay(self) :
-        pass
+    def pay(cls, booking: Booking):
+        return cls(
+            booking.get_price()
+        )
 
 
-class CreditClassPayment(Payment) :
+class CreditCardPayment(Payment):
     #def __init__(self, securtity_code):
     #    self.security_code = securtity_code
 
-    def pay(self,total_fare) :
+    def pay(self, total_fare):
         print("Credit Class Payment : SUCCESS")
-        print("TRANSACTION ID :",self._transaction_id)
-        print("TOTAL FARE :",total_fare,"THB")
+        print("TRANSACTION ID :", self._transaction_id)
+        print("TOTAL FARE :", total_fare,"THB")
         self._status = PaymentStatus.COMPLETED
 
 
-class InternetBankingPayment(Payment) :
-    def pay(self,total_fare) :
+class InternetBankingPayment(Payment):
+    def pay(self, total_fare):
         print("Internet Banking Payment : SUCCESS")
-        print("TRANSACTION ID :",self._transaction_id)
-        print("TOTAL FARE :",total_fare,"THB")
+        print("TRANSACTION ID :", self._transaction_id)
+        print("TOTAL FARE :", total_fare,"THB")
         self._status = PaymentStatus.COMPLETED
 
 
-class PaypalPayment(Payment) :
-    def pay(self,total_fare) :
+class PaypalPayment(Payment):
+    def pay(self, total_fare):
         print("Paypal Payment : SUCCESS")
-        print("TRANSACTION ID :",self._transaction_id)
-        print("TOTAL FARE :",total_fare,"THB")
+        print("TRANSACTION ID :", self._transaction_id)
+        print("TOTAL FARE :", total_fare,"THB")
         self._status = PaymentStatus.COMPLETED
+        
+
+payment_map: dict[PaymentMethod, Type[Payment]] = {
+    PaymentMethod.CREDIT_CARD: 
+        CreditCardPayment,
+    PaymentMethod.INTERNET_BANKING: 
+        InternetBankingPayment,
+    PaymentMethod.PAYPAL: 
+        PaypalPayment,
+}

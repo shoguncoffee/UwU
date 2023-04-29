@@ -16,7 +16,7 @@ from .account import (
     Admin,
 )
 from .passenger import (
-    PassengerDetails, 
+    Passenger, 
     Pax, 
     ContactInformation,
 )
@@ -38,12 +38,12 @@ from .payment import (
     PaypalPayment,
     payment_map,
 )
-
-from .base import *
-
-journey_param = Sequence[
-    tuple[FlightItinerary, TravelClass]
-]
-fares_param = Sequence[
-    tuple[TravelClass, Fare]
-]
+from .catalog import (
+    AccountCatalog,
+    AirportCatalog,
+    AircraftCatalog,
+    FlightCatalog,
+    FlightScheduling,
+    ScheduleCatalog,
+    ScheduleDate,
+)

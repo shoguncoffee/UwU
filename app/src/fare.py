@@ -1,8 +1,8 @@
 from __future__ import annotations
-from .base import *
+from app.base import *
 
 if TYPE_CHECKING:
-    from app.src import *
+    from . import Pax
 
 
 @dataclass(slots=True, frozen=True)
