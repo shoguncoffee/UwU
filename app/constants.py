@@ -6,20 +6,7 @@ https://fastapi.tiangolo.com/sq/tutorial/path-params/#working-with-python-enumer
 function-call syntax
 first argument must match the name
 """
-from enum import *
-
-__all__ = (
-    'FlightStatus',
-    'PassengerType',
-    'TravelClass',
-    'AccountStatus',
-    'BookingStatus',
-    'SeatType',
-    'GenderType',
-    'PaymentStatus',
-    'PaymentMethod',
-    'Country',
-)
+from enum import IntEnum, Flag, StrEnum
 
 
 FlightStatus = IntEnum(

@@ -46,6 +46,10 @@ class PassengerBody(BaseModel):
     passport_id: str
     gender: GenderType
     type: PassengerType
+
+    @property
+    def name(self):
+        return f"{self.forename} {self.surname}"
     
     @classmethod
     def transform(cls, obj: src.Passenger):
@@ -67,24 +71,6 @@ class PassengerBody(BaseModel):
         return [
             obj.convert() for obj in objs
         ]
-    
-
-class FlightInstanceBody(BaseModel):
-    """
-        FlightInstance for converting from json
-    """
-    date: dt.date
-    designator: str
-    
-    def convert(self):
-        schedule = Airline.schedules.get(self.date)
-        return schedule.get(self.designator)
-    
-    @classmethod
-    def converts(cls, objs: Sequence[Self]):
-        return src.FlightItinerary(
-            obj.convert() for obj in objs
-        )
 
 
 class FlightInfoBody(BaseModel):
@@ -111,23 +97,60 @@ class FlightInfoBody(BaseModel):
             date=obj.date,
             aircraft_model=obj.aircraft.model,
         )
+
+    def reduce(self):
+        return FlightInstanceBody(
+            date=self.date,
+            designator=self.designator,
+        )
+
+
+class ClassInfoBody(BaseModel):
+    travel_class: TravelClass
+    seat_left: int
+    price: int
+    info: list[str]
+
+
+class ItineraryBody(BaseModel):
+    flights: list[FlightInfoBody]
+    classes: list[ClassInfoBody]
     
     @classmethod
-    def transforms(cls, objs: src.FlightItinerary, pax: src.Pax):
-        return {
-            'flights': [
-                cls.transform(obj) for obj in objs
+    def transform(cls, obj: src.FlightItinerary, pax: src.Pax):
+        return cls(
+            flights=[
+                FlightInfoBody.transform(instance) for instance in obj
             ],
-            'classes': {
-                travel_class: {
-                    'seat_left': objs.get_seats_left(travel_class),
-                    'price': objs.get_price(pax, travel_class),
-                    'info': descriptions.travel_class[travel_class],
-                } for travel_class in objs.all_travel_class
-            }
-        }
+            classes=[
+                ClassInfoBody(
+                    travel_class=travel_class,
+                    seat_left=obj.get_seats_left(travel_class),
+                    price=obj.get_price(pax, travel_class),
+                    info=descriptions.travel_class[travel_class],
+                 ) for travel_class in obj.all_travel_class
+            ]
+        )
+
+
+class FlightInstanceBody(BaseModel):
+    """
+        FlightInstance for converting from json
+    """
+    date: dt.date
+    designator: str
     
+    def convert(self):
+        schedule = Airline.schedules.get(self.date)
+        return schedule.get(self.designator)
     
+    @classmethod
+    def converts(cls, objs: Sequence[Self]):
+        return src.FlightItinerary(
+            obj.convert() for obj in objs
+        )
+
+
 class ContactInfoBody(BaseModel):
     index: int
     phone: str

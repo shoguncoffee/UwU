@@ -1,5 +1,6 @@
-import tkinter as tk
-import requests
+from __future__ import annotations
+from .base import *
+
 
 class App:
     def __init__(self, master):
@@ -13,13 +14,13 @@ class App:
         self.username_entry.grid(row=0, column=1, padx=10, pady=10)
 
         # Create buttons for retrieving account info and bookings
-        self.account_button = Button(master, text="Get Account Info", command=self.get_account_info, bg="#4CAF50", fg="white")
+        self.account_button = Button(master, text="Get Account Info", command=self.get_account_info)
         self.account_button.grid(row=1, column=0, padx=10, pady=10)
-        self.bookings_button = Button(master, text="Get Bookings", command=self.get_bookings, bg="#2196F3", fg="white")
+        self.bookings_button = Button(master, text="Get Bookings", command=self.get_bookings)
         self.bookings_button.grid(row=1, column=1, padx=10, pady=10)
 
         # Create text box for displaying account info and bookings
-        self.text_box = Text(master, height=10, width=50, padx=10, pady=10)
+        self.text_box = tk.Text(master, height=10, width=50, padx=10, pady=10)
         self.text_box.grid(row=2, column=0, columnspan=2)
 
     def get_account_info(self):
@@ -31,11 +32,11 @@ class App:
 
         # Update text box with account info
         if response.status_code == 200:
-            self.text_box.delete(1.0, END)
-            self.text_box.insert(END, response.json(), "bold")
+            self.text_box.delete(1.0, tk.END)
+            self.text_box.insert(tk.END, response.json(), "bold")
         else:
-            self.text_box.delete(1.0, END)
-            self.text_box.insert(END, response.json()["detail"], "bold")
+            self.text_box.delete(1.0, tk.END)
+            self.text_box.insert(tk.END, response.json()["detail"], "bold")
 
     def get_bookings(self):
         # Get username input from user
@@ -46,15 +47,11 @@ class App:
 
         # Update text box with bookings
         if response.status_code == 200:
-            self.text_box.delete(1.0, END)
-            self.text_box.insert(END, response.json(), "bold")
+            self.text_box.delete(1.0, tk.END)
+            self.text_box.insert(tk.END, response.json(), "bold")
         else:
-            self.text_box.delete(1.0, END)
-            self.text_box.insert(END, response.json()["detail"], "bold")
+            self.text_box.delete(1.0, tk.END)
+            self.text_box.insert(tk.END, response.json()["detail"], "bold")
 
         # Set the text style to bold
         self.text_box.tag_configure("bold", font=("Helvetica", 10, "bold"))
-
-root = Tk()
-app = App(root)
-root.mainloop()

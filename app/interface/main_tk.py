@@ -1,681 +1,809 @@
-from tkinter import *
-from tkinter import ttk
-import sv_ttk
-import requests
+"""
+https://tkdocs.com/tutorial/concepts.html
+http://tkdocs.com/pyref/index.html
+"""
+from __future__ import annotations
+from .base import *
 
 
-API_EndPoint1 = "http://127.0.0.1:8000/account/createAccount"
-API_EndPoint2 = "http://127.0.0.1:8000/account/login"
-
-
-class RootWindow(Tk):
-    def __init__(self):
-        super().__init__(
-            
-        )
-        self.title("Main")
-        self.geometry("500x300")
-
-    def open_menu(self):
-        self.withdraw()
-        menu_window = MenuWindow(self)
-        menu_window.deiconify()
-
+class MenuPage(StaticPage):
+    master: Root
     
-
-class MenuWindow(Frame):
-    def __init__(self, master):
-        super().__init__(master)
+    def add_widgets(self):
+        self.label = Label(self, 
+            text="SHOGUNUS Airline", 
+            font="Bold 20",
+        ).pack()
         
-        self.username_label = Label(self, text="SHOGUNUS Airline", font="Bold 20")
-        self.username_label.pack()
-
-        self.login_button = Button(self, text="Login", command=self.open_login)
-        self.login_button.pack()
-
-        self.register_button = Button(self, text="Register", command=self.open_register)
-        self.register_button.pack()
-
-        self.search_button = Button(self, text="Search Flight", command=self.open_search)
-        self.search_button.pack()
-
-    def open_login(self):
-        # Close the window
-        # Open the login window
-        root = Tk()
-        login_window = LoginWindow(root)
-        root.mainloop()
-
-    def open_register(self):
-        # Close the window
-        # Open the registration window
-        root = Tk()
-        register_window = RegisterWindow(root)
-        root.mainloop()
-
+        self.login_button = Button(self, 
+            command=partial(self.jump, LoginPage), 
+            width=15,
+            text="Login",
+        ).pack()
         
+        self.search_button = Button(self, 
+            command=partial(self.jump, BookingSection), 
+            width=15,
+            text="Search Flight",
+        ).pack()
 
 
-class LoginWindow:
-    def __init__(self, master):
-        self.master = master
-        master.title("Login")
-        self.master.geometry("300x200")
+class LoginPage(StaticPage):
+    master: Root
 
-        # Create labels and entries for user input
-        self.username_label = Label(master, text="Username")
-        self.username_label.pack()
-        self.username_entry = Entry(master)
-        self.username_entry.pack()
-
-        self.password_label = Label(master, text="Password")
-        self.password_label.pack()
-        self.password_entry = Entry(master, show="*")
-        self.password_entry.pack()
-
-        # Create a button to submit the form
-        self.submit_button = Button(master, text="Login", command=self.submit_form)
-        self.submit_button.pack()
-
-        # Create a button to go to the registration window
-        self.register_button = Button(master, text="Register", command=self.open_registration)
-        self.register_button.pack()
-
-        # Create a button to go to the main window
-        self.back_button = Button(master, text="Back", command=self.open_main)
-        self.back_button.pack()
-
-        # Create a label for the response message
-        self.response_label = Label(master, text="")
-        self.response_label.pack()
-
-    def submit_form(self):
-        # Get input values from the user
-        username = self.username_entry.get()
-        password = self.password_entry.get()
-
-        # Send a POST request to the server to login
-        url = API_EndPoint2
-        data = {"username": username, "password": password}
-        response = requests.post(url, params=data)
-
-        # Show the response message to the user
+    def submit(self):
+        response = requests.post(API_EndPoint2, params={
+            "username": self.username_entry.get(), 
+            "password": self.password_entry.get()
+        })
         if response.status_code == 200:
-            self.response_label.config(text="Login successful!", fg="green")
+            self.response_label.configure(
+                text="Login successful!"
+            )
+            self.root.username = response.json()
         else:
-            self.response_label.config(text="Error: " + response.json()["detail"], fg="red")
-
-    def open_registration(self):
-        # Close the window
-        # Open the registration window
-        root = Tk()
-        registration_window = RegisterWindow(root)
-        root.mainloop()
-
-    def open_main(self):
-        # Close the window
-        # Open the Main window
-        root = Tk()
-        main_window = MainWindow(root)
-        root.mainloop()
-
-class RegisterWindow:
-    def __init__(self, master):
-        self.master = master
-        master.title("Register")
-        self.master.geometry("300x250")
-
-        # Create labels and entries for user input
-        self.username_label = Label(master, text="Username")
-        self.username_label.pack()
-        self.username_entry = Entry(master)
-        self.username_entry.pack()
-
-        self.password_label = Label(master, text="Password")
-        self.password_label.pack()
-        self.password_entry = Entry(master, show="*")
-        self.password_entry.pack()
-
-        self.email_label = Label(master, text="Email")
-        self.email_label.pack()
-        self.email_entry = Entry(master)
-        self.email_entry.pack()
-
-        self.phone_label = Label(master, text="Phone")
-        self.phone_label.pack()
-        self.phone_entry = Entry(master)
-        self.phone_entry.pack()
-
-        # Create a button to submit the form
-        self.submit_button = Button(master, text="Submit", command=self.submit_form)
-        self.submit_button.pack()
-
-        # Create a button to go back to the login window
-        self.login_button = Button(master, text="Go to Login", command=self.go_to_login)
-        self.login_button.pack()
-
-        # Create a label for the response message
-        self.response_label = Label(master, text="")
-        self.response_label.pack()
-
-    def submit_form(self):
-        # Get input values from the user
-        username = self.username_entry.get()
-        password = self.password_entry.get()
-        email = self.email_entry.get()
-        phone = self.phone_entry.get()
-
-        # Send a POST request to the server to create a new account
-        data = {"username": username, "password": password, "email": email, "phone": phone}
-        response = requests.post(API_EndPoint1, params=data)
-
-        # Show the response message to the user
-        if response.status_code == 200:
-            self.response_label.config(text="New account created!", fg="green")
-        else:
-            self.response_label.config(text="Error: " + response.json()["detail"], fg="red")
-
-        self.response_label.pack()
-
-    def go_to_login(self):
-        # Close the window
-        # Open the login window
-        root = Tk()
-        login_window = LoginWindow(root)
-        root.mainloop()
-
-API_Data1 = "http://127.0.0.1:8000/data/airports"
-API_Endpoint3 = "http://127.0.0.1:8000/search/one-way"
-class SearchFlightWindow:
-    def __init__(self, master):
-        self.master = master
-        master.title("Search Flight")
-        self.airports = requests.get(API_Data1).json()
-        self.airports_code = [airport["location_code"] for airport in self.airports]
-        
-        self.from_label = Label(master, text="From").grid(row=0, column=0)
-        self.from_combobox = ttk.Combobox(master,height=5, width=15, values=self.airports_code)
-        self.from_combobox.grid(row=1, column=0)
-
-        self.to_label = Label(master, text="To").grid(row=0, column=1)
-        self.to_combobox = ttk.Combobox(master,height=5, width=15, values=self.airports_code)
-        self.to_combobox.grid(row=1, column=1)
-
-        self.trip_label = Label(master, text="Trip").grid(row=0, column=2)
-        self.trip_combobox = ttk.Combobox(master,height=5,width=15,values=["One Way"])
-        self.trip_combobox.grid(row=1,column=2)
-
-        self.departure_date_label = Label(master, text="Departure Date").grid(row=0, column=3)
-
-        self.departure_day_combobox = ttk.Combobox(master,height=5,width=15,values=list(str(s) for s in range(1, 32)))
-        self.departure_day_combobox.grid(row=1,column=3)
-        self.departure_day_combobox.insert(0, "Day")
-
-        self.departure_month_combobox = ttk.Combobox(master,height=5,width=15,values=list(str(s) for s in range(1, 13)))
-        self.departure_month_combobox.grid(row=2,column=3)
-        self.departure_month_combobox.insert(0, "Month")
-
-        self.departure_year_combobox = ttk.Combobox(master,height=5,width=15,values=['2023'])
-        self.departure_year_combobox.grid(row=3,column=3)
-        self.departure_year_combobox.insert(0, "Year")
-
-        self.passenger_label = Label(master, text="Passenger").grid(row=0, column=5)
-
-        self.passenger_adult_combobox = ttk.Combobox(master,height=5,width=15,values=["1","2","3","4","5","6","7","8","9"])
-        self.passenger_adult_combobox.grid(row=1,column=5)
-        self.passenger_adult_combobox.insert(0, "Adult")
-
-        self.passenger_children_combobox = ttk.Combobox(master,height=5,width=15,values=["0","1","2","3","4","5","6","7","8","9"])
-        self.passenger_children_combobox.grid(row=2,column=5)
-        self.passenger_children_combobox.insert(0, "Children")
-
-        self.passenger_infant_combobox = ttk.Combobox(master,height=5,width=15,values=["0","1","2","3","4","5","6","7","8","9"])
-        self.passenger_infant_combobox.grid(row=3,column=5)
-        self.passenger_infant_combobox.insert(0, "Infant")
-
-        self.search_button = Button(master, text="Search", command=self.search_flight).grid(row=5, column=2)
-
-        self.back_button = Button(master, text="Back to Main", command=self.open_main).grid(row=6, column=2)
-
-    def search_flight(self):
-        origin = self.from_combobox.get()
-        destination = self.to_combobox.get()
-        trip = self.trip_combobox.get()
-        departure_day = self.departure_day_combobox.get()
-        departure_month = self.departure_month_combobox.get()
-        departure_year = self.departure_year_combobox.get()
-        passenger_adult = self.passenger_adult_combobox.get()
-        passenger_children = self.passenger_children_combobox.get()
-        passenger_infant = self.passenger_infant_combobox.get()
-
-        if origin=="" or destination=="" or trip=="" or departure_day=="" or departure_month=="" or departure_year=="" or passenger_adult=="" or passenger_children=="" or passenger_infant=="":
-            messagebox.showerror("Error","Please fill all the fields")
-        else:
-            if origin == destination:
-                messagebox.showerror("Error","Origin and Destination cannot be same")
-            else:
-                data = {
-                    "origin": origin,
-                    "destination": destination,
-                    "date": departure_year + "-" + departure_month + "-" + departure_day,
-                    "adult": passenger_adult,
-                    "child": passenger_children,
-                    "infant": passenger_infant,
-                }
-
-                response = requests.get(url = API_Endpoint3, params=data)
-                all_passengers = int(passenger_adult) + int(passenger_children) + int(passenger_infant)
-                # Close the window
-                        # Open the search flight result window
-                root = Tk()
-                search_flight_result_window = SearchFlightResultWindow(root, response, all_passengers)
-                root.mainloop()
-
-    def open_main(self):
-        # Close the window
-        # Open the Main window
-        root = Tk()
-        main_window = MainWindow(root)
-        root.mainloop()        
-
-class SearchFlightResultWindow:
-    def __init__(self, master, response: requests.Response, all_passengers: int):
-        self.master = master
-        master.title("Search Flight Result")
-
-        print(all_passengers)
-
-        self.origin_label = Label(master, text="Origin").grid(row=0, column=0)
-        self.destination_label = Label(master, text="Destination").grid(row=0, column=1)
-        self.departure_label = Label(master, text="Departure").grid(row=0, column=2)
-        self.arrival_label = Label(master, text="Arrival").grid(row=0, column=3)
-        self.economy_label = Label(master, text="Economy").grid(row=0, column=5)
-        self.business_label = Label(master, text="Business").grid(row=0, column=6)
-        self.first_label = Label(master, text="First").grid(row=0, column=7)
-        
-        self.back_button = Button(master, text="SearchFlight", command=self.open_search_flight).grid(row=0, column=8)
-
-        result = response.json()
-        self.all_passengers = all_passengers
-        
-        for n, itinerary in enumerate(result) :
-            flights = itinerary['flights']
-            first_flight = flights[0]
-            last_flight = flights[-1]
- 
-            departure = first_flight['departure']
-            arrival = last_flight['arrival']
-            origin = first_flight['origin']
-            destination = last_flight['destination']
-
-            self.origin_result_label = Label(master,text=origin).grid(row=n+1,column=0)
-            self.destination_result_label = Label(master,text=destination).grid(row=n+1,column=1)
-            self.departure_result_label = Label(master,text=departure).grid(row=n+1,column=2)
-            self.arrival_result_label = Label(master,text=arrival).grid(row=n+1,column=3)
-
-            classes = itinerary['classes']
-            for item in classes.items():
-                cls, data = item
-                price = data['price']
-                self.book_button = Button(master, text=price, command=self.select_flight(flights, item)).grid(row=n+1, column=4+int(cls))
-            
-    def open_search_flight(self):
-        # Close the window
-        # Open the searchflight window
-        root = Tk()
-        searchFlight_window = SearchFlightWindow(root)
-        root.mainloop()
-
-    def select_flight(self, itinerary, travel_class):
-        def func():
-            all_passengers = self.all_passengers
-            passenger_num = 1
-            passenger_detail_list = []
-            # Close the window
-                # Open the fill passenger details window
-            root = Tk()
-            fillPassengerDetails_window = FillPassengerDetail(root, itinerary, travel_class, passenger_num, all_passengers, passenger_detail_list)
-            root.mainloop()
-        return func
-
-class FillPassengerDetail:
-    def __init__(self, master, itinerary, travel_class, passenger_num: int, all_passengers: int, passenger_detail_list: list):
-        self.master = master
-        master.title("Fill Passenger Details")
-
-        print(itinerary)
-        print(travel_class)
-        print(passenger_num)
-        print(all_passengers)
-
-        self.all_itinerary = itinerary
-        self.travel_class = travel_class
-        self.passenger_num = passenger_num
-        self.all_passengers = all_passengers 
-        self.passenger_detail_list = passenger_detail_list
-        #self.total_price = travel_class[1]["price"]
-
-        from app.constants import GenderType
-        self.title_label = Label(master, text="Title").grid(row=0, column=0)
-
-        self.title_combobox = ttk.Combobox(master,height=5,width=15,values=["Mr.", "Mrs", "Ms."])
-        self.title_combobox.grid(row=1,column=0)
-        self.title_combobox.insert(0, "Choose your title")
-
-        self.firstname_label = Label(master, text="First Name").grid(row=2, column=0)
-        self.firstname_entry = Entry(master)
-        self.firstname_entry.grid(row=3, column=0)
-        self.lastname_label = Label(master, text="Last Name").grid(row=2, column=1)
-        self.lastname_entry = Entry(master)
-        self.lastname_entry.grid(row=3, column=1)
-        self.birth_label = Label(master, text="Date of Birth (YYYY-MM-DD)").grid(row=4, column=0)
-        self.birth_entry = Entry(master)
-        self.birth_entry.grid(row=5, column=0)
-
-        self.nationality_combobox = ttk.Combobox(master, height=5, width=15, values=["Thailand","India","China"])
-        self.nationality_combobox.grid(row=5, column=1)
-        self.nationality_combobox.insert(0, "Nationality")
-
-        self.label1 = Label(master, text="Gender").grid(row=6, column=0)
-        from app.constants import GenderType
-        self.gender_list = [gender.name for gender in GenderType]
-        self.gender_combobox = ttk.Combobox(master,height=5,width=15,values=self.gender_list)
-        self.gender_combobox.grid(row=7,column=0)
-        self.gender_combobox.insert(0, "Choose your gender")
-
-        self.label2 = Label(master, text="Passenger type").grid(row=6, column=1)
-        from app.constants import PassengerType
-        self.passenger_type_list = [age.name for age in PassengerType]
-        self.passenger_type_combobox = ttk.Combobox(master,height=5,width=15,values=self.passenger_type_list)
-        self.passenger_type_combobox.grid(row=7,column=1)
-        self.passenger_type_combobox.insert(0, "Choose your age range")
-
-        self.label3 = Label(master, text="").grid(row=8, column=1)
-
-        self.passport_detail_label = Label(master, text="Passport details (Optional)").grid(row=9, column=0)
-        self.passport_detail_entry = Entry(master)
-        self.passport_detail_entry.grid(row=10, column=0)
-        self.passport_expiry_label = Label(master, text="Passport expiry date (Optional)").grid(row=9, column=1)
-        self.passport_expiry_entry = Entry(master)
-        self.passport_expiry_entry.grid(row=10, column=1)
-
-        self.travel_type_label = Label(master, text="Travel document (Optional)").grid(row=11, column=0)
-        self.travel_type_combobox = ttk.Combobox(master, height=5, width=15, values=["Passport", "Green Card", "Visa"])
-        self.travel_type_combobox.grid(row=12, column=0)
-        self.travel_type_combobox.insert(0, "Travel Document Type")
-
-        self.residence_country_label = Label(master, text="Country of residence (Optional").grid(row=11, column=1)
-        self.residence_country_combobox = ttk.Combobox(master, height=5, width=15, values=["Thailand","India","China"])
-        self.residence_country_combobox.grid(row=12, column=1)
-        self.residence_country_combobox.insert(0, "Select Country")
-
-        self.label4 = Label(master, text="").grid(row=13, column=1)
-
-        self.back_button = Button(master, text="SearchFlight", command=self.open_search_flight).grid(row=19, column=0)
-
-        if passenger_num < all_passengers:
-            self.next_passenger_button = Button(master, text="Next Passenger", command=self.next_passenger).grid(row=19, column=1)
-        
-        else:
-            self.contact_detail_label = Label(master, text="Contact details").grid(row=15, column=0)
-            self.phone_entry = Entry(master)
-            self.phone_entry.grid(row=17, column=0)
-            self.phone_entry.insert(0, "Phone number")
-            self.email_entry = Entry(master)
-            self.email_entry.grid(row=17, column=1)
-            self.email_entry.insert(0, "Email address")
-
-            self.username_entry = Entry(master)
-            self.username_entry.grid(row=18, column=0)
-            self.username_entry.insert(0, "Account username")
-
-            self.contact_combobox = ttk.Combobox(master,height=5,width=15,values=list(str(i) for i in range(1, self.all_passengers+1)))
-            self.contact_combobox.grid(row=18,column=1)
-            self.contact_combobox.insert(0, "Choose whose contact")
-
-            self.booking_button = Button(master, text="Book", command=self.create_booking).grid(row=19, column=1)
+            self.response_label.configure(
+                text=f'Error: {response.json()["detail"]}', 
+            )
     
-    def next_passenger(self):
-        from app.constants import GenderType, PassengerType
-
-        title = self.title_combobox.get()
-        firstname = title + self.firstname_entry.get()
-        lastname = self.lastname_entry.get()
-        date_of_birth = self.birth_entry.get()
-        nationality = self.nationality_combobox.get()
-        gender = GenderType[self.gender_combobox.get()]
-        passenger_type = PassengerType[self.passenger_type_combobox.get()]
-        passport_detail = self.passport_detail_entry.get()
-        passport_expiry = self.passport_expiry_entry.get()
-        travel_document = self.travel_type_combobox.get()
-        country_of_residence = self.residence_country_combobox.get()
-
-        passenger_detail = {
-            "forename": firstname,
-            "surname": lastname,
-            "birthdate": date_of_birth,
-            "nationality": nationality,
-            "passport_id": passport_detail,
-            "gender": gender,
-            "type": passenger_type
-            }
+    def add_widgets(self):
+        self.username_label = Label(self, 
+            text="Username"
+        ).pack()
+        self.username_entry = Entry(self, 
+        ).pack()
         
-        self.passenger_detail_list.append(passenger_detail)
+        self.password_label = Label(self, 
+            text="Password"
+        ).pack()
+        self.password_entry = Entry(self, 
+            show="*"
+        ).pack()
         
-        itinerary = self.all_itinerary
-        travel_class = self.travel_class
-        passenger_num = self.passenger_num + 1
-        all_passengers = self.all_passengers
-
-        print(passenger_detail)
-        print(self.passenger_detail_list)
-
-        # Close the window
-        # Open the fill window
-        root = Tk()
-        fillPassengerDetails_window = FillPassengerDetail(root, itinerary, travel_class, passenger_num, all_passengers, self.passenger_detail_list)
-        root.mainloop()
+        self.submit_button = Button(self, 
+            command=self.submit, 
+            text="Login",
+        ).pack()
         
+        self.register_button = Button(self, 
+            command=partial(self.jump, RegisterPage), 
+            text="Register",
+        ).pack()
+        
+        self.back_button = Button(self, 
+            command=partial(self.jump, MenuPage), 
+            text="Back",
+        ).pack()
+        
+        self.response_label = Label(self, 
+            text="",
+        ).pack()
 
+
+class RegisterPage(StaticPage):
+    master: Root
+
+    def submit(self):
+        response = requests.post(API_EndPoint1, params={
+            "username": self.username_entry.get(), 
+            "password": self.password_entry.get(), 
+            "email": self.email_entry.get(), 
+            "phone": self.phone_entry.get()
+        })
+        if response.status_code == 200:
+            self.response_label.configure(
+                text="New account created!", 
+            )
+        else:
+            self.response_label.configure(
+                text=f'Error: {response.json()["detail"]}', 
+            )
+    
+    def add_widgets(self):        
+        self.username_label = Label(self, 
+            text="Username",
+        ).pack()
+        self.username_entry = Entry(self,
+        ).pack()
+        
+        self.password_label = Label(self, 
+            text="Password",
+        ).pack()
+        self.password_entry = Entry(self, 
+            show="*",
+        ).pack()
+        
+        self.email_label = Label(self, 
+            text="Email",
+        ).pack()
+        self.email_entry = Entry(self,
+        ).pack()
+        
+        self.phone_label = Label(self, 
+            text="Phone",
+        ).pack()
+        self.phone_entry = Entry(self,
+        ).pack()
+        
+        self.submit_button = Button(self, 
+            command=self.submit, 
+            text="Submit",
+        ).pack()
+        
+        self.login_button = Button(self, 
+            command=partial(self.jump, LoginPage), 
+            text="Go to Login",
+        ).pack()
+        
+        self.response_label = Label(self, 
+            text="",
+        ).pack()
+
+
+class BookingSection(SubSection):
+    def procedure(self):
+        pax, self.journey = self.open(
+            SearchSection(self)
+        ).returned()
+        
+        self.passengers, self.contact = self.open(
+            PassengerSection(self, pax)
+        ).returned()
+        #contact_unforgot
+        self.summery()
+        self.wait_variable(self.waiter)
+        self.jump(MenuPage)
+        
     def create_booking(self):
-        from app.constants import GenderType, PassengerType
-        
-        title = self.title_combobox.get()
-        firstname = title + self.firstname_entry.get()
-        lastname = self.lastname_entry.get()
-        date_of_birth = self.birth_entry.get()
-        nationality = self.nationality_combobox.get()
-        gender = GenderType[self.gender_combobox.get()]
-        passenger_type = PassengerType[self.passenger_type_combobox.get()]
-        passport_detail = self.passport_detail_entry.get()
-        passport_expiry = self.passport_expiry_entry.get()
-        travel_document = self.travel_type_combobox.get()
-        country_of_residence = self.residence_country_combobox.get()
-        phone_number = self.phone_entry.get()
-        email_address = self.email_entry.get()
-        username = self.username_entry.get()
-        contact = self.contact_combobox.get()
+        API_EndPoint4 = f"http://127.0.0.1:8000/account/{self.root.username}/book"
 
-        API_EndPoint4 = f"http://127.0.0.1:8000/account/{username}/book"
-        
-        data = {
-            "journey":
-            [
-                (
-                    [
-                        {
-                            "date": flight['date'],
-                            "designator": flight['designator']
-                        }
-                        for flight in self.all_itinerary
-                    ], 
-                    self.travel_class[0]
-                )
+        response = requests.post(API_EndPoint4, json={
+            "journey": [(
+                    [flight.reduce().json() for flight in itinerary.flights], travel_class
+                ) for itinerary, travel_class in self.journey
             ],
-            "contact":
-            {
-                "index": int(contact),
-                "phone":phone_number,
-                "email": email_address
-            },
-            "passengers": self.passenger_detail_list + [
-                {
-                    "forename": firstname,
-                    "surname": lastname,
-                    "birthdate": date_of_birth,
-                    "nationality": nationality,
-                    "passport_id": passport_detail,
-                    "gender": gender,
-                    "type": passenger_type
-                }
+            "contact": self.contact.json(),
+            "passengers": [
+                passenger.json() for passenger in self.passengers
             ]
-        }
-        import json
-        print(json.dumps(data, indent=4))
+        })
+        self.next()
 
-        response = requests.post(url=API_EndPoint4, json=data)
+    def summery(self): 
+        frame = Frame(self)
         
-        print(response.text)
-
-        # Close the window
-        # Open the bookingSummary window
-        root = Tk()
-        booking_summary_window = BookingSummaryWindow(root, data)
-        root.mainloop()
-
-    def open_search_flight(self):
-        # Close the window
-        # Open the searchflight window
-        root = Tk()
-        searchFlight_window = SearchFlightWindow(root)
-        root.mainloop()
-
-class BookingSummaryWindow:
-    def __init__(self, master, data: dict):
-        self.master = master
-        master.title("Booking Summary")
-
-        self.data = data 
-
-        self.trip_summary_label = Label(master, text="Trip Summary", font="bold").grid(row=0, column=0)
-        self.origin_summary_labbel = Label(master, text="Origin").grid(row=1, column=0)
-        self.departure_summary_label = Label(master, text="Departuer").grid(row=1, column=1)
-        self.destination_summary_label = Label(master, text="Destination").grid(row=1, column=2)
-        self.arrival_summary_label = Label(master, text="Arrival").grid(row=1, column=3)
-        self.class_summary_label = Label(master, text="Class").grid(row=1, column=4)
+        self.trip_summary_label = Label(frame, 
+            text="Trip Summary", 
+            font="bold"
+        ).grid(row=0, column=0)
+        
+        self.origin_summary_labbel = Label(frame, 
+            text="Origin"
+        ).grid(row=1, column=0)
+        
+        self.departure_summary_label = Label(frame, 
+            text="Departuer"
+        ).grid(row=1, column=1)
+        
+        self.destination_summary_label = Label(frame,               
+            text="Destination"
+        ).grid(row=1, column=2)
+        
+        self.arrival_summary_label = Label(frame, 
+            text="Arrival"
+        ).grid(row=1, column=3)
+        
+        self.class_summary_label = Label(frame, 
+            text="Class"
+        ).grid(row=1, column=4)
         
         #need to get trip data
+        self.label1 = Label(frame, 
+            text=""
+        ).grid(row=3, column=1)
+        
+        self.passenger_detail_summary_label = Label(frame, 
+            text="Passenger details", 
+            font="bold"
+        ).grid(row=4, column=0)
+        
+        self.passenger_name_summary_label = Label(frame, 
+            text="Passenger name"
+        ).grid(row=5, column=0)
+        
+        self.date_of_birth_summary_label = Label(frame, 
+            text="Date of birth"
+        ).grid(row=5, column=1)
+        
+        self.type_summary_label = Label(frame, 
+            text="Type"
+        ).grid(row=5, column=2)
 
-        self.label1 = Label(master, text="").grid(row=3, column=1)
+        for n, passenger in enumerate(self.passengers, 1):
+            self.passenger_name_summary_result_label = Label(frame, 
+                text = passenger.name
+            ).grid(
+                row=n+5, column=0
+            )
+            self.date_of_birth_summary_result_label = Label(frame, 
+                text = str(passenger.birthdate)
+            ).grid(row=n+5, column=1)
+            
+            self.type_summary_result_label = Label(frame, 
+                text = passenger.type.name
+            ).grid(row=n+5, column=2)
 
-        self.passenger_detail_summary_label = Label(master, text="Passenger details", font="bold").grid(row=4, column=0)
-        self.passenger_name_summary_label = Label(master, text="Passenger name").grid(row=5, column=0)
-        self.date_of_birth_summary_label = Label(master, text="Date of birth").grid(row=5, column=1)
-        self.type_summary_label = Label(master, text="Type").grid(row=5, column=2)
+        i = 5 + len(self.passengers)
+        
+        self.label2 = Label(frame, 
+            text=""
+        ).grid(row=i+1, column=1)
 
-        #get passenger details data
-        passenger_detail = self.data["passengers"]
-        from app.constants import PassengerType
-        n = 0
-        i = 5
-        for item in passenger_detail:
-            passenger_name = item["forename"] + " " + item["surname"]
-            date_of_birth = item["birthdate"]
-            passenger_type = PassengerType(int(item["type"])).name
+        self.contact_detail_label = Label(frame, 
+            text="Contact details", 
+            font="bold"
+        ).grid(row=i+2, column=0)
+        
+        self.passenger_name_contact_label = Label(frame, 
+            text="Passenger name"
+        ).grid(row=i+3, column=0)
+        
+        self.email_contact_label = Label(frame, 
+            text="E-mail"
+        ).grid(row=i+3, column=1)
+        
+        self.phone_contact_label = Label(frame, 
+            text="Phone number"
+        ).grid(row=i+3, column=2)
 
-            print(passenger_name)
-            print(date_of_birth)
-            print(passenger_type)
-            n += 1
-            i += 1
+        passenger_name = self.passengers[self.contact.index].name
+        email = self.contact.email
+        phone = self.contact.phone
 
-            self.passenger_name_summary_result_label = Label(master, text=passenger_name).grid(row=n+5, column=0)
-            self.date_of_birth_summary_result_label = Label(master, text=date_of_birth).grid(row=n+5, column=1)
-            self.type_summary_result_label = Label(master, text=passenger_type).grid(row=n+5, column=2)
+        self.passenger_name_contact_result_label = Label(frame, 
+            text=passenger_name
+        ).grid(row=i+4, column=0)
+        
+        self.email_contact_result_label = Label(frame, 
+            text=email
+        ).grid(row=i+4, column=1)
+        
+        self.phone_contact_result_label = Label(frame, 
+            text=phone
+        ).grid(row=i+4, column=2)
 
-        self.label2 = Label(master, text="").grid(row=i+1, column=1)
+        self.label3 = Label(frame, 
+            text=""
+        ).grid(row=i+5, column=1)
 
-        self.contact_detail_label = Label(master, text="Contact details", font="bold").grid(row=i+2, column=0)
-        self.passenger_name_contact_label = Label(master, text="Passenger name").grid(row=i+3, column=0)
-        self.email_contact_label = Label(master, text="E-mail").grid(row=i+3, column=1)
-        self.phone_contact_label = Label(master, text="Phone number").grid(row=i+3, column=2)
-
-        #get contact details data
-        contact = self.data["contact"]
-        index = contact["index"]
-        passenger_name = passenger_detail[int(index)-1]["forename"] + " " + passenger_detail[int(index)-1]["surname"]
-        email = contact["email"]
-        phone = contact["phone"]
-
-        self.passenger_name_contact_result_label = Label(master, text=passenger_name).grid(row=i+4, column=0)
-        self.email_contact_result_label = Label(master, text=email).grid(row=i+4, column=1)
-        self.phone_contact_result_label = Label(master, text=phone).grid(row=i+4, column=2)
-
-        self.label3 = Label(master, text="").grid(row=i+5, column=1)
-
-        self.total_price_label = Label(master, text="Total price", font="bold").grid(row=i+6, column=0)
-        self.payable_amount_label = Label(master, text="Payable amount", font="bold").grid(row=i+7, column=0)
+        self.total_price_label = Label(frame, 
+            text="Total price", 
+            font="bold"
+        ).grid(row=i+6, column=0)
+        
+        self.payable_amount_label = Label(frame, 
+            text="Payable amount", 
+            font="bold"
+        ).grid(row=i+7, column=0)
 
         #need to get total price data
+        self.label4 = Label(frame, 
+            text=""
+        ).grid(row=14, column=1)
 
-        self.label4 = Label(master, text="").grid(row=14, column=1)
+        self.choose_how_to_pay_label = Label(frame, 
+            text="Choose how to pay" , 
+            font="bold"
+        ).grid(row=15, column=0)
 
-        self.choose_how_to_pay_label = Label(master, text="Choose how to pay" , font="bold").grid(row=15, column=0)
-
-        self.pay_now_check = BooleanVar()
-        self.hold_my_booking_check = BooleanVar()
-        self.pay_now_checkbutton = Checkbutton(master, text="Pay now", variable=self.pay_now_check).grid(row=16, column=0)
-        self.hold_my_booking_checkbutton = Checkbutton(master, text="Hold my booking", variable=self.hold_my_booking_check).grid(row=16, column=1)
-
-        self.label5 = Label(master, text="").grid(row=17, column=1)
-
-        self.cancel_button = Button(master, text="Cancel", command=self.open_search_flight).grid(row=18, column=0)
-        self.purchase_button = Button(master, text="Purchase", command=self.open_payment).grid(row=18, column=1)
-
-    def open_search_flight(self):
-        # Close the window
-        # Open the searchflight window
-        root = Tk()
-        searchFlight_window = SearchFlightWindow(root)
-        root.mainloop()
-
-    def open_payment(self):
-        # Close the window
-        # Open the payment window
-        root = Tk()
-        payment_window = PaymentWindow(root)
-        root.mainloop()
-
-class PaymentWindow:
-    def __init__(self, master):
-        self.master = master
-        master.title("Payment")
-
-        self.payment_label = Label(master, text="Select your preferred payment method").grid(row=0, column=0)
+        pay_now_check = tk.BooleanVar(frame)
+        hold_my_booking_check = tk.BooleanVar(frame)
         
-        #need to create input and get data
+        self.pay_now_checkbutton = Checkbutton(frame, 
+            text = "Pay now", 
+            variable = pay_now_check,
+        ).grid(row = 16, column=0)
+        
+        self.hold_my_booking_checkbutton = Checkbutton(frame, 
+            text = "Hold my booking", 
+            variable = hold_my_booking_check
+        ).grid(row=16, column=1)
 
-        self.back_button = Button(master, text="Back", command=self.open_booking_summary).grid(row=2, column=0)
+        self.label5 = Label(frame, 
+            text=""
+        ).grid(row=17, column=1)
 
-    def open_booking_summary(self):
-        # Close the window
-        # Open the booking summary window
-        root = Tk()
-        booking_summary_window = MainWindow(root)
-        root.mainloop()
+        self.cancel_button = Button(frame, 
+            text="Cancel", 
+            command = self.next
+        ).grid(row=18, column=0)
+        
+        self.purchase_button = Button(frame, 
+            text="Purchase", 
+            command=self.create_booking
+        ).grid(row=18, column=1)
+
+        frame.pack()
+        
+
+class SearchSection(SubSection):
+    def procedure(self):
+        self.pax, itinerarys = self.peek(
+            SearchPage(self)
+        ).returned()
+
+        # self.jouney = []
+        self.itinerarys = self.peek(
+            ResultPage(self, itinerarys)
+        ).returned()
+            
+    def returned(self): 
+        return self.pax, [self.itinerarys] #!
 
 
-root = Tk()
-main_window = MainWindow(root)
-root.mainloop()
-
-#q = []
-#for a in range(10):
-    #def g():
-    #    return a
+class SearchPage(Page):
+    master: SearchSection
     
-    #q.append(g)
+    # def next(self):
+        # if ['invalaid'] not in self.origin_entry['state']:
+            # super().wait_done()
+        # super().next()
+
+    def returned(self):
+        super().returned()
+        trip = self.trip_combobox.get()
+        departure_day = self.departure_day_spinbox.get()
+        departure_month = self.departure_month_spinbox.get()
+        departure_year = self.departure_year_spinbox.get()
+        
+        pax = src.Pax({
+            passenger_type: int(spinbox.get())
+            for passenger_type, spinbox in self.pax_spinbox.items()
+        }.items())
+        
+        response = requests.get(url + API_Endpoint3, params={
+            "origin": self.origin_entry.get(),
+            "destination": self.destination_entry.get(),
+            "date": f'{departure_year}-{departure_month}-{departure_day}',
+            "adult": pax.get(PassengerType.ADULT),
+            "child": pax.get(PassengerType.CHILD),
+            "infant": pax.get(PassengerType.INFANT),
+        })
+        itinerary = [
+            body.ItineraryBody(**data) for data in response.json()
+        ]
+        return pax, itinerary
+       
+    def add_widgets(self):        
+        self.origin_label = Label(self, 
+            text="From",
+        ).grid(row=0, column=0,)
+        
+        self.destination_label = Label(self, 
+            text="To"
+        ).grid(row=0, column=1,)
+        
+        self.origin_entry = AirportEntry(self).grid(row=1, column=0)
+        self.destination_entry = AirportEntry(self).grid(row=1, column=1)
+        
+        self.trip_label = Label(self, 
+            text="Trip",
+        ).grid(row=0, column=2,)
+        
+        self.trip_combobox = Combobox(self,
+            height=6, width=13, 
+            values=["One Way"],
+        ).grid(row=1, column=2,)
+        
+        self.departure_date_label = Label(self, 
+            text="Departure",
+        ).grid(row=0, column=3,)
+        
+        self.departure_day_spinbox = Combobox(self,
+            width=6,
+            values=[str(s) for s in range(1, 31)],
+        ).grid(row=1, column=3)
+
+        self.departure_month_spinbox = Combobox(self,
+            width=6,
+            values=[str(s) for s in range(1, 13)],
+        ).grid(row=2, column=3,)
+        
+        self.departure_year_spinbox = Combobox(self,
+            width=6,
+            values=['2023'],
+        ).grid(row=3, column=3,)
+
+        self.passenger_label = Label(self, 
+            text="Passengers",
+        ).grid(row=0, column=5,)
+
+        self.departure_day_spinbox.insert(0, "Day")
+        self.departure_month_spinbox.insert(0, "Month")
+        self.departure_year_spinbox.insert(0, "Year")
+
+        self.pax_spinbox = {
+            PassengerType.ADULT: Spinbox(self,
+                    from_=1, to=20, 
+                    width=2,
+                    state='readonly'
+                ).grid(row=1, column=6,),
+            PassengerType.CHILD: Spinbox(self,
+                    from_=0, to=10, 
+                    width=2,
+                    state='readonly'
+                ).grid(row=2, column=6,),
+            PassengerType.INFANT: Spinbox(self,
+                    from_=0, to=10, 
+                    width=2,
+                    state='readonly'
+                ).grid(row=3, column=6,),
+        }
+        for passenger_type, spinbox in self.pax_spinbox.items():
+            Label(self, 
+                text=passenger_type.name
+            ).grid(row=spinbox.grid_info()['row'], column=5,)
 
 
-#for n, func in zip(range(3), q):
-    #b1 = (command=func)
+        self.search_button = Button(self, 
+            command=self.next, 
+            text="Search",
+            # state=DISABLED,
+        ).grid(row=4, column=2,)
+        # self.search_button['state'] = NORMAL
+        
+        self.back_button = Button(self, 
+            command=partial(self.master.jump, MenuPage), 
+            text="Back to Main",
+        ).grid(row=3, column=2,)
+
+
+class ResultPage(Page):
+    master: SearchSection
+
+    def __init__(self, master, itinerarys: list[body.ItineraryBody]):
+        self.itinerarys = itinerarys
+        super().__init__(master)
+        
+    def returned(self):
+        super().returned()
+        return self.itinerary, self.travel_class
+
+    def choose(self, itinerary: body.ItineraryBody, travel_class: TravelClass):
+        self.travel_class = travel_class
+        self.itinerary = itinerary
+        self.next()
+        
+    def add_widgets(self):        
+        self.origin_label = Label(self, 
+            text="Origin"
+        ).grid(row=0, column=0)
+        
+        self.destination_label = Label(self, 
+            text="Destination"
+        ).grid(row=0, column=1)
+        
+        self.departure_label = Label(self, 
+            text="Departure"
+        ).grid(row=0, column=2)
+        
+        self.arrival_label = Label(self, 
+            text="Arrival"
+        ).grid(row=0, column=3)
+        
+        self.economy_label = Label(self, 
+            text="Economy"
+        ).grid(row=0, column=5)
+        
+        self.business_label = Label(self, 
+            text="Business"
+        ).grid(row=0, column=6)
+        
+        self.first_label = Label(self, 
+            text="First"
+        ).grid(row=0, column=7)
+        
+        self.back_button = Button(self, 
+            command=self.back,
+            text="Search Flight",
+        ).grid(row=0, column=8)
+        
+        for n, itinerary in enumerate(self.itinerarys, 1) :
+            first_flight = itinerary.flights[0]
+            last_flight = itinerary.flights[-1]
+
+            origin = first_flight.origin
+            departure = first_flight.departure
+            destination = last_flight.destination
+            arrival = last_flight.arrival
+
+            if first_flight is last_flight:
+                ...
+
+            Label(self, 
+                text = origin
+            ).grid(row=n, column=0)
+            
+            Label(self, 
+                text = destination
+            ).grid(row=n, column=1)
+            
+            Label(self, 
+                text = f'{departure:%H:%M}'
+            ).grid(row=n, column=2)
+            
+            Label(self, 
+                text = f'{arrival:%H:%M}'
+            ).grid(row=n, column=3)
+            
+            for data in itinerary.classes:
+                travel_class = data.travel_class
+                
+                if data.seat_left < 20:
+                    # show seat left?
+                    ...
+                
+                Button(self, 
+                    text = data.price,
+                    command = partial(self.choose, itinerary, travel_class)
+                ).grid(row=n, column=travel_class + 4)
+
+
+class PassengerSection(SubSection):    
+    def __init__(self, master, pax: src.Pax):
+        self.pages = [(
+            type(f'{FillPassengerPage.__name__}{n}', (FillPassengerPage,), {}), passenger_type
+            ) for passenger_type, number in pax for n in range(number)
+        ]
+        print(self.pages)
+        super().__init__(master)
+
+    def returned(self):
+        return self.passengers, self.contact
+
+    def procedure(self):
+        self.passengers: list[body.PassengerBody] = []
+        
+        for n, (FillPage, passenger_type) in enumerate(self.pages):
+            page = self.peek(
+                FillPage(self, passenger_type, n)
+            )
+            self.passengers.append(page.returned())
+            print('append')
+
+        print('contact')
+        self.contact = self.peek(
+            SelectContactPage(self, self.passengers)
+        ).returned()
+        
+
+class FillPassengerPage(Page):
+    master: PassengerSection
+
+    def __init__(self, master, passenger_type: PassengerType, number: int):
+        self.number = number
+        self.passenger_type = passenger_type
+        super().__init__(master)
+
+    def returned(self):
+        super().returned()
+        passport_expiry = self.passport_expiry_entry.get()
+        travel_document = self.travel_type_combobox.get()
+        country_of_residence = self.residence_country_combobox.get()
+        
+        return body.PassengerBody(
+            forename = self.title_combobox.get() + self.firstname_entry.get(),
+            surname = self.lastname_entry.get(),
+            birthdate = dt.date.fromisoformat(self.birth_entry.get()),
+            nationality = self.nationality_combobox.get(),
+            passport_id = self.passport_detail_entry.get(),
+            gender = GenderType[self.gender_combobox.get()],
+            type = self.passenger_type
+        )
+
+    def add_widgets(self):
+        self.title_label = Label(self, 
+            text="Title"
+        ).grid(row=0, column=0)
+        self.title_combobox = Combobox(self, 
+            height=5, width=15,
+            values=["Mr.", "Mrs.", "Ms."]
+        ).grid(row=1,column=0)
+
+        self.firstname_label = Label(self, 
+            text="First Name"
+        ).grid(row=2, column=0)
+        self.firstname_entry = Entry(self
+        ).grid(row=3, column=0)
+
+        self.lastname_label = Label(self,
+             text="Last Name"
+        ).grid(row=2, column=1)
+        self.lastname_entry = Entry(self
+        ).grid(row=3, column=1)
+        
+        self.birth_label = Label(self, 
+            text="Date of Birth (YYYY-MM-DD)"
+        ).grid(row=4, column=0)
+        self.birth_entry = Entry(self
+        ).grid(row=5, column=0)
+
+        self.nationality_combobox = Combobox(self, 
+            height=5, 
+            width=15, 
+            values=["Thailand","India","China"]
+        ).grid(row=5, column=1)
+
+        self.label1 = Label(self, 
+            text="Gender"
+        ).grid(row=6, column=0)
+        self.gender_combobox = Combobox(self,
+            height=5, width=15, 
+            values=[gender.name for gender in GenderType]
+        ).grid(row=7, column=0)
+
+        self.label2 = Label(self, 
+            text = f'{self.number+1}. {self.passenger_type.name}'
+        ).grid(row=0, column=1)
+
+        self.label3 = Label(self, 
+            text=""
+        ).grid(row=8, column=1)
+
+        self.passport_detail_label = Label(self, 
+            text="Passport details (Optional)"
+        ).grid(row=9, column=0)
+        self.passport_detail_entry = Entry(self
+        ).grid(row=10, column=0)
+
+        self.passport_expiry_label = Label(self, 
+            text="Passport expiry date (Optional)"
+        ).grid(row=9, column=1)
+        self.passport_expiry_entry = Entry(self
+        ).grid(row=10, column=1)
+
+        self.travel_type_label = Label(self, 
+            text="Travel document (Optional)"
+        ).grid(row=11, column=0)
+        self.travel_type_combobox = Combobox(self, 
+            height=5, 
+            width=15, 
+            values=["Passport", "Green Card", "Visa"]
+        ).grid(row=12, column=0)
+
+        self.residence_country_label = Label(self, 
+            text="Country of residence (Optional"
+        ).grid(row=11, column=1)
+        self.residence_country_combobox = Combobox(self, 
+            height=5, 
+            width=15, 
+            values=["Thailand","India","China"]
+        ).grid(row=12, column=1)
+
+        self.label4 = Label(self, 
+            text=""
+        ).grid(row=13, column=1)
+
+        self.title_combobox.insert(0, "Choose your title")
+        self.nationality_combobox.insert(0, "Nationality")        
+        self.gender_combobox.insert(0, "Choose your gender")
+        self.travel_type_combobox.insert(0, "Travel Document Type")
+        self.residence_country_combobox.insert(0, "Select Country")        
+
+        if self.number > 0:
+            self.back_button = Button(self, 
+                text = 'previous', 
+                command = self.back
+            ).grid(row=19, column=0)
+        
+        self.next_button = Button(self, 
+            text = "Next", 
+            command = self.next
+        ).grid(row=19, column=1)
+
+
+class SelectContactPage(Page):
+    def __init__(self, master, passengers: list[body.PassengerBody]):
+        self.passengers_name = [
+            passenger.name for passenger in passengers
+            if passenger.type is PassengerType.ADULT
+        ]
+        super().__init__(master)
+
+    def returned(self):
+        super().returned()
+        return body.ContactInfoBody(
+            index = self.contact_combobox.current(),
+            phone = self.phone_entry.get(),
+            email = self.email_entry.get()
+        )
+        
+    def add_widgets(self):
+        self.contact_combobox = Combobox(self,
+            height = 5,
+            width = 20,
+            values = self.passengers_name
+        ).grid(row=18,column=1)
+
+        self.contact_detail_label = Label(self, 
+            text="Contact details"
+        ).grid(row=15, column=0)
+          
+        self.next_button = Button(self, 
+            text="summery", 
+            command=self.next
+        ).grid(row=19, column=1)
+        
+        self.phone_entry = Entry(self
+        ).grid(row=17, column=0)
+
+        self.email_entry = Entry(self
+        ).grid(row=17, column=1)
+        
+        self.contact_combobox.insert(0, "Choose whose contact")
+        self.phone_entry.insert(0, "Phone number")
+        self.email_entry.insert(0, "Email address") 
+
+class PaymentPage(Page):
+    def __init__(self, master, booking: body.BookingBody):
+        self.booking = booking
+        super().__init__(master)
+
+    def add_widgets(self):
+        self.payment_label = Label(self, 
+            text="Select your preferred payment method"
+        ).grid(row=0, column=0)
+        
+        self.back_button = Button(self, 
+            text="Back", 
+            command=...
+        ).grid(row=2, column=0)
+
+
+class SelectSeatSection(SubSection):
+    def __init__(self, master, 
+        itinerary: body.ItineraryBody,
+        
+    ):
+        self.itinerary = itinerary
+        self.seats: list[body.SeatBody] = []
+        super().__init__(master)    
+
+    def procedure(self):
+        search_page = SearchPage(self)
+        self.stack(search_page)
+        
+        self.pax, itinerarys = search_page.returned()
+
+        result = self.stack(ResultPage(self, itinerarys))
+        
+        for page in SearchPage, ResultPage:
+            if ...:
+                self
+                break
+        
+        self.pax, itinerarys = self.stack(SearchPage(self)).returned()
+        self.travel_class, self.itinerary = self.stack(ResultPage(self, itinerarys)).returned()
+
+
+    def returned(self):
+        return ...
+
+
+class SelectSeatPage(Page):
+    def __init__(self, master, 
+        itinerary: body.ItineraryBody,
+        
+    ):
+        self.itinerary = itinerary
+        self.seats: list[body.SeatBody] = []
+        super().__init__(master)
+
+    def add_widgets(self):
+        self.seat_frame = Frame(self).pack(side=RIGHT)
+
+        for seat in self.seats:
+            seat = Button(self.seat_frame, 
+                text=seat.number, 
+                command=...
+            ).pack(side=LEFT)

@@ -14,11 +14,11 @@ async def pax_parameters(
     child: int = 0,
     infant: int = 0,
 ):
-    return src.Pax([
-        (PassengerType.ADULT, adult),
-        (PassengerType.CHILD, child),
-        (PassengerType.INFANT, infant)
-    ])
+    return src.Pax({
+        PassengerType.ADULT: adult,
+        PassengerType.CHILD: child,
+        PassengerType.INFANT: infant
+    }.items())
     
 async def route_parameters(
     origin: Annotated[str, Query(max_length=3)],
@@ -58,7 +58,7 @@ async def one_way_flight(
         *route, date, pax
     )
     return [
-        FlightInfoBody.transforms(itinerary, pax) 
+        ItineraryBody.transform(itinerary, pax) 
         for itinerary in results
     ]
 
