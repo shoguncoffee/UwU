@@ -1,7 +1,7 @@
 from .base import *
 
 
-window = Tk()
+window = tk.Tk()
 window.title("Welcome")
 window.geometry('350x200')
 

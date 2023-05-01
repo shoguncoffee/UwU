@@ -154,28 +154,11 @@ class BookingSection(SubSection):
             PassengerSection(self, pax)
         ).returned()
         
-        # contact_unforgot
-        confirm = self.open(
-            ReviewSection(self)
+        self.open(
+            ReviewSection(self, self.journey, self.contact, self.passengers)
         ).returned()
-        if confirm:
-            self.create_booking()
             
         self.jump(MenuPage)
-        
-    def create_booking(self):
-        API_EndPoint4 = f"http://127.0.0.1:8000/account/{self.root.username}/book"
-
-        response = requests.post(API_EndPoint4, json={
-            'journey': [(
-                    [json.loads(flight.reduce().json()) for flight in itinerary.flights], travel_class
-                ) for itinerary, travel_class in self.journey
-            ],
-            'contact': json.loads(self.contact.json()), 
-            'passengers': [
-                json.loads(passenger.json()) for passenger in self.passengers
-            ]
-        })
         
 
 class SearchSection(SubSection):
@@ -409,7 +392,6 @@ class PassengerSection(SubSection):
             type(f'{FillPassengerPage.__name__}{n}', (FillPassengerPage,), {}), passenger_type
             ) for passenger_type, number in pax for n in range(number)
         ]
-        print(self.pages)
         super().__init__(master)
 
     def returned(self):
@@ -425,7 +407,6 @@ class PassengerSection(SubSection):
             self.passengers.append(page.returned())
             print('append')
 
-        print('contact')
         self.contact = self.peek(
             SelectContactPage(self, self.passengers)
         ).returned()
@@ -600,172 +581,52 @@ class SelectContactPage(Page):
 
 
 class ReviewSection(SubSection):
+    def __init__(self, master, journey, contact, passengers):
+        self.journey = journey
+        self.contact = contact
+        self.passengers = passengers
+        super().__init__(master)
+
     def procedure(self):
-        self.open(SummeryPage(self))
-        self.open(PaymentPage(self, ...))
+        confirm, self.paynow = self.peek(
+            SummeryPage(self)
+        )
+        if confirm:
+            self.create_booking()
+
+        if self.paynow:
+            self.peek(
+                PaymentPage(self)
+            )
 
     def returned(self):
-        return False #!
+        return ...
     
+    def create_booking(self):
+        API_EndPoint4 = f"http://127.0.0.1:8000/account/{self.root.username}/book"
+
+        response = requests.post(API_EndPoint4, json={
+            'journey': [(
+                    [json.loads(flight.reduce().json()) for flight in itinerary.flights], travel_class
+                ) for itinerary, travel_class in self.journey
+            ],
+            'contact': json.loads(self.contact.json()), 
+            'passengers': [
+                json.loads(passenger.json()) for passenger in self.passengers
+            ]
+        })
+    
+
 class SummeryPage(Page):
-    def __init__(self, master, booking: body.):
-        self.booking = booking
+    master: ReviewSection
+
+    def __init__(self, master):
+        self.journey = self.master.journey
+        self.contact = self.master.contact
+        self.passengers = self.master.passengers
         super().__init__(master)
         
-    def add_widgets(self):
-        """
-        self.trip_summary_label = Label(self, 
-            text="Trip Summary", 
-            font="bold"
-        ).grid(row=0, column=0)
-        
-        self.origin_summary_labbel = Label(self, 
-            text="Origin"
-        ).grid(row=1, column=0)
-        
-        self.departure_summary_label = Label(self, 
-            text="Departuer"
-        ).grid(row=1, column=1)
-        
-        self.destination_summary_label = Label(self,               
-            text="Destination"
-        ).grid(row=1, column=2)
-        
-        self.arrival_summary_label = Label(self, 
-            text="Arrival"
-        ).grid(row=1, column=3)
-        
-        self.class_summary_label = Label(self, 
-            text="Class"
-        ).grid(row=1, column=4)
-        
-        #need to get trip data
-        self.label1 = Label(self, 
-            text=""
-        ).grid(row=3, column=1)
-        
-        self.passenger_detail_summary_label = Label(self, 
-            text="Passenger details", 
-            font="bold"
-        ).grid(row=4, column=0)
-        
-        self.passenger_name_summary_label = Label(self, 
-            text="Passenger name"
-        ).grid(row=5, column=0)
-        
-        self.date_of_birth_summary_label = Label(self, 
-            text="Date of birth"
-        ).grid(row=5, column=1)
-        
-        self.type_summary_label = Label(self, 
-            text="Type"
-        ).grid(row=5, column=2)
-
-        for n, passenger in enumerate(self.passengers, 1):
-            self.passenger_name_summary_result_label = Label(self, 
-                text = passenger.name
-            ).grid(
-                row=n+5, column=0
-            )
-            self.date_of_birth_summary_result_label = Label(self, 
-                text = str(passenger.birthdate)
-            ).grid(row=n+5, column=1)
-            
-            self.type_summary_result_label = Label(self, 
-                text = passenger.type.name
-            ).grid(row=n+5, column=2)
-
-        i = 5 + len(self.passengers)
-        
-        self.label2 = Label(self, 
-            text=""
-        ).grid(row=i+1, column=1)
-
-        self.contact_detail_label = Label(self, 
-            text="Contact details", 
-            font="bold"
-        ).grid(row=i+2, column=0)
-        
-        self.passenger_name_contact_label = Label(self, 
-            text="Passenger name"
-        ).grid(row=i+3, column=0)
-        
-        self.email_contact_label = Label(self, 
-            text="E-mail"
-        ).grid(row=i+3, column=1)
-        
-        self.phone_contact_label = Label(self, 
-            text="Phone number"
-        ).grid(row=i+3, column=2)
-
-        passenger_name = self.passengers[self.contact.index].name
-        email = self.contact.email
-        phone = self.contact.phone
-
-        self.passenger_name_contact_result_label = Label(self, 
-            text=passenger_name
-        ).grid(row=i+4, column=0)
-        
-        self.email_contact_result_label = Label(self, 
-            text=email
-        ).grid(row=i+4, column=1)
-        
-        self.phone_contact_result_label = Label(self, 
-            text=phone
-        ).grid(row=i+4, column=2)
-
-        self.label3 = Label(self, 
-            text=""
-        ).grid(row=i+5, column=1)
-
-        self.total_price_label = Label(self, 
-            text="Total price", 
-            font="bold"
-        ).grid(row=i+6, column=0)
-        
-        self.payable_amount_label = Label(self, 
-            text="Payable amount", 
-            font="bold"
-        ).grid(row=i+7, column=0)
-
-        #need to get total price data
-        self.label4 = Label(self, 
-            text=""
-        ).grid(row=14, column=1)
-
-        self.choose_how_to_pay_label = Label(self, 
-            text="Choose how to pay" , 
-            font="bold"
-        ).grid(row=15, column=0)
-
-        pay_now_check = tk.BooleanVar(self)
-        hold_my_booking_check = tk.BooleanVar(self)
-        
-        self.pay_now_checkbutton = Checkbutton(self, 
-            text = "Pay now", 
-            variable = pay_now_check,
-        ).grid(row = 16, column=0)
-        
-        self.hold_my_booking_checkbutton = Checkbutton(self, 
-            text = "Hold my booking", 
-            variable = hold_my_booking_check
-        ).grid(row=16, column=1)
-
-        self.label5 = Label(self, 
-            text=""
-        ).grid(row=17, column=1)
-
-        self.cancel_button = Button(self, 
-            text="Cancel", 
-            command = self.back
-        ).grid(row=18, column=0)
-        
-        self.purchase_button = Button(self, 
-            text="Purchase", 
-            command=self.next
-        ).grid(row=18, column=1)
-        """
-
+    def add_widgets(self): 
         self.trip_summary_label = Label(self, 
             text="Trip Summary", 
             font="bold"
@@ -955,14 +816,21 @@ class SummeryPage(Page):
         
         self.purchase_button = Button(self, 
             text="Purchase", 
-            command=self.create_booking
+            command=self.next
         ).grid(row=i+12, column=1)
 
 
 class PaymentPage(Page):
-    def __init__(self, master, booking: body.BookingBody):
-        self.booking = booking
+    master: ReviewSection
+
+    def __init__(self, master):
+        self.journey = self.master.journey
+        self.contact = self.master.contact
+        self.passengers = self.master.passengers
         super().__init__(master)
+
+    def pay(self):
+        requests.post('')
 
     def add_widgets(self):
         self.label1 = Label(self, 
