@@ -265,6 +265,25 @@ class BookingBody(BaseModel):
                 PassengerBody.transform(passenger) for passenger in obj.passengers
             ],
         )
+
+        
+class BookingInfoBody(BaseModel):
+    price: int
+    
+        
+    @classmethod
+    def transform(cls, obj: src.Booking):
+        return cls(
+            datetime=obj.datetime,
+            reference=obj.reference,
+            status=obj.status,
+            payment=PaymentBody.transform(obj.payment) if obj.payment else None,
+            contact=ContactInfoBody.transform(obj.contact, obj.passengers),
+            segments=FlightReservationBody.transforms(obj.reservations),
+            passengers=[
+                PassengerBody.transform(passenger) for passenger in obj.passengers
+            ],
+        )
     
     
 class PaxBody(BaseModel):

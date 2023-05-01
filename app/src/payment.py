@@ -33,6 +33,9 @@ class Payment(ABC):
     @property
     def status(self):
         return self._status
+
+    
+
     
     @classmethod
     @abstractmethod
@@ -43,9 +46,8 @@ class Payment(ABC):
 
 
 class CreditCardPayment(Payment):
-    #def __init__(self, securtity_code):
-    #    self.security_code = securtity_code
 
+    @classmethod
     def pay(self, total_fare):
         print("Credit Class Payment : SUCCESS")
         print("TRANSACTION ID :", self._transaction_id)

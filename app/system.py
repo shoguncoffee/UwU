@@ -76,7 +76,7 @@ class Airline:
         with open(cls.path, 'rb') as f:
             obj = pickle.load(f)
 
-        print(obj)
+        print(obj) #!
         cls._instance = obj
     
     @classmethod
@@ -126,10 +126,11 @@ class Airline:
     def payment(cls, 
         booking: Booking,
         payment_method: PaymentMethod,
+        data: dict
     ):
-        if not booking.payment:
-            payment = payment_map[payment_method].pay(booking)
-            ...
+        if booking.payment is None:
+            payment = payment_map[payment_method]
+            payment.pay(booking, **data)
     
     
     @classmethod

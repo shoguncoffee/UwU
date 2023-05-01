@@ -3,7 +3,7 @@ from .base import *
 from time import sleep
 import sv_ttk
 
-if sys.platform == 'win32':
+if sys.platform.startswith('win'):
     import ctypes
     ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
