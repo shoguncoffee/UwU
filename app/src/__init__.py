@@ -1,7 +1,7 @@
 from .airport import Airport
 from .itinerary import FlightItinerary
 from .fare import Fare
-from .booking import Booking
+from .booking import BookingPage
 from .schedule import (
     FlightPlan, 
     Deviation,
