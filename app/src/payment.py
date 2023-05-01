@@ -50,7 +50,7 @@ class CreditCardPayment(Payment):
     @classmethod
     def pay(self, total_fare):
         print("Credit Class Payment : SUCCESS")
-        print("TRANSACTION ID :", self._transaction_id)
+        print("TRANSACTION ID :", self.transaction_id)
         print("TOTAL FARE :", total_fare,"THB")
         self._status = PaymentStatus.COMPLETED
 
@@ -58,7 +58,7 @@ class CreditCardPayment(Payment):
 class InternetBankingPayment(Payment):
     def pay(self, total_fare):
         print("Internet Banking Payment : SUCCESS")
-        print("TRANSACTION ID :", self._transaction_id)
+        print("TRANSACTION ID :", self.transaction_id)
         print("TOTAL FARE :", total_fare,"THB")
         self._status = PaymentStatus.COMPLETED
 
@@ -66,7 +66,7 @@ class InternetBankingPayment(Payment):
 class PaypalPayment(Payment):
     def pay(self, total_fare):
         print("Paypal Payment : SUCCESS")
-        print("TRANSACTION ID :", self._transaction_id)
+        print("TRANSACTION ID :", self.transaction_id)
         print("TOTAL FARE :", total_fare,"THB")
         self._status = PaymentStatus.COMPLETED
         
