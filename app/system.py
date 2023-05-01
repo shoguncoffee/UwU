@@ -123,14 +123,17 @@ class Airline:
     
     
     @classmethod
-    def payment(cls, 
+    def pay(cls, 
         booking: Booking,
         payment_method: PaymentMethod,
-        data: dict
+        data: dict,
     ):
-        if booking.payment is None:
-            payment = payment_map[payment_method]
-            payment.pay(booking, **data)
+        if not booking.payment:
+            paymentclass = payment_map[payment_method]
+            payment = paymentclass.pay(booking, **data)
+            if payment:
+                booking.update_payment(payment)
+                return True
     
     
     @classmethod

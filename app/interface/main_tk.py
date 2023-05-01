@@ -614,7 +614,7 @@ class ReviewSection(SubSection):
             ],
         )
         response = requests.post(
-            f'http://127.0.0.1:8000/account/{self.root.username}/book', 
+            f'{url}/account/{self.root.username}/book', 
             prebooking.json()
         )
     
@@ -830,13 +830,16 @@ class SummeryPage(Page):
 
 class PaymentPage(Page):
     master: ReviewSection
-
-    def __init__(self, master):
-        
-        super().__init__(master)
-
+    
     def pay(self):
-        requests.post('')
+        requests.post(
+            f'{url}/account/{self.root.username}/payment', 
+            params={'method': PaymentMethod},
+            json={
+                'card_number': ...
+            }
+        )
+        self.next()
 
     def add_widgets(self):
         self.label1 = Label(self, 
@@ -935,7 +938,7 @@ class PaymentPage(Page):
 
         self.purchase_button = Button(self, 
             text="Purchase", 
-            command=...
+            command=self.pay
         ).grid(row=10, column=1)
 
 
@@ -973,11 +976,16 @@ class SelectSeatPage(Page):
         self.seats: list[body.SeatBody] = []
         super().__init__(master)
 
+
+    def select(self):
+        
+        self.next()
+
     def add_widgets(self):
         self.seat_frame = Frame(self).pack(side=RIGHT)
 
         for seat in self.seats:
             seat = Button(self.seat_frame, 
                 text=seat.number, 
-                command=...
+                command=partial(self.select, ...)
             ).pack(side=LEFT)

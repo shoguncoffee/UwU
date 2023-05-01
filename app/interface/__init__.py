@@ -17,7 +17,7 @@ class Root(Section, tk.Tk):
             'AirportEntry.Treeview', 
             rowheight = 56
         )
-        self.geometry("1920x1080")
+        self.geometry("900x600")
         self.resizable(False, False)
         self.title("Main")
         # self.iconbitmap("app\\interface\\images\\icon.ico")

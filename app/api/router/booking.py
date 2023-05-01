@@ -51,7 +51,7 @@ async def select_seat(username: str,
 
 
 @router.post("/{username}/{booking_id}/payment")
-async def book(username: str,
+async def pay(username: str,
     booking_id: UUID,
     method: PaymentMethod,
     data: dict
@@ -60,4 +60,4 @@ async def book(username: str,
     assert isinstance(customer, src.Customer)
 
     booking = customer.get_booking(booking_id)
-    return Airline.payment(booking, method, data)
+    return Airline.pay(booking, method, data)

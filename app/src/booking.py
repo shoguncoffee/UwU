@@ -74,15 +74,16 @@ class Booking:
     @property
     def pax(self):
         return Pax.init(self.passengers)
-    
+
+    def update_payment(self, payment: Payment):
+        self.__payment = payment
+        self.__status = BookingStatus.COMPLETED
+        
     def cancel(self):
         self.__status = BookingStatus.CANCELLED
         
     def pending(self):
-        self.__status = BookingStatus.PENDING
-        
-    def complete(self):
-        self.__status = BookingStatus.COMPLETED
+        self.__status = BookingStatus.PENDING        
         
     def get_price(self):
         prices: list[int] = []

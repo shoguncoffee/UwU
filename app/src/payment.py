@@ -34,41 +34,30 @@ class Payment(ABC):
     def status(self):
         return self._status
 
-    
-
+    @classmethod
+    def pay(cls, booking: Booking, **data):
+        if cls.send_api(**data):
+            return cls(booking.get_price())
     
     @classmethod
     @abstractmethod
-    def pay(cls, booking: Booking):
-        return cls(
-            booking.get_price()
-        )
+    def send_api(self, **data): 
+        """send api to payment provider"""
 
 
 class CreditCardPayment(Payment):
-
     @classmethod
-    def pay(self, total_fare):
-        print("Credit Class Payment : SUCCESS")
-        print("TRANSACTION ID :", self.transaction_id)
-        print("TOTAL FARE :", total_fare,"THB")
-        self._status = PaymentStatus.COMPLETED
+    def send_api(self, **data): ...
 
 
 class InternetBankingPayment(Payment):
-    def pay(self, total_fare):
-        print("Internet Banking Payment : SUCCESS")
-        print("TRANSACTION ID :", self.transaction_id)
-        print("TOTAL FARE :", total_fare,"THB")
-        self._status = PaymentStatus.COMPLETED
+    @classmethod
+    def send_api(self, **data): ...
 
 
 class PaypalPayment(Payment):
-    def pay(self, total_fare):
-        print("Paypal Payment : SUCCESS")
-        print("TRANSACTION ID :", self.transaction_id)
-        print("TOTAL FARE :", total_fare,"THB")
-        self._status = PaymentStatus.COMPLETED
+    @classmethod
+    def send_api(self, **data): ...
         
 
 payment_map: dict[PaymentMethod, Type[Payment]] = {
