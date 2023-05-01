@@ -594,7 +594,7 @@ class ReviewSection(SubSection):
         confirm, paynow = self.peek(
             SummeryPage(self)
         ).returned()
-        print(confirm, paynow)
+
         if confirm:
             id = self.create_booking()
 
@@ -624,15 +624,15 @@ class SummeryPage(Page):
     master: ReviewSection
 
     def __init__(self, master):
-        self.is_cancel = False
+        self.confirm = True
         super().__init__(master)
 
     def returned(self):
         super().returned()
-        return self.is_cancel, self.pay_now_var.get() 
+        return self.confirm, self.pay_now_var.get() 
 
     def cancel(self):
-        self.is_cancel = True
+        self.confirm = False
         self.next()
         
     def add_widgets(self): 
