@@ -591,13 +591,13 @@ class ReviewSection(SubSection):
         super().__init__(master)
 
     def procedure(self):
-        confirm, self.paynow = self.peek(
+        confirm, paynow = self.peek(
             SummeryPage(self)
-        )
+        ).returned()
         if confirm:
             self.create_booking()
 
-        if self.paynow:
+        if paynow:
             self.peek(
                 PaymentPage(self)
             )
@@ -623,7 +623,18 @@ class SummeryPage(Page):
     master: ReviewSection
 
     def __init__(self, master):
+        self.is_cancel = False
+        self.pay_now_var = tk.BooleanVar(self)
+        
         super().__init__(master)
+
+    def returned(self):
+        super().returned()
+        return self.is_cancel, self.pay_now_var.get() 
+
+    def cancel(self):
+        self.is_cancel = True
+        self.next()
         
     def add_widgets(self): 
         self.trip_summary_label = Label(self, 
@@ -780,7 +791,6 @@ class SummeryPage(Page):
             font=("bold")   
         ).grid(row=i+7, column=1)
 
-        #price data
         self.label4 = Label(self, 
             text=""
         ).grid(row=i+8, column=1)
@@ -790,17 +800,17 @@ class SummeryPage(Page):
             font="bold"
         ).grid(row=i+9, column=0)
 
-        pay_now_check = tk.BooleanVar(self)
-        hold_my_booking_check = tk.BooleanVar(self)
         
-        self.pay_now_checkbutton = Checkbutton(self, 
+        self.pay_now_button = Radiobutton(self, 
             text = "Pay now", 
-            variable = pay_now_check,
+            variable = self.pay_now_var,
+            value = True
         ).grid(row = i+10, column=0)
         
-        self.hold_my_booking_checkbutton = Checkbutton(self, 
+        self.hold_my_booking_button = Radiobutton(self, 
             text = "Hold my booking", 
-            variable = hold_my_booking_check
+            variable = self.pay_now_var,
+            value = False
         ).grid(row=i+10, column=1)
 
         self.label5 = Label(self, 
@@ -809,7 +819,7 @@ class SummeryPage(Page):
 
         self.cancel_button = Button(self, 
             text="Cancel", 
-            command = self.next
+            command = self.cancel
         ).grid(row=i+12, column=0)
         
         self.purchase_button = Button(self, 
