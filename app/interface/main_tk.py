@@ -3,6 +3,8 @@ https://tkdocs.com/tutorial/concepts.html
 http://tkdocs.com/pyref/index.html
 """
 from __future__ import annotations
+
+from app.api.body_template import PreBookingBody
 from .base import *
 
 
@@ -143,21 +145,18 @@ class RegisterPage(StaticPage):
 
 class BookingSection(SubSection):
     def procedure(self):
-        pax, self.journey = self.open(
+        pax, selected_trip = self.open(
             SearchSection(self)
         ).returned()
-
-        print(self.journey)
-        print(self.root.username)
         
-        self.passengers, self.contact = self.open(
+        passengers, contact = self.open(
             PassengerSection(self, pax)
         ).returned()
-        
+
         self.open(
-            ReviewSection(self, self.journey, self.contact, self.passengers)
-        ).returned()
-            
+            ReviewSection(self, passengers, contact, selected_trip)
+        )
+        
         self.jump(MenuPage)
         
 
@@ -168,12 +167,12 @@ class SearchSection(SubSection):
         ).returned()
 
         # self.jouney = []
-        self.itinerarys = self.peek(
+        self.flights, self.classinfo = self.peek(
             ResultPage(self, itinerarys)
         ).returned()
             
     def returned(self): 
-        return self.pax, [self.itinerarys] #!
+        return self.pax, [(self.flights, self.classinfo)] #!
 
 
 class SearchPage(Page):
@@ -303,11 +302,11 @@ class ResultPage(Page):
         
     def returned(self):
         super().returned()
-        return self.itinerary, self.travel_class
+        return self.flights, self.classinfo
 
     def choose(self, itinerary: body.ItineraryBody, travel_class: TravelClass):
-        self.travel_class = travel_class
-        self.itinerary = itinerary
+        self.classinfo = itinerary.get_class(travel_class)
+        self.flights = itinerary.flights
         self.next()
         
     def add_widgets(self):        
@@ -581,10 +580,14 @@ class SelectContactPage(Page):
 
 
 class ReviewSection(SubSection):
-    def __init__(self, master, journey, contact, passengers):
-        self.journey = journey
-        self.contact = contact
+    def __init__(self, master, 
+        passengers: list[body.PassengerBody],
+        contact: body.ContactInfoBody,
+        selected_trip: list[tuple[list[body.FlightInfoBody], body.ClassInfoBody]],
+    ):
         self.passengers = passengers
+        self.contact = contact
+        self.selected_trip = selected_trip
         super().__init__(master)
 
     def procedure(self):
@@ -598,32 +601,28 @@ class ReviewSection(SubSection):
             self.peek(
                 PaymentPage(self)
             )
-
-    def returned(self):
-        return ...
     
     def create_booking(self):
-        API_EndPoint4 = f"http://127.0.0.1:8000/account/{self.root.username}/book"
-
-        response = requests.post(API_EndPoint4, json={
-            'journey': [(
-                    [json.loads(flight.reduce().json()) for flight in itinerary.flights], travel_class
-                ) for itinerary, travel_class in self.journey
+        prebooking = body.PreBookingBody(
+            contact = self.contact,
+            passengers = self.passengers,
+            journey = [
+                (
+                    [flight.reduce() for flight in flights], 
+                    classinfo.travel_class
+                ) for flights, classinfo in self.selected_trip
             ],
-            'contact': json.loads(self.contact.json()), 
-            'passengers': [
-                json.loads(passenger.json()) for passenger in self.passengers
-            ]
-        })
+        )
+        response = requests.post(
+            f'http://127.0.0.1:8000/account/{self.root.username}/book', 
+            prebooking.json()
+        )
     
 
 class SummeryPage(Page):
     master: ReviewSection
 
     def __init__(self, master):
-        self.journey = self.master.journey
-        self.contact = self.master.contact
-        self.passengers = self.master.passengers
         super().__init__(master)
         
     def add_widgets(self): 
@@ -652,9 +651,8 @@ class SummeryPage(Page):
             text="Date"
         ).grid(row=1, column=4)
         
-        #trip data
         m = 2 
-        for flight in self.journey[0][0].flights:
+        for flight in self.master.selected_trip[0][0]:
             self.each_origin_label = Label(self,
                 text=flight.origin
             ).grid(row=m, column=0)
@@ -701,10 +699,10 @@ class SummeryPage(Page):
             text="Class"
         ).grid(row=m+3, column=3)
 
-        #passenger data
-        travel_class = self.journey[0][1]
 
-        for n, passenger in enumerate(self.passengers, 1):
+        travel_class = self.master.selected_trip[0][1].travel_class
+
+        for n, passenger in enumerate(self.master.passengers, 1):
             self.passenger_name_summary_result_label = Label(self, 
                 text = passenger.name
             ).grid(
@@ -722,7 +720,7 @@ class SummeryPage(Page):
                 text=TravelClass(travel_class).name
             ).grid(row=n+m+3, column=3)
 
-        i = m+3 + len(self.passengers)
+        i = m+3 + len(self.master.passengers)
         
         self.label2 = Label(self, 
             text=""
@@ -745,9 +743,9 @@ class SummeryPage(Page):
             text="Phone number"
         ).grid(row=i+3, column=2)
 
-        passenger_name = self.passengers[self.contact.index].name
-        email = self.contact.email
-        phone = self.contact.phone
+        passenger_name = self.master.passengers[self.master.contact.index].name
+        email = self.master.contact.email
+        phone = self.master.contact.phone
 
         self.passenger_name_contact_result_label = Label(self, 
             text=passenger_name
@@ -775,7 +773,7 @@ class SummeryPage(Page):
             font="bold"
         ).grid(row=i+7, column=0)
  
-        total_price = self.journey[0][0].classes[travel_class - 1].price
+        total_price = self.master.selected_trip[0][1].price
 
         self.payable_amount_result_label = Label(self,
             text=total_price,
@@ -824,9 +822,7 @@ class PaymentPage(Page):
     master: ReviewSection
 
     def __init__(self, master):
-        self.journey = self.master.journey
-        self.contact = self.master.contact
-        self.passengers = self.master.passengers
+        
         super().__init__(master)
 
     def pay(self):

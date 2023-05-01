@@ -61,7 +61,13 @@ class PassengerBody(BaseModel):
             passport_id=obj.passport_id,
             gender=obj.gender,
             type=obj.type,
-        )    
+        )
+
+    @classmethod
+    def transforms(cls, objs: Sequence[src.Passenger]):
+        return [
+            cls.transform(passenger) for passenger in objs
+        ]
         
     def convert(self):
         return src.Passenger(*vars(self).values())
@@ -72,6 +78,13 @@ class PassengerBody(BaseModel):
             obj.convert() for obj in objs
         ]
 
+    
+class PaxBody(BaseModel):
+    pax: list[tuple[PassengerType, int]]
+
+    def convert(self):
+        return src.Pax(self.pax)
+    
 
 class FlightInfoBody(BaseModel):
     """
@@ -130,6 +143,12 @@ class ItineraryBody(BaseModel):
                     info=descriptions.travel_class[travel_class],
                  ) for travel_class in obj.all_travel_class
             ]
+        )
+
+    def get_class(self, travel_class: TravelClass):
+        return next(
+            classinfo for classinfo in self.classes
+            if classinfo.travel_class == travel_class
         )
 
 
@@ -203,96 +222,8 @@ class SeatBody(BaseModel):
             cls.transform(select.seat) if select.seat else None 
             for select in selected
         ]
-     
-     
-class FlightReservationBody(BaseModel):
-    travel_class: TravelClass
-    selected: list[SeatBody | None]
-    is_assigned: bool
-    flight: FlightInfoBody
-    
-    @classmethod
-    def transform(cls, obj: src.FlightReservation):
-        return cls(
-            travel_class=obj.provider.travel_class,
-            selected=SeatBody.transforms(obj.selected),
-            is_assigned=obj.is_assigned,
-            flight=FlightInfoBody.transform(obj.provider.host),
-        )
-    
-    @classmethod
-    def transforms(cls, journey: Sequence[Sequence[src.FlightReservation]]):
-        return [
-            [cls.transform(obj) for obj in segment] for segment in journey
-        ]
 
 
-class PaymentBody(BaseModel):
-    transaction_id: UUID
-    payment_time: dt.datetime
-    total_price: int
-    status: PaymentStatus
-    
-    @classmethod
-    def transform(cls, obj: src.Payment):
-        return cls(
-            transaction_id=obj.transaction_id,
-            payment_time=obj.datetime,
-            total_price=obj.total_price,
-            status=obj.status,
-        )
-    
-    
-class BookingBody(BaseModel):
-    datetime: dt.datetime
-    reference: UUID
-    status: BookingStatus
-    payment: Optional[PaymentBody]
-    contact: ContactInfoBody
-    passengers: list[PassengerBody]
-    segments: list[list[FlightReservationBody]]
-    
-    @classmethod
-    def transform(cls, obj: src.Booking):
-        return cls(
-            datetime=obj.datetime,
-            reference=obj.reference,
-            status=obj.status,
-            payment=PaymentBody.transform(obj.payment) if obj.payment else None,
-            contact=ContactInfoBody.transform(obj.contact, obj.passengers),
-            segments=FlightReservationBody.transforms(obj.reservations),
-            passengers=[
-                PassengerBody.transform(passenger) for passenger in obj.passengers
-            ],
-        )
-
-        
-class BookingInfoBody(BaseModel):
-    price: int
-    
-        
-    @classmethod
-    def transform(cls, obj: src.Booking):
-        return cls(
-            datetime=obj.datetime,
-            reference=obj.reference,
-            status=obj.status,
-            payment=PaymentBody.transform(obj.payment) if obj.payment else None,
-            contact=ContactInfoBody.transform(obj.contact, obj.passengers),
-            segments=FlightReservationBody.transforms(obj.reservations),
-            passengers=[
-                PassengerBody.transform(passenger) for passenger in obj.passengers
-            ],
-        )
-    
-    
-class PaxBody(BaseModel):
-    pax: list[tuple[PassengerType, int]]
-    
-    def convert(self):
-        return src.Pax(self.pax)
-    
-    
 class CabinBody(BaseModel):
     travel_class: TravelClass
     seats: list[SeatBody]
@@ -338,4 +269,115 @@ class AirportBody(BaseModel):
             location_code=obj.location_code,
             name=obj.name,
             country=obj.country,
+        )
+
+     
+class FlightReservationBody(BaseModel):
+    travel_class: TravelClass
+    selected: list[SeatBody | None]
+    is_assigned: bool
+    flight: FlightInfoBody
+    
+    @classmethod
+    def transform(cls, obj: src.FlightReservation):
+        return cls(
+            travel_class=obj.provider.travel_class,
+            selected=SeatBody.transforms(obj.selected),
+            is_assigned=obj.is_assigned,
+            flight=FlightInfoBody.transform(obj.provider.host),
+        )
+    
+    @classmethod
+    def transforms(cls, journey: Sequence[Sequence[src.FlightReservation]]):
+        return [
+            [cls.transform(obj) for obj in segment] for segment in journey
+        ]
+
+
+class PaymentBody(BaseModel):
+    transaction_id: UUID
+    payment_time: dt.datetime
+    total_price: int
+    status: PaymentStatus
+    
+    @classmethod
+    def transform(cls, obj: Optional[src.Payment]):
+        if obj:
+            return cls(
+                transaction_id=obj.transaction_id,
+                payment_time=obj.datetime,
+                total_price=obj.total_price,
+                status=obj.status,
+            )
+    
+    
+class BookingBody(BaseModel):
+    """
+    shallow booking's data
+    intent to use when user want to see preview of all bookings
+    - `trip`: `tuple[origin, destination, departure, arrival]`
+        - `
+    """
+    reference: UUID
+    datetime: dt.datetime
+    status: BookingStatus
+    pax: PaxBody
+    trip: list[
+        tuple[AirportBody, AirportBody, dt.date, dt.date]
+    ]
+    
+    @classmethod
+    def transform(cls, obj: src.Booking):
+        return cls(
+            reference=obj.reference,
+            datetime=obj.datetime,
+            status=obj.status,
+            pax=PaxBody(pax=list(obj.pax)),
+            trip=[(
+                    AirportBody.transform(first.provider.host.flight.origin), 
+                    AirportBody.transform(last.provider.host.flight.destination), 
+                    first.provider.host.date, 
+                    last.provider.host.date
+                ) for first, *_, last in obj.reservations
+            ]
+        )
+
+
+class PreBookingBody(BaseModel):
+    """
+    temporary data that is needed for create booking
+    """
+    journey: list[tuple[list[FlightInstanceBody], TravelClass]]
+    contact: ContactInfoBody
+    passengers: list[PassengerBody]
+
+    def convert(self):
+        journey = [(
+                FlightInstanceBody.converts(itinerary), travel_class
+            ) for itinerary, travel_class in self.journey
+        ]
+        passengers = PassengerBody.converts(self.passengers)
+        contact = self.contact.convert(passengers)
+        return journey, contact, passengers
+
+
+class BookingInfoBody(BaseModel):
+    """
+    deeper booking's data
+    intent to use when user want to see specfic detail of one booking
+    """
+    price: int
+    passengers: list[PassengerBody]
+    contact: ContactInfoBody
+    payment: Optional[PaymentBody]
+    segments: list[list[FlightReservationBody]]
+    
+    @classmethod
+    def transform(cls, obj: src.Booking):
+        return cls(
+            price=obj.get_price(),
+            payment=PaymentBody.transform(obj.payment),
+            contact=ContactInfoBody.transform(obj.contact, obj.passengers),
+            segments=FlightReservationBody.transforms(obj.reservations),
+            passengers=PassengerBody.transforms(obj.passengers),
         )
