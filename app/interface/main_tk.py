@@ -600,7 +600,7 @@ class ReviewSection(SubSection):
         if paynow:
             self.peek(
                 PaymentPage(self)
-            )
+            ).returned()
     
     def create_booking(self):
         prebooking = body.PreBookingBody(
@@ -624,8 +624,7 @@ class SummeryPage(Page):
 
     def __init__(self, master):
         self.is_cancel = False
-        self.pay_now_var = tk.BooleanVar(self)
-        
+
         super().__init__(master)
 
     def returned(self):
@@ -800,7 +799,8 @@ class SummeryPage(Page):
             font="bold"
         ).grid(row=i+9, column=0)
 
-        
+        self.pay_now_var = tk.BooleanVar(self)
+
         self.pay_now_button = Radiobutton(self, 
             text = "Pay now", 
             variable = self.pay_now_var,
