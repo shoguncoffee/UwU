@@ -834,9 +834,16 @@ class PaymentPage(Page):
     def pay(self):
         requests.post(
             f'{url}/account/{self.root.username}/payment', 
-            params={'method': PaymentMethod},
+            params={'method': PaymentMethod.CREDIT_CARD},
             json={
-                'card_number': ...
+                'data': {
+                'method': self.method_combobox.get(),
+                'card_holder_firstname': self.firstname_entry.get(),
+                'card_holder_lastname': self.lastname_entry.get(),
+                'card_number': self.card_number_entry.get(),
+                'expiration_date': self.expiration_date_entry.get(),
+                'verification_number': self.verification_entry.get()
+                }
             }
         )
         self.next()
@@ -850,53 +857,14 @@ class PaymentPage(Page):
             text="Payable amount:"
         ).grid(row=1, column=0)
 
-        self.method_label = Label(self, 
-            text="Payment Method:"
-        ).grid(row=2, column=0)
-        self.method_combobox = Combobox(self,
-            height=5, width=15,
-            values=["Cradit card", "Master card"]
-        ).grid(row=2, column=1)
-
-        self.firstname_label = Label(self, 
-            text="Firstname:"
-        ).grid(row=4, column=0)
-        self.firstname_entry = Entry(self).grid(row=4, column=1)
-
-        self.lastname_label = Label(self, 
-            text="Lastname:"
-        ).grid(row=5, column=0)
-        self.lastname_entry = Entry(self).grid(row=5, column=1)
-
-        self.label2 = Label(self, 
-            text=""
-        ).grid(row=6, column=1)
-
-        self.card_number_label = Label(self, 
-            text="Card number:"
-        ).grid(row=7, column=0)
-        self.card_number_entry = Entry(self).grid(row=7, column=1)
-        
-        self.expiration_date_label = Label(self, 
-            text="Expiration date(YYYY-MM-DD):"
-        ).grid(row=8, column=0)
-        self.expiration_date_entry = Entry(self).grid(row=8, column=1)
-        
-        self.verification_label = Label(self, 
-            text="Verification number:"
-        ).grid(row=9, column=0)
-        self.verification_entry = Entry(self).grid(row=9, column=1)
-        self.label1 = Label(self, 
-            text="Fill payment details"
-        ).grid(row=0, column=0) 
-
-        self.payment_detail_lable = Label(self, 
-            text="Payable amount:"
-        ).grid(row=1, column=0)
+        self.total_price_label = Label(self,
+            text=self.master.selected_trip[0][1].price
+        ).grid(row=1, column=1)
 
         self.method_label = Label(self, 
             text="Payment Method:"
         ).grid(row=2, column=0)
+
         self.method_combobox = Combobox(self,
             height=5, width=15,
             values=["Cradit card", "Master card"]
@@ -934,7 +902,7 @@ class PaymentPage(Page):
         self.back_button = Button(self, 
             text="Back", 
             command=self.back
-        ).grid(row=2, column=0)
+        ).grid(row=10, column=0)
 
         self.purchase_button = Button(self, 
             text="Purchase", 

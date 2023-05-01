@@ -18,7 +18,7 @@ class Root(Section, tk.Tk):
             rowheight = 56
         )
         self.geometry("900x600")
-        self.resizable(False, False)
+        #self.resizable(False, False)
         self.title("Main")
         # self.iconbitmap("app\\interface\\images\\icon.ico")
 
