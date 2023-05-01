@@ -32,15 +32,16 @@ class LoginPage(StaticPage):
     master: Root
 
     def submit(self):
-        response = requests.post(API_EndPoint2, params={
-            "username": self.username_entry.get(), 
+        username = self.username_entry.get()
+        response = requests.post(url + API_EndPoint2, params={
+            "username": username, 
             "password": self.password_entry.get()
         })
         if response.status_code == 200:
             self.response_label.configure(
                 text="Login successful!"
             )
-            self.root.username = response.json()
+            self.root.username = username
         else:
             self.response_label.configure(
                 text=f'Error: {response.json()["detail"]}', 
@@ -84,7 +85,7 @@ class RegisterPage(StaticPage):
     master: Root
 
     def submit(self):
-        response = requests.post(API_EndPoint1, params={
+        response = requests.post(url + API_EndPoint1, params={
             "username": self.username_entry.get(), 
             "password": self.password_entry.get(), 
             "email": self.email_entry.get(), 
@@ -145,6 +146,9 @@ class BookingSection(SubSection):
         pax, self.journey = self.open(
             SearchSection(self)
         ).returned()
+
+        print(self.journey)
+        print(self.root.username)
         
         self.passengers, self.contact = self.open(
             PassengerSection(self, pax)
@@ -152,21 +156,28 @@ class BookingSection(SubSection):
         #contact_unforgot
         self.summery()
         self.wait_variable(self.waiter)
-        self.jump(MenuPage)
+        self.jump(PaymentPage)
         
     def create_booking(self):
         API_EndPoint4 = f"http://127.0.0.1:8000/account/{self.root.username}/book"
-
-        response = requests.post(API_EndPoint4, json={
-            "journey": [(
-                    [flight.reduce().json() for flight in itinerary.flights], travel_class
-                ) for itinerary, travel_class in self.journey
-            ],
-            "contact": self.contact.json(),
-            "passengers": [
-                passenger.json() for passenger in self.passengers
+        journey = [(
+                [
+                    json.loads(flight.reduce().json()) 
+                    for flight in itinerary.flights
+                ], 
+                travel_class.value
+            ) for itinerary, travel_class in self.journey 
+        ]
+        
+        data = {
+            'journey': journey, 
+            'contact': json.loads(self.contact.json()), 
+            'passengers': [
+                json.loads(passenger.json()) for passenger in self.passengers
             ]
-        })
+        }
+        print(json.dumps(data, indent=4))
+        response = requests.post(API_EndPoint4, json=data)
         self.next()
 
     def summery(self): 
@@ -177,63 +188,97 @@ class BookingSection(SubSection):
             font="bold"
         ).grid(row=0, column=0)
         
-        self.origin_summary_labbel = Label(frame, 
+        self.origin_summary_label = Label(frame, 
             text="Origin"
         ).grid(row=1, column=0)
         
-        self.departure_summary_label = Label(frame, 
-            text="Departuer"
+        self.destination_summary_label = Label(frame, 
+            text="Destination"
         ).grid(row=1, column=1)
         
-        self.destination_summary_label = Label(frame,               
-            text="Destination"
+        self.departure_summary_label = Label(frame,               
+            text="Departuer"
         ).grid(row=1, column=2)
         
         self.arrival_summary_label = Label(frame, 
             text="Arrival"
         ).grid(row=1, column=3)
-        
-        self.class_summary_label = Label(frame, 
-            text="Class"
+
+        self.date_summary_label = Label(frame, 
+            text="Date"
         ).grid(row=1, column=4)
         
-        #need to get trip data
+        #trip data
+        m = 2 
+        for flight in self.journey[0][0].flights:
+            self.each_origin_label = Label(frame,
+                text=flight.origin
+            ).grid(row=m, column=0)
+
+            self.each_destination_label = Label(frame,
+                text=flight.destination
+            ).grid(row=m, column=1)
+
+            self.each_departure_label = Label(frame,
+                text=str(flight.departure)
+            ).grid(row=m, column=2)
+
+            self.each_arrival_label = Label(frame,
+                text=str(flight.arrival)
+            ).grid(row=m, column=3)
+
+            self.each_date_label = Label(frame,
+                text=str(flight.date)
+            ).grid(row=m, column=4)
+            m += 1
+
         self.label1 = Label(frame, 
             text=""
-        ).grid(row=3, column=1)
+        ).grid(row=m+1, column=1)
         
         self.passenger_detail_summary_label = Label(frame, 
             text="Passenger details", 
             font="bold"
-        ).grid(row=4, column=0)
+        ).grid(row=m+2, column=0)
         
         self.passenger_name_summary_label = Label(frame, 
             text="Passenger name"
-        ).grid(row=5, column=0)
+        ).grid(row=m+3, column=0)
         
         self.date_of_birth_summary_label = Label(frame, 
             text="Date of birth"
-        ).grid(row=5, column=1)
+        ).grid(row=m+3, column=1)
         
         self.type_summary_label = Label(frame, 
             text="Type"
-        ).grid(row=5, column=2)
+        ).grid(row=m+3, column=2)
+
+        self.class_summary_label = Label(frame, 
+            text="Class"
+        ).grid(row=m+3, column=3)
+
+        #passenger data
+        travel_class = self.journey[0][1]
 
         for n, passenger in enumerate(self.passengers, 1):
             self.passenger_name_summary_result_label = Label(frame, 
                 text = passenger.name
             ).grid(
-                row=n+5, column=0
+                row=n+m+3, column=0
             )
             self.date_of_birth_summary_result_label = Label(frame, 
                 text = str(passenger.birthdate)
-            ).grid(row=n+5, column=1)
+            ).grid(row=n+m+3, column=1)
             
             self.type_summary_result_label = Label(frame, 
                 text = passenger.type.name
-            ).grid(row=n+5, column=2)
+            ).grid(row=n+m+3, column=2)
 
-        i = 5 + len(self.passengers)
+            self.each_class_label = Label(frame,
+                text=TravelClass(travel_class).name
+            ).grid(row=n+m+3, column=3)
+
+        i = m+3 + len(self.passengers)
         
         self.label2 = Label(frame, 
             text=""
@@ -282,19 +327,26 @@ class BookingSection(SubSection):
         ).grid(row=i+6, column=0)
         
         self.payable_amount_label = Label(frame, 
-            text="Payable amount", 
+            text="Payable amount : ", 
             font="bold"
         ).grid(row=i+7, column=0)
+ 
+        total_price = self.journey[0][0].classes[travel_class - 1].price
 
-        #need to get total price data
+        self.payable_amount_result_label = Label(frame,
+            text=total_price,
+            font=("bold")   
+        ).grid(row=i+7, column=1)
+
+        #price data
         self.label4 = Label(frame, 
             text=""
-        ).grid(row=14, column=1)
+        ).grid(row=i+8, column=1)
 
         self.choose_how_to_pay_label = Label(frame, 
             text="Choose how to pay" , 
             font="bold"
-        ).grid(row=15, column=0)
+        ).grid(row=i+9, column=0)
 
         pay_now_check = tk.BooleanVar(frame)
         hold_my_booking_check = tk.BooleanVar(frame)
@@ -302,26 +354,26 @@ class BookingSection(SubSection):
         self.pay_now_checkbutton = Checkbutton(frame, 
             text = "Pay now", 
             variable = pay_now_check,
-        ).grid(row = 16, column=0)
+        ).grid(row = i+10, column=0)
         
         self.hold_my_booking_checkbutton = Checkbutton(frame, 
             text = "Hold my booking", 
             variable = hold_my_booking_check
-        ).grid(row=16, column=1)
+        ).grid(row=i+10, column=1)
 
         self.label5 = Label(frame, 
             text=""
-        ).grid(row=17, column=1)
+        ).grid(row=i+11, column=1)
 
         self.cancel_button = Button(frame, 
             text="Cancel", 
             command = self.next
-        ).grid(row=18, column=0)
+        ).grid(row=i+12, column=0)
         
         self.purchase_button = Button(frame, 
             text="Purchase", 
             command=self.create_booking
-        ).grid(row=18, column=1)
+        ).grid(row=i+12, column=1)
 
         frame.pack()
         
@@ -538,13 +590,14 @@ class ResultPage(Page):
             
             for data in itinerary.classes:
                 travel_class = data.travel_class
+                total_price = data.price
                 
                 if data.seat_left < 20:
                     # show seat left?
                     ...
                 
                 Button(self, 
-                    text = data.price,
+                    text = total_price,
                     command = partial(self.choose, itinerary, travel_class)
                 ).grid(row=n, column=travel_class + 4)
 
@@ -750,14 +803,77 @@ class PaymentPage(Page):
         super().__init__(master)
 
     def add_widgets(self):
-        self.payment_label = Label(self, 
-            text="Select your preferred payment method"
+        self.label1 = Label(self, 
+            text="Fill payment details"
         ).grid(row=0, column=0)
+
+        #need to get total price
+        self.payment_detail_lable = Label(self, 
+            text="Payable amount:"
+        ).grid(row=1, column=0)
         
+        self.method_label = Label(self, 
+            text="Payment Method:"
+        ).grid(row=2, column=0)
+
+        self.method_combobox = Combobox(self, 
+            height=5,
+            width=15,
+            values=["Cradit card", "Master card"]
+        ).grid(row=2, column=1)
+
+        self.label2 = Label(self, 
+            text=""
+        ).grid(row=3, column=1)
+
+        self.firstname_label = Label(self, 
+            text="Firstname:"
+        ).grid(row=4, column=0)
+
+        self.firstname_entry = Entry(self
+        ).grid(row=4, column=1)
+
+        self.lastname_label = Label(self, 
+            text="Lastname:"
+        ).grid(row=5, column=0)
+
+        self.lastname_entry = Entry(self
+        ).grid(row=5, column=1)
+
+        self.label3 = Label(self, 
+            text=""
+        ).grid(row=6, column=1)
+
+        self.card_number_label = Label(self, 
+            text="Card number:"
+        ).grid(row=7, column=0)
+
+        self.card_number_entry = Entry(self
+        ).grid(row=7, column=1)
+
+        self.expiration_date_label = Label(self, 
+            text="Expiration date(YYYY-MM-DD):"
+        ).grid(row=8, column=0)
+
+        self.expiration_date_entry = Entry(self
+        ).grid(row=8, column=1)
+
+        self.verification_label = Label(self, 
+            text="Verification number:"
+        ).grid(row=9, column=0)
+
+        self.verification_entry = Entry(self
+        ).grid(row=9, column=1)
+
         self.back_button = Button(self, 
             text="Back", 
             command=...
-        ).grid(row=2, column=0)
+        ).grid(row=10, column=0)
+
+        self.purchase_button = Button(self, 
+            text="Purchase", 
+            command=...
+        ).grid(row=10, column=1)
 
 
 class SelectSeatSection(SubSection):
