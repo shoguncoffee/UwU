@@ -103,7 +103,7 @@ class Airline:
             
             creator.bookings.append(booking)
             booking.pending()
-            return True
+            return booking.reference
     
     
     @classmethod

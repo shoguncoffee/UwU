@@ -594,20 +594,20 @@ class ReviewSection(SubSection):
         confirm, paynow = self.peek(
             SummeryPage(self)
         ).returned()
+        print(confirm, paynow)
         if confirm:
-            self.create_booking()
+            id = self.create_booking()
 
-        if paynow:
-            self.peek(
-                PaymentPage(self)
-            ).returned()
+            if paynow:
+                self.peek(
+                    PaymentPage(self, id)
+                ).returned()
     
     def create_booking(self):
         prebooking = body.PreBookingBody(
             contact = self.contact,
             passengers = self.passengers,
-            journey = [
-                (
+            journey = [(
                     [flight.reduce() for flight in flights], 
                     classinfo.travel_class
                 ) for flights, classinfo in self.selected_trip
@@ -617,6 +617,7 @@ class ReviewSection(SubSection):
             f'{url}/account/{self.root.username}/book', 
             prebooking.json()
         )
+        return response.json()
     
 
 class SummeryPage(Page):
@@ -624,7 +625,6 @@ class SummeryPage(Page):
 
     def __init__(self, master):
         self.is_cancel = False
-
         super().__init__(master)
 
     def returned(self):
@@ -830,19 +830,23 @@ class SummeryPage(Page):
 
 class PaymentPage(Page):
     master: ReviewSection
+
+    def __init__(self, master, uuid: str):
+        self.uuid = uuid
+        super().__init__(master)
     
     def pay(self):
         requests.post(
-            f'{url}/account/{self.root.username}/payment', 
+            f'{url}/account/{self.root.username}/{self.uuid}/payment', 
             params={'method': PaymentMethod.CREDIT_CARD},
             json={
                 'data': {
-                'method': self.method_combobox.get(),
-                'card_holder_firstname': self.firstname_entry.get(),
-                'card_holder_lastname': self.lastname_entry.get(),
-                'card_number': self.card_number_entry.get(),
-                'expiration_date': self.expiration_date_entry.get(),
-                'verification_number': self.verification_entry.get()
+                    'method': self.method_combobox.get(),
+                    'card_holder_firstname': self.firstname_entry.get(),
+                    'card_holder_lastname': self.lastname_entry.get(),
+                    'card_number': self.card_number_entry.get(),
+                    'expiration_date': self.expiration_date_entry.get(),
+                    'verification_number': self.verification_entry.get()
                 }
             }
         )
