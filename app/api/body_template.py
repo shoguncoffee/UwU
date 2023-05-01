@@ -78,13 +78,6 @@ class PassengerBody(BaseModel):
             obj.convert() for obj in objs
         ]
 
-    
-class PaxBody(BaseModel):
-    pax: list[tuple[PassengerType, int]]
-
-    def convert(self):
-        return src.Pax(self.pax)
-    
 
 class FlightInfoBody(BaseModel):
     """
@@ -321,25 +314,30 @@ class BookingBody(BaseModel):
     reference: UUID
     datetime: dt.datetime
     status: BookingStatus
-    pax: PaxBody
+    pax: list[tuple[PassengerType, int]]
     trip: list[
         tuple[AirportBody, AirportBody, dt.date, dt.date]
     ]
     
     @classmethod
-    def transform(cls, obj: src.Booking):
+    def transform(cls, obj: src.BookingPage):
+        trip = []
+        for flight in obj.reservations:
+            first = flight[0].provider.host
+            last = flight[-1].provider.host
+            trip.append((
+                AirportBody.transform(first.flight.origin),
+                AirportBody.transform(last.flight.destination),
+                first.date, last.date,
+            ))
+
+        
         return cls(
             reference=obj.reference,
             datetime=obj.datetime,
             status=obj.status,
-            pax=PaxBody(pax=list(obj.pax)),
-            trip=[(
-                    AirportBody.transform(first.provider.host.flight.origin), 
-                    AirportBody.transform(last.provider.host.flight.destination), 
-                    first.provider.host.date, 
-                    last.provider.host.date
-                ) for first, *_, last in obj.reservations
-            ]
+            pax=list(obj.pax),
+            trip=trip
         )
 
 
@@ -373,7 +371,7 @@ class BookingInfoBody(BaseModel):
     segments: list[list[FlightReservationBody]]
     
     @classmethod
-    def transform(cls, obj: src.Booking):
+    def transform(cls, obj: src.BookingPage):
         return cls(
             price=obj.get_price(),
             payment=PaymentBody.transform(obj.payment),

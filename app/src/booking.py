@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(slots=True)
-class Booking:
+class BookingPage:
     __creator: Customer # type: ignore
     __contact: ContactInformation # type: ignore
     __passengers: tuple[Passenger, ...] # type: ignore

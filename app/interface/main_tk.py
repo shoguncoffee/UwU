@@ -12,21 +12,27 @@ class MenuPage(StaticPage):
     master: Root
     
     def add_widgets(self):
-        self.label = Label(self, 
-            text="SHOGUNUS Airline", 
+        Label(self, 
+            text="UwU Airline", 
             font="Bold 20",
         ).pack()
         
-        self.login_button = Button(self, 
+        Button(self, 
+            command=partial(self.jump, BookingSection), 
+            width=15,
+            text="Search Flight",
+        ).pack()
+        
+        Button(self, 
             command=partial(self.jump, LoginPage), 
             width=15,
             text="Login",
         ).pack()
         
-        self.search_button = Button(self, 
-            command=partial(self.jump, BookingSection), 
+        Button(self,
+            command=partial(self.jump, ViewBookingSection),
             width=15,
-            text="Search Flight",
+            text="View Booking"
         ).pack()
 
 
@@ -893,7 +899,7 @@ class PaymentPage(Page):
             text="Card number:"
         ).grid(row=7, column=0)
         self.card_number_entry = Entry(self).grid(row=7, column=1)
-        
+
         self.expiration_date_label = Label(self, 
             text="Expiration date(YYYY-MM-DD):"
         ).grid(row=8, column=0)
@@ -956,5 +962,104 @@ class SelectSeatPage(Page):
         for seat in self.seats:
             seat = Button(self.seat_frame, 
                 text=seat.number, 
-                command=partial(self.select, ...)
+                command=partial(self.select)
             ).pack(side=LEFT)
+
+
+class ViewBookingSection(SubSection):
+    def procedure(self):
+        self.bookings = self.get_bookings()
+        
+        selected = self.peek(
+            ViewBookingsPage(self)
+        ).returned()
+
+        self.peek(
+            ViewBookingsPage(self)
+        ).returned()
+        
+
+    def get_bookings(self):
+        response = requests.get(f'{url}/account/{self.root.username}/my-bookings')
+        return [
+            body.BookingBody(**data) for data in response.json()
+        ]
+
+
+
+class ViewBookingsPage(Page):
+    master: ViewBookingSection
+
+    def choose(self, event):
+        booking = event.widget.booking
+        self.selected_id = booking.reference
+        self.next()
+
+    def returned(self):
+        super().returned()
+        return self.selected_id
+    
+    def add_widgets(self):
+        top_frame = Frame(self).pack(side=TOP)
+        
+        self.label1 = Label(top_frame,
+            text="View Booking"                   
+        ).grid(row=0, column=0)
+
+        for booking in self.master.bookings:
+            button = LabelFrame(self).pack()
+            
+            button.booking = booking # type: ignore
+            button.bind("<Button-1>", self.choose)
+
+            Label(button, 
+                text=booking.status.name
+            ).pack(side=LEFT)
+            
+            Label(button, 
+                text=f'{booking.datetime: %a, %d %b %Y}'
+            ).pack(side=LEFT)
+            
+            Label(button, 
+                text=' '.join(f'{type.name} {number}' for type, number in booking.pax)
+            ).pack(side=LEFT)            
+            
+            tab = LabelFrame(button).pack(side=RIGHT)
+            for origin, destination, departure, arrival in booking.trip:
+                Label(tab, 
+                    text=f'{origin.location_code} -> {destination.location_code}'
+                ).pack(side=LEFT)
+                
+                Label(tab, 
+                    text=f'{departure: %a, %d %b %Y} - {arrival: %a, %d %b %Y}'
+                ).pack(side=RIGHT)
+
+
+class BookingPage(SubSection):
+    master: ViewBookingSection
+    
+    def add_widgets(self):
+        
+        self.label1 = Label(self,
+            text="Booking Details"
+        ).grid(row=0, column=0)
+
+        self.reference_label = Label(self,
+            text="Reference : "                            
+        ).grid(row=1, column=0)
+
+        self.datetime_label = Label(self,
+            text="Date time : "                            
+        ).grid(row=2, column=0)
+
+        self.status_label = Label(self,
+            text="Status : "                            
+        ).grid(row=3, column=0)
+
+        self.pax_label = Label(self,
+            text="Passenger : "                            
+        ).grid(row=4, column=0)
+
+        self.trip_label = Label(self,
+            text="Trip : "                            
+        ).grid(row=5, column=0)

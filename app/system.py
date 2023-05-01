@@ -91,7 +91,7 @@ class Airline:
             itinerary.bookable(pax, travel_class) 
             for itinerary, travel_class in journey
         ):
-            booking = Booking(
+            booking = BookingPage(
                 creator,
                 contact,
                 tuple(passengers),
@@ -124,7 +124,7 @@ class Airline:
     
     @classmethod
     def pay(cls, 
-        booking: Booking,
+        booking: BookingPage,
         payment_method: PaymentMethod,
         data: dict,
     ):

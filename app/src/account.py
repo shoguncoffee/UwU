@@ -2,7 +2,7 @@ from __future__ import annotations
 from app.base import *
 
 if TYPE_CHECKING:
-    from . import Booking
+    from . import BookingPage
     
 
 @dataclass(slots=True)
@@ -41,7 +41,7 @@ class Admin(Account):
 
 @dataclass(slots=True)
 class Customer(Account):
-    __bookings: list[Booking] = field(init=False, default_factory=list)
+    __bookings: list[BookingPage] = field(init=False, default_factory=list)
     
     @property
     def bookings(self):
