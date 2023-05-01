@@ -836,7 +836,7 @@ class PaymentPage(Page):
         super().__init__(master)
     
     def pay(self):
-        requests.post(
+        respone = requests.post(
             f'{url}/account/{self.root.username}/{self.uuid}/payment', 
             params={'method': PaymentMethod.CREDIT_CARD},
             json={
@@ -850,6 +850,7 @@ class PaymentPage(Page):
                 }
             }
         )
+        print('pay:', respone.json())
         self.next()
 
     def add_widgets(self):
@@ -928,11 +929,7 @@ class SelectSeatSection(SubSection):
         self.stack(search_page)
         
         self.pax, itinerarys = search_page.returned()
-
-        result = self.stack(ResultPage(self, itinerarys))
         
-        self.pax, itinerarys = self.stack(SearchPage(self)).returned()
-        self.travel_class, self.itinerary = self.stack(ResultPage(self, itinerarys)).returned()
 
 
     def returned(self):
