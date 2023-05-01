@@ -6,15 +6,14 @@ router = APIRouter(
     tags=["booking"],
 )
 
-print(BookingBody)
 
-@router.get("{username}/{booking_id}")
+@router.get("{username}/{booking_id}/price")
 async def view_booking(username: str, booking_id: UUID): # vs get_bookings?
     customer = Airline.accounts.get(username)
     assert isinstance(customer, src.Customer)
     
     booking = customer.get_booking(booking_id)
-    return BookingBody.transform(booking)
+    return booking.get_price()
 
 
 @router.post("{username}/{booking_id}/select-seat")
@@ -25,8 +24,11 @@ async def select_seat(username: str,
     selected: list[str],
 ):
     """
-    - `index`: `int`
+    - `reservation_index`: `int`
         - index of reservation (or flight) in booking
+
+    - `segment_index: `int`
+        - index of flights (connecting flights) in booking
         
     - `selected`: `list[str]`
         - list of seat number e.g. ['C12', 'K13']
@@ -47,9 +49,15 @@ async def select_seat(username: str,
         ]
     )
 
-# @router.put("{username}/{booking}/select-seat")
-# async def mod(username: str,
-#     booking: str,
-#     seat: SeatBody,
-# ):
-#     return
+
+@router.post("/{username}/{booking_id}/payment")
+async def book(username: str,
+    booking_id: UUID,
+    method: PaymentMethod,
+    data: dict
+):
+    customer = Airline.accounts.get(username)
+    assert isinstance(customer, src.Customer)
+
+    booking = customer.get_booking(booking_id)
+    return Airline.payment(booking, method, data)

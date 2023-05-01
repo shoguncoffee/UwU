@@ -15,7 +15,10 @@ import uvicorn
 if 0:
     def run_server():
         Airline.load()            
-        uvicorn.run('app.api:web', reload=True)
+        uvicorn.run('app.api:web', 
+            host='UWU', port=8000,
+            reload=True,
+        )
         
         
     def run_interface():

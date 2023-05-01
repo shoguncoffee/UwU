@@ -1,25 +1,25 @@
 from app.constants import *
 
-travel_class: dict[TravelClass, tuple[str, ...]] = {
-    TravelClass.ECONOMY: (
+travel_class: dict[TravelClass, list[str]] = {
+    TravelClass.ECONOMY: [
         'economy',
-    ),
-    TravelClass.BUSSINESS: (
+    ],
+    TravelClass.BUSSINESS: [
         'bussiness',
-    ),
-    TravelClass.FIRST: (
+    ],
+    TravelClass.FIRST: [
         'first',
-    ),
+    ],
 }
 
-seat: dict[SeatType, tuple[str, ...]] = {
-    SeatType.WINDOW: (
+seat: dict[SeatType, list[str]] = {
+    SeatType.WINDOW: [
         'window',
-    ),
-    SeatType.AISLE: (
+    ],
+    SeatType.AISLE: [
         'aisle',
-    ),
-    SeatType.LEGROOM: (
+    ],
+    SeatType.LEGROOM: [
         'middle',
-    ),
+    ],
 } #!

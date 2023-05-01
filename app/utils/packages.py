@@ -12,8 +12,9 @@ import datetime as dt
 from uuid import UUID, uuid4
 from math import ceil, floor
 from copy import deepcopy
+from time import sleep
 from random import sample, choice, randrange, random
-from abc import ABC, abstractmethod
+from enum import IntEnum, Flag, StrEnum
 from dataclasses import (
     dataclass, 
     field, 
@@ -38,10 +39,14 @@ from itertools import (
     accumulate,
     chain,
 )
-# for type hinting
+# for type check and hinting
 # https://docs.python.org/3/library/typing.html
-from types import ModuleType
+from types import ModuleType 
+from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from typing import (
+    Literal,
+    overload,
     ItemsView, 
     Any, 
     Callable, 

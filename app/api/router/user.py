@@ -30,9 +30,7 @@ async def get_bookings(username: str):
 
 @router.post("/{username}/book")
 async def book(username: str,
-    journey: list[tuple[list[FlightInstanceBody], TravelClass]],
-    contact: ContactInfoBody,
-    passengers: list[PassengerBody],
+    data: PreBookingBody,
 ):
     """
     - `creator`: 
@@ -44,15 +42,9 @@ async def book(username: str,
     customer = Airline.accounts.get(username)
     assert isinstance(customer, src.Customer)
     
-    _passengers = PassengerBody.converts(passengers)
-    _journey = [
-        (
-            FlightInstanceBody.converts(itinerary), travel_class
-        ) for itinerary, travel_class in journey
-    ]
-    return Airline.create_booking(
-        customer,
-        contact.convert(_passengers),
-        _passengers,
-        _journey,
+    journey, contact, passengers = data.convert()
+    return Airline.create_booking(customer,
+        contact,
+        passengers,
+        journey,
     )
