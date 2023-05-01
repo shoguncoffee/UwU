@@ -275,11 +275,8 @@ class SearchPage(Page):
                 ).grid(row=3, column=6,),
         }
         for row, (passenger_type, spinbox) in enumerate(self.pax_spinbox.items(), 1):
-        for row, (passenger_type, spinbox) in enumerate(self.pax_spinbox.items(), 1):
             Label(self, 
                 text=passenger_type.name
-            ).grid(row=row, column=5)
-            spinbox.grid(row=row, column=6)
             ).grid(row=row, column=5)
             spinbox.grid(row=row, column=6)
 
@@ -347,8 +344,7 @@ class ResultPage(Page):
             text="Search Flight",
         ).grid(row=0, column=8)
         
-        for row, itinerary in enumerate(self.itinerarys, 1) :
-        for row, itinerary in enumerate(self.itinerarys, 1) :
+        for row, itinerary in enumerate(self.itinerarys, 1):
             first_flight = itinerary.flights[0]
             last_flight = itinerary.flights[-1]
 
@@ -363,21 +359,17 @@ class ResultPage(Page):
             Label(self, 
                 text = origin
             ).grid(row=row, column=0)
-            ).grid(row=row, column=0)
             
             Label(self, 
                 text = destination
-            ).grid(row=row, column=1)
             ).grid(row=row, column=1)
             
             Label(self, 
                 text = f'{departure:%H:%M}'
             ).grid(row=row, column=2)
-            ).grid(row=row, column=2)
             
             Label(self, 
                 text = f'{arrival:%H:%M}'
-            ).grid(row=row, column=3)
             ).grid(row=row, column=3)
             
             for data in itinerary.classes:
@@ -391,7 +383,6 @@ class ResultPage(Page):
                 Button(self, 
                     text = total_price,
                     command = partial(self.choose, itinerary, travel_class)
-                ).grid(row=row, column=travel_class + 4)
                 ).grid(row=row, column=travel_class + 4)
 
 
@@ -933,7 +924,6 @@ class PaymentPage(Page):
         
         self.back_button = Button(self, 
             text="Back", 
-            command=self.back
             command=self.back
         ).grid(row=2, column=0)
 
