@@ -2,12 +2,12 @@ from __future__ import annotations
 from app.base import *
 
 if TYPE_CHECKING:
-    from . import BookingPage, FlightClass, Passenger, Seat
+    from . import Booking, FlightClass, Passenger, Seat
 
 
 @dataclass(slots=True)
 class FlightReservation:
-    __holder: BookingPage # type: ignore
+    __holder: Booking # type: ignore
     __provider: FlightClass # type: ignore
     
     __selected: tuple[SeatReservation, ...] = field(init=False)

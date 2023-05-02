@@ -3,8 +3,6 @@ https://tkdocs.com/tutorial/concepts.html
 http://tkdocs.com/pyref/index.html
 """
 from __future__ import annotations
-
-from app.api.body_template import PreBookingBody
 from .base import *
 
 
@@ -159,12 +157,31 @@ class BookingSection(SubSection):
             PassengerSection(self, pax)
         ).returned()
 
+        booking_id = self.create_booking(passengers, contact, selected_trip)
+        
         self.open(
-            ReviewSection(self, passengers, contact, selected_trip)
+            ReviewSection(self, booking_id)
         )
-        
         self.jump(MenuPage)
-        
+
+    def create_booking(self,
+        passengers: list[body.PassengerBody],
+        contact: body.ContactInfoBody,
+        selected_trip: list[tuple[list[body.FlightInfoBody],  TravelClass]],
+    ):
+        prebooking = body.PreBookingBody(
+            contact = contact,
+            passengers = passengers,
+            journey = [(
+                    [flight.reduce() for flight in flights], travel_class
+                ) for flights, travel_class in selected_trip
+            ],
+        )
+        response = requests.post(
+            f'{url}/account/{self.root.username}/book', 
+            prebooking.json()
+        )
+        return UUID(response.json())
 
 class SearchSection(SubSection):
     def procedure(self):
@@ -178,20 +195,19 @@ class SearchSection(SubSection):
         ).returned()
             
     def returned(self): 
-        return self.pax, [(self.flights, self.classinfo)] #!
+        return self.pax, [(self.flights, self.classinfo.travel_class)] #!
 
 
 class SearchPage(Page):
     master: SearchSection
-    
-    # def next(self):
-        # if ['invalaid'] not in self.origin_entry['state']:
-            # super().wait_done()
-        # super().next()
+
+    def predefine(self):
+        super().predefine()
+        self.trip_type = tk.IntVar(self)
 
     def returned(self):
         super().returned()
-        trip = self.trip_combobox.get()
+        trip = self.trip_type.get()
         departure_day = self.departure_day_spinbox.get()
         departure_month = self.departure_month_spinbox.get()
         departure_year = self.departure_year_spinbox.get()
@@ -225,15 +241,24 @@ class SearchPage(Page):
         
         self.origin_entry = AirportEntry(self).grid(row=1, column=0)
         self.destination_entry = AirportEntry(self).grid(row=1, column=1)
+
         
         self.trip_label = Label(self, 
             text="Trip",
         ).grid(row=0, column=2,)
         
-        self.trip_combobox = Combobox(self,
-            height=6, width=13, 
-            values=["One Way"],
+        Radiobutton(self,
+            text = 'One Way',
+            variable = self.trip_type,
+            value = 0
         ).grid(row=1, column=2,)
+        
+        Radiobutton(self,
+            text = 'Return',
+            variable = self.trip_type,
+            value = 1
+        ).grid(row=2, column=2,)
+
         
         self.departure_date_label = Label(self, 
             text="Departure",
@@ -281,21 +306,19 @@ class SearchPage(Page):
         }
         for row, (passenger_type, spinbox) in enumerate(self.pax_spinbox.items(), 1):
             Label(self, 
-                text=passenger_type.name
+                text = passenger_type.name
             ).grid(row=row, column=5)
             spinbox.grid(row=row, column=6)
 
 
         self.search_button = Button(self, 
-            command=self.next, 
-            text="Search",
-            # state=DISABLED,
+            command = self.next, 
+            text = "Search",
         ).grid(row=4, column=2,)
-        # self.search_button['state'] = NORMAL
         
         self.back_button = Button(self, 
-            command=partial(self.master.jump, MenuPage), 
-            text="Back to Main",
+            command = partial(self.master.jump, MenuPage), 
+            text = "Back to Menu",
         ).grid(row=3, column=2,)
 
 
@@ -317,37 +340,44 @@ class ResultPage(Page):
         
     def add_widgets(self):        
         self.origin_label = Label(self, 
-            text="Origin"
-        ).grid(row=0, column=0)
-        
-        self.destination_label = Label(self, 
-            text="Destination"
+            text="Origin",
+            width=11,
         ).grid(row=0, column=1)
         
-        self.departure_label = Label(self, 
-            text="Departure"
+        self.destination_label = Label(self, 
+            text="Destination",
+            width=11,
         ).grid(row=0, column=2)
         
-        self.arrival_label = Label(self, 
-            text="Arrival"
+        self.departure_label = Label(self, 
+            text="Departure",
+            width=11,
         ).grid(row=0, column=3)
         
+        self.arrival_label = Label(self, 
+            text="Arrival",
+            width=11,
+        ).grid(row=0, column=4)
+        
         self.economy_label = Label(self, 
-            text="Economy"
+            text="Economy",
+            width=11,
         ).grid(row=0, column=5)
         
         self.business_label = Label(self, 
-            text="Business"
+            text="Business",
+            width=11,
         ).grid(row=0, column=6)
         
         self.first_label = Label(self, 
-            text="First"
+            text="First",
+            width=11,
         ).grid(row=0, column=7)
         
         self.back_button = Button(self, 
             command=self.back,
             text="Search Flight",
-        ).grid(row=0, column=8)
+        ).grid(row=0, column=0)
         
         for row, itinerary in enumerate(self.itinerarys, 1):
             first_flight = itinerary.flights[0]
@@ -358,37 +388,38 @@ class ResultPage(Page):
             destination = last_flight.destination
             arrival = last_flight.arrival
 
-            if first_flight is last_flight:
-                ...
+            Label(self, 
+                text = 'Non-Stop' if (n := len(itinerary.flights)) == 1 else f'{n-1} Stop'
+            ).grid(row=row, column=0)
 
             Label(self, 
                 text = origin
-            ).grid(row=row, column=0)
-            
-            Label(self, 
-                text = destination
             ).grid(row=row, column=1)
             
             Label(self, 
-                text = f'{departure:%H:%M}'
+                text = destination
             ).grid(row=row, column=2)
             
             Label(self, 
-                text = f'{arrival:%H:%M}'
+                text = f'{departure:%H:%M}'
             ).grid(row=row, column=3)
+            
+            Label(self, 
+                text = f'{arrival:%H:%M}'
+            ).grid(row=row, column=4)
             
             for data in itinerary.classes:
                 travel_class = data.travel_class
-                total_price = data.price
-                
-                if data.seat_left < 20:
-                    # show seat left?
-                    ...
-                
-                Button(self, 
-                    text = total_price,
+                select = Button(self, 
+                    text = data.price,
                     command = partial(self.choose, itinerary, travel_class)
                 ).grid(row=row, column=travel_class + 4)
+
+                if not data.seat_left:
+                    select['state'] = 'disabled'
+                
+                elif data.seat_left < 20: # show seat left
+                    ...
 
 
 class PassengerSection(SubSection):    
@@ -410,7 +441,6 @@ class PassengerSection(SubSection):
                 FillPage(self, passenger_type, n)
             )
             self.passengers.append(page.returned())
-            print('append')
 
         self.contact = self.peek(
             SelectContactPage(self, self.passengers)
@@ -544,25 +574,25 @@ class FillPassengerPage(Page):
 
 class SelectContactPage(Page):
     def __init__(self, master, passengers: list[body.PassengerBody]):
-        self.passengers_name = [
-            passenger.name for passenger in passengers
+        self.passengers_name = {
+            passenger.name: n for n, passenger in enumerate(passengers)
             if passenger.type is PassengerType.ADULT
-        ]
+        }
         super().__init__(master)
 
     def returned(self):
         super().returned()
         return body.ContactInfoBody(
-            index = self.contact_combobox.current(),
+            index = self.passengers_name[self.contact_combobox.get()],
             phone = self.phone_entry.get(),
             email = self.email_entry.get()
         )
         
     def add_widgets(self):
         self.contact_combobox = Combobox(self,
-            height = 5,
-            width = 20,
-            values = self.passengers_name
+            height = 5, width = 20,
+            values = list(self.passengers_name),
+            state = 'readonly',
         ).grid(row=18,column=1)
 
         self.contact_detail_label = Label(self, 
@@ -571,14 +601,23 @@ class SelectContactPage(Page):
           
         self.next_button = Button(self, 
             text="summery", 
-            command=self.next
+            command=self.next,
         ).grid(row=19, column=1)
+        
+        if self.root.username is None:
+            self.next_button['state'] ='disabled'
         
         self.phone_entry = Entry(self
         ).grid(row=17, column=0)
 
-        self.email_entry = Entry(self
+        self.email_entry = Entry(self,
+            width = 20,
         ).grid(row=17, column=1)
+
+        self.back_button = Button(self, 
+            text = 'cancel', 
+            command = partial(self.jump, MenuPage)
+        ).grid(row=19, column=1)
         
         self.contact_combobox.insert(0, "Choose whose contact")
         self.phone_entry.insert(0, "Phone number")
@@ -586,52 +625,31 @@ class SelectContactPage(Page):
 
 
 class ReviewSection(SubSection):
-    def __init__(self, master, 
-        passengers: list[body.PassengerBody],
-        contact: body.ContactInfoBody,
-        selected_trip: list[tuple[list[body.FlightInfoBody], body.ClassInfoBody]],
-    ):
-        self.passengers = passengers
-        self.contact = contact
-        self.selected_trip = selected_trip
+    def __init__(self, master, booking_id: UUID):
+        self.booking = self.root.get_booking(booking_id)
         super().__init__(master)
 
     def procedure(self):
-        confirm, paynow = self.peek(
-            SummeryPage(self)
-        ).returned()
+        confirm, paynow = self.peek(SummeryPage(self)).returned()
 
         if confirm:
-            id = self.create_booking()
-
+            self.pend_booking()
             if paynow:
-                self.peek(
-                    PaymentPage(self, id)
-                ).returned()
-    
-    def create_booking(self):
-        prebooking = body.PreBookingBody(
-            contact = self.contact,
-            passengers = self.passengers,
-            journey = [(
-                    [flight.reduce() for flight in flights], 
-                    classinfo.travel_class
-                ) for flights, classinfo in self.selected_trip
-            ],
-        )
-        response = requests.post(
-            f'{url}/account/{self.root.username}/book', 
-            prebooking.json()
-        )
-        return response.json()
-    
+                self.peek(PaymentPage(self)).returned()
+        else:
+            self.temp_booking()
+
+    def pend_booking(self):
+        if self.booking.status is BookingStatus.INCOMPLETE:
+            requests.put(f'{url}/{self.root.username}/{self.booking.reference}/pend')
+
+    def temp_booking(self):
+        if self.booking.status is BookingStatus.INCOMPLETE:
+            requests.delete(f'{url}/{self.root.username}/{self.booking.reference}/temp')
+
 
 class SummeryPage(Page):
     master: ReviewSection
-
-    def __init__(self, master):
-        self.confirm = True
-        super().__init__(master)
 
     def returned(self):
         super().returned()
@@ -640,6 +658,11 @@ class SummeryPage(Page):
     def cancel(self):
         self.confirm = False
         self.next()
+
+    def predefine(self):
+        super().predefine()
+        self.confirm = True
+        self.pay_now_var = tk.BooleanVar(self)
         
     def add_widgets(self): 
         self.trip_summary_label = Label(self, 
@@ -668,27 +691,30 @@ class SummeryPage(Page):
         ).grid(row=1, column=4)
         
         m = 2 
-        for flight in self.master.selected_trip[0][0]:
-            self.each_origin_label = Label(self,
-                text=flight.origin
-            ).grid(row=m, column=0)
+        for segment in self.master.booking.segments:
+            for reservation in segment:
+                flight = reservation.flight
+                
+                self.each_origin_label = Label(self,
+                    text=flight.origin
+                ).grid(row=m, column=0)
 
-            self.each_destination_label = Label(self,
-                text=flight.destination
-            ).grid(row=m, column=1)
+                self.each_destination_label = Label(self,
+                    text=flight.destination
+                ).grid(row=m, column=1)
 
-            self.each_departure_label = Label(self,
-                text=str(flight.departure)
-            ).grid(row=m, column=2)
+                self.each_departure_label = Label(self,
+                    text=str(flight.departure)
+                ).grid(row=m, column=2)
 
-            self.each_arrival_label = Label(self,
-                text=str(flight.arrival)
-            ).grid(row=m, column=3)
+                self.each_arrival_label = Label(self,
+                    text=str(flight.arrival)
+                ).grid(row=m, column=3)
 
-            self.each_date_label = Label(self,
-                text=str(flight.date)
-            ).grid(row=m, column=4)
-            m += 1
+                self.each_date_label = Label(self,
+                    text=str(flight.date)
+                ).grid(row=m, column=4)
+                m += 1
 
         self.label1 = Label(self, 
             text=""
@@ -716,9 +742,9 @@ class SummeryPage(Page):
         ).grid(row=m+3, column=3)
 
 
-        travel_class = self.master.selected_trip[0][1].travel_class
+        travel_class = self.master.booking.segments[0][0].travel_class
 
-        for n, passenger in enumerate(self.master.passengers, 1):
+        for n, passenger in enumerate(self.master.booking.passengers, 1):
             self.passenger_name_summary_result_label = Label(self, 
                 text = passenger.name
             ).grid(
@@ -736,7 +762,7 @@ class SummeryPage(Page):
                 text=TravelClass(travel_class).name
             ).grid(row=n+m+3, column=3)
 
-        i = m+3 + len(self.master.passengers)
+        i = m+3 + len(self.master.booking.passengers)
         
         self.label2 = Label(self, 
             text=""
@@ -759,9 +785,10 @@ class SummeryPage(Page):
             text="Phone number"
         ).grid(row=i+3, column=2)
 
-        passenger_name = self.master.passengers[self.master.contact.index].name
-        email = self.master.contact.email
-        phone = self.master.contact.phone
+        contact = self.master.booking.contact
+        passenger_name = self.master.booking.passengers[contact.index].name
+        email = contact.email
+        phone = contact.phone
 
         self.passenger_name_contact_result_label = Label(self, 
             text=passenger_name
@@ -789,7 +816,7 @@ class SummeryPage(Page):
             font="bold"
         ).grid(row=i+7, column=0)
  
-        total_price = self.master.selected_trip[0][1].price
+        total_price = self.master.booking.price
 
         self.payable_amount_result_label = Label(self,
             text=total_price,
@@ -804,8 +831,6 @@ class SummeryPage(Page):
             text="Choose how to pay" , 
             font="bold"
         ).grid(row=i+9, column=0)
-
-        self.pay_now_var = tk.BooleanVar(self)
 
         self.pay_now_button = Radiobutton(self, 
             text = "Pay now", 
@@ -836,14 +861,10 @@ class SummeryPage(Page):
 
 class PaymentPage(Page):
     master: ReviewSection
-
-    def __init__(self, master, uuid: str):
-        self.uuid = uuid
-        super().__init__(master)
     
     def pay(self):
         respone = requests.post(
-            f'{url}/account/{self.root.username}/{self.uuid}/payment', 
+            f'{url}/account/{self.root.username}/{self.master.booking.reference}/payment', 
             params={'method': PaymentMethod.CREDIT_CARD},
             json={
                 'data': {
@@ -856,7 +877,6 @@ class PaymentPage(Page):
                 }
             }
         )
-        print('pay:', respone.json())
         self.next()
 
     def add_widgets(self):
@@ -869,7 +889,7 @@ class PaymentPage(Page):
         ).grid(row=1, column=0)
 
         self.total_price_label = Label(self,
-            text=self.master.selected_trip[0][1].price
+            text=self.master.booking.price
         ).grid(row=1, column=1)
 
         self.method_label = Label(self, 
@@ -923,8 +943,10 @@ class PaymentPage(Page):
 
 class SelectSeatSection(SubSection):
     def __init__(self, master, 
-        itinerary: body.ItineraryBody,
-        
+        itinerary: list[
+            
+            body.ItineraryBody
+        ],
     ):
         self.itinerary = itinerary
         self.seats: list[body.SeatBody] = []
@@ -936,7 +958,6 @@ class SelectSeatSection(SubSection):
         
         self.pax, itinerarys = search_page.returned()
         
-
 
     def returned(self):
         return ...
@@ -968,31 +989,39 @@ class SelectSeatPage(Page):
 
 class ViewBookingSection(SubSection):
     def procedure(self):
-        self.bookings = self.get_bookings()
+        self.all_bookings = self.get_all_bookings()
         
         selected = self.peek(
             ViewBookingsPage(self)
         ).returned()
 
-        self.peek(
-            ViewBookingsPage(self)
-        ).returned()
-        
+        if selected: 
+            will_pay = self.peek(
+                BookingPage(self, selected)
+            ).returned()
+            
+            if will_pay:
+                self.peek(
+                    ReviewSection(self, selected)
+                )
+            
 
-    def get_bookings(self):
+    def get_all_bookings(self):
         response = requests.get(f'{url}/account/{self.root.username}/my-bookings')
         return [
             body.BookingBody(**data) for data in response.json()
         ]
 
 
-
 class ViewBookingsPage(Page):
     master: ViewBookingSection
 
-    def choose(self, event):
-        booking = event.widget.booking
-        self.selected_id = booking.reference
+    def __init__(self, master):
+        self.selected_id = None
+        super().__init__(master)
+
+    def choose(self, selected_id: UUID):
+        self.selected_id = selected_id
         self.next()
 
     def returned(self):
@@ -1006,60 +1035,84 @@ class ViewBookingsPage(Page):
             text="View Booking"                   
         ).grid(row=0, column=0)
 
-        for booking in self.master.bookings:
-            button = LabelFrame(self).pack()
+        for booking in self.master.all_bookings:
+            button = LabelFrame(self,
+                text=f'{booking.datetime: %d %b %Y %H:%M}'
+            ).pack()
             
-            button.booking = booking # type: ignore
-            button.bind("<Button-1>", self.choose)
-
-            Label(button, 
-                text=booking.status.name
+            Button(
+                text='back',
+                command=self.next
             ).pack(side=LEFT)
-            
-            Label(button, 
-                text=f'{booking.datetime: %a, %d %b %Y}'
+
+            Button(button, 
+                text=booking.status.name,
+                command=partial(self.choose, booking.reference)
             ).pack(side=LEFT)
             
             Label(button, 
                 text=' '.join(f'{type.name} {number}' for type, number in booking.pax)
             ).pack(side=LEFT)            
             
-            tab = LabelFrame(button).pack(side=RIGHT)
-            for origin, destination, departure, arrival in booking.trip:
-                Label(tab, 
-                    text=f'{origin.location_code} -> {destination.location_code}'
-                ).pack(side=LEFT)
+            itinerary = Frame(button).pack(side=RIGHT)
+            for n, (origin, destination, departure, arrival) in enumerate(booking.trip):
+                Label(itinerary, 
+                    text=f'{origin.code} -> {destination.code}'
+                ).grid(row=n, column=0)
                 
-                Label(tab, 
+                Label(itinerary, 
                     text=f'{departure: %a, %d %b %Y} - {arrival: %a, %d %b %Y}'
-                ).pack(side=RIGHT)
+                ).grid(row=n, column=1)
 
 
-class BookingPage(SubSection):
+class BookingPage(Page):
     master: ViewBookingSection
+
+    def __init__(self, master, selected: UUID):
+        self.booking = self.root.get_booking(selected)
+        self.will_pay = False
+        super().__init__(master)
+
+    def pay(self):
+        self.will_pay = True
+        self.next()
+
+    def returned(self):
+        super().returned()
+        return self.will_pay
     
-    def add_widgets(self):
-        
+    def add_widgets(self):        
         self.label1 = Label(self,
             text="Booking Details"
         ).grid(row=0, column=0)
 
         self.reference_label = Label(self,
-            text="Reference : "                            
+            text=f"passenger: {self.booking.passengers}"                            
         ).grid(row=1, column=0)
 
         self.datetime_label = Label(self,
-            text="Date time : "                            
+            text=f"payment: {self.booking.payment}"                            
         ).grid(row=2, column=0)
 
         self.status_label = Label(self,
-            text="Status : "                            
+            text=f"price: {self.booking.price}"                            
         ).grid(row=3, column=0)
 
         self.pax_label = Label(self,
-            text="Passenger : "                            
+            text=f"contact: {self.booking.contact}"                            
         ).grid(row=4, column=0)
 
         self.trip_label = Label(self,
-            text="Trip : "                            
+            text=f'Trip: {self.booking.segments}'                            
         ).grid(row=5, column=0)
+
+        self.back_button = Button(self,
+            text="Back",
+            command=self.back
+        ).grid(row=6, column=0)
+
+        if self.booking.payment is None:
+            self.paybutton = Button(self,
+            text="pay",
+            command=self.pay
+        ).grid(row=6, column=1)

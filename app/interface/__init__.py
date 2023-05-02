@@ -24,6 +24,8 @@ class Root(Section, tk.Tk):
 
         self.username: Optional[str] = None
         self.get_airports()
+        self.get_aircraft()
+        
         self.open(main_tk.MenuPage(self))
         
 
@@ -34,10 +36,20 @@ class Root(Section, tk.Tk):
     #         super().report_callback_exception(exception, value, traceback)
         
     def get_airports(self):
-        data: list[dict[str, str]] = requests.get(url + API_Data1).json()        
+        data: list[dict[str, str]] = requests.get(f'{url}{API_Data1}').json()        
         self.airports = [
             body.AirportBody(**attr) for attr in data
         ]
+
+    def get_aircraft(self):
+        data: dict[str, dict] = requests.get(f'{url}/data/aircrafts').json()
+        self.aircraft = {
+            model: body.AircraftBody(**attr) for model, attr in data.items()
+        }
+
+    def get_booking(self, id: UUID):
+        response = requests.get(f'{url}/account/{self.username}/{id}')
+        return body.BookingInfoBody(**response.json())
         
 sleep(3.5)
 Root().mainloop()

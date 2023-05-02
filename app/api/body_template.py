@@ -252,14 +252,14 @@ class AircraftBody(BaseModel):
 
 
 class AirportBody(BaseModel):
-    location_code: str
+    code: str
     name: str
     country: str
     
     @classmethod
     def transform(cls, obj: src.Airport):
         return cls(
-            location_code=obj.location_code,
+            code=obj.location_code,
             name=obj.name,
             country=obj.country,
         )
@@ -314,13 +314,14 @@ class BookingBody(BaseModel):
     reference: UUID
     datetime: dt.datetime
     status: BookingStatus
+    
     pax: list[tuple[PassengerType, int]]
     trip: list[
         tuple[AirportBody, AirportBody, dt.date, dt.date]
     ]
     
     @classmethod
-    def transform(cls, obj: src.BookingPage):
+    def transform(cls, obj: src.Booking):
         trip = []
         for flight in obj.reservations:
             first = flight[0].provider.host
@@ -330,8 +331,6 @@ class BookingBody(BaseModel):
                 AirportBody.transform(last.flight.destination),
                 first.date, last.date,
             ))
-
-        
         return cls(
             reference=obj.reference,
             datetime=obj.datetime,
@@ -364,6 +363,10 @@ class BookingInfoBody(BaseModel):
     deeper booking's data
     intent to use when user want to see specfic detail of one booking
     """
+    reference: UUID
+    datetime: dt.datetime
+    status: BookingStatus
+    
     price: int
     passengers: list[PassengerBody]
     contact: ContactInfoBody
@@ -371,8 +374,11 @@ class BookingInfoBody(BaseModel):
     segments: list[list[FlightReservationBody]]
     
     @classmethod
-    def transform(cls, obj: src.BookingPage):
+    def transform(cls, obj: src.Booking):
         return cls(
+            reference=obj.reference,
+            datetime=obj.datetime,
+            status=obj.status,
             price=obj.get_price(),
             payment=PaymentBody.transform(obj.payment),
             contact=ContactInfoBody.transform(obj.contact, obj.passengers),

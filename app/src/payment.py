@@ -2,7 +2,7 @@ from __future__ import annotations
 from app.base import *
 
 if TYPE_CHECKING:
-    from . import BookingPage
+    from . import Booking
 
 
 class Payment(ABC):
@@ -35,7 +35,7 @@ class Payment(ABC):
         return self._status
 
     @classmethod
-    def pay(cls, booking: BookingPage, **data):
+    def pay(cls, booking: Booking, **data):
         if cls.send_api(**data):
             return cls(booking.get_price())
     

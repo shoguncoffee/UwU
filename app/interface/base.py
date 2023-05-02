@@ -309,7 +309,7 @@ class AirportEntry(CustomWidget, ttk.Entry):
         string = string or self.string
         
         for airport in self.airports:
-            if string == airport.location_code.lower():
+            if string == airport.code.lower():
                 self.state(["!invalid"])
                 return True
         
@@ -328,7 +328,7 @@ class AirportEntry(CustomWidget, ttk.Entry):
         for airport in result:
             self.suggester.insert(
                 '', END, 
-                text = airport.location_code, 
+                text = airport.code, 
                 values = ['\n'.join(
                     [airport.country, airport.name]
                 )]
@@ -376,9 +376,9 @@ class AirportEntry(CustomWidget, ttk.Entry):
     def search(self, key: str):
         return [
             *search.multi_opt(
-                'location_code', 'name', 'country', 
+                'code', 'name', 'country', 
                 query=key, pool=self.airports,
-                score_cutoff=80
+                score_cutoff=85
             )
         ]
         

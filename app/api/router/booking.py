@@ -7,13 +7,13 @@ router = APIRouter(
 )
 
 
-@router.get("{username}/{booking_id}/price")
-async def view_booking(username: str, booking_id: UUID): # vs get_bookings?
+@router.get("{username}/{booking_id}")
+async def view_booking(username: str, booking_id: UUID):
     customer = Airline.accounts.get(username)
     assert isinstance(customer, src.Customer)
     
     booking = customer.get_booking(booking_id)
-    return booking.get_price()
+    return BookingInfoBody.transform(booking)
 
 
 @router.post("{username}/{booking_id}/select-seat")
@@ -61,3 +61,21 @@ async def pay(username: str,
 
     booking = customer.get_booking(booking_id)
     return Airline.pay(booking, method, data)
+
+
+@router.put("/{username}/{booking_id}/pend")
+async def pending(username: str, booking_id: UUID):
+    customer = Airline.accounts.get(username)
+    assert isinstance(customer, src.Customer)
+
+    booking = customer.get_booking(booking_id)
+    return Airline.pend(booking)
+
+
+@router.delete("/{username}/{booking_id}/temp")
+async def temping(username: str, booking_id: UUID):
+    customer = Airline.accounts.get(username)
+    assert isinstance(customer, src.Customer)
+
+    booking = customer.get_booking(booking_id)
+    return Airline.temp(booking)

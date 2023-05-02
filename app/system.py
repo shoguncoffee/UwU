@@ -91,7 +91,7 @@ class Airline:
             itinerary.bookable(pax, travel_class) 
             for itinerary, travel_class in journey
         ):
-            booking = BookingPage(
+            booking = Booking(
                 creator,
                 contact,
                 tuple(passengers),
@@ -102,9 +102,20 @@ class Airline:
                 flightclass.booked(reservation)
             
             creator.bookings.append(booking)
-            booking.pending()
             return booking.reference
-    
+      
+    @classmethod
+    def temp(cls, booking: Booking):
+        if booking.status is BookingStatus.INCOMPLETE:
+            customer = booking.creator
+            customer.bookings.remove(booking)
+            return True
+
+    @classmethod
+    def pend(cls, booking: Booking):
+        if booking.status is BookingStatus.INCOMPLETE:
+            booking.pending()
+            return True
     
     @classmethod
     def select_seats(cls, 
@@ -121,10 +132,9 @@ class Airline:
                     SeatReservation(*select) for select in selected
                 )
     
-    
     @classmethod
     def pay(cls, 
-        booking: BookingPage,
+        booking: Booking,
         payment_method: PaymentMethod,
         data: dict,
     ):
@@ -134,7 +144,6 @@ class Airline:
             if payment:
                 booking.update_payment(payment)
                 return True
-    
     
     @classmethod
     def register(cls, account: Account):
