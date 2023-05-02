@@ -3,6 +3,10 @@ https://tkdocs.com/tutorial/concepts.html
 http://tkdocs.com/pyref/index.html
 """
 from __future__ import annotations
+from cProfile import label
+from tkinter import Grid
+
+from app.src import booking
 from .base import *
 
 
@@ -153,14 +157,18 @@ class BookingSection(SubSection):
             SearchSection(self)
         ).returned()
         
-        passengers, contact = self.open(
+        passengers, contact, want_select_seat = self.open(
             PassengerSection(self, pax)
         ).returned()
-
         booking_id = self.create_booking(passengers, contact, selected_trip)
+                
+        if want_select_seat:
+            self.open(
+                SelectSeatSection(self, self.root.get_booking(booking_id))
+            ).returned()
         
         self.open(
-            ReviewSection(self, booking_id)
+            ReviewSection(self, self.root.get_booking(booking_id))
         )
         self.jump(MenuPage)
 
@@ -182,6 +190,7 @@ class BookingSection(SubSection):
             prebooking.json()
         )
         return UUID(response.json())
+
 
 class SearchSection(SubSection):
     def procedure(self):
@@ -431,7 +440,7 @@ class PassengerSection(SubSection):
         super().__init__(master)
 
     def returned(self):
-        return self.passengers, self.contact
+        return self.passengers, self.contact, self.want_select_seat
 
     def procedure(self):
         self.passengers: list[body.PassengerBody] = []
@@ -442,7 +451,7 @@ class PassengerSection(SubSection):
             )
             self.passengers.append(page.returned())
 
-        self.contact = self.peek(
+        self.contact, self.want_select_seat = self.peek(
             SelectContactPage(self, self.passengers)
         ).returned()
         
@@ -574,6 +583,7 @@ class FillPassengerPage(Page):
 
 class SelectContactPage(Page):
     def __init__(self, master, passengers: list[body.PassengerBody]):
+        self.want_select_seat = False
         self.passengers_name = {
             passenger.name: n for n, passenger in enumerate(passengers)
             if passenger.type is PassengerType.ADULT
@@ -586,7 +596,11 @@ class SelectContactPage(Page):
             index = self.passengers_name[self.contact_combobox.get()],
             phone = self.phone_entry.get(),
             email = self.email_entry.get()
-        )
+        ), self.want_select_seat
+
+    def select_seat(self):
+        self.want_select_seat = True
+        self.next()
         
     def add_widgets(self):
         self.contact_combobox = Combobox(self,
@@ -618,6 +632,11 @@ class SelectContactPage(Page):
             text = 'cancel', 
             command = partial(self.jump, MenuPage)
         ).grid(row=19, column=0)
+
+        self.select_seat_button = Button(self, 
+            text="Select seat", 
+            command=self.select_seat
+        ).grid(row=19, column=2)
         
         self.contact_combobox.insert(0, "Choose whose contact")
         self.phone_entry.insert(0, "Phone number")
@@ -625,8 +644,8 @@ class SelectContactPage(Page):
 
 
 class ReviewSection(SubSection):
-    def __init__(self, master, booking_id: UUID):
-        self.booking = self.root.get_booking(booking_id)
+    def __init__(self, master, booking: body.BookingInfoBody):
+        self.booking = booking
         super().__init__(master)
 
     def procedure(self):
@@ -641,11 +660,11 @@ class ReviewSection(SubSection):
 
     def pend_booking(self):
         if self.booking.status is BookingStatus.INCOMPLETE:
-            requests.put(f'{url}/{self.root.username}/{self.booking.reference}/pend')
+            requests.put(f'{url}/account/{self.root.username}/{self.booking.reference}/pend')
 
     def temp_booking(self):
         if self.booking.status is BookingStatus.INCOMPLETE:
-            requests.delete(f'{url}/{self.root.username}/{self.booking.reference}/temp')
+            requests.delete(f'{url}/account/{self.root.username}/{self.booking.reference}/temp')
 
 
 class SummeryPage(Page):
@@ -653,7 +672,7 @@ class SummeryPage(Page):
 
     def returned(self):
         super().returned()
-        return self.confirm, self.pay_now_var.get() 
+        return self.confirm, self.pay_now_var.get(), 
 
     def cancel(self):
         self.confirm = False
@@ -741,10 +760,23 @@ class SummeryPage(Page):
             text="Class"
         ).grid(row=m+3, column=3)
 
+        self.seat_summary_label = Label(self, 
+            text="Seat"
+        ).grid(row=m+3, column=4)
 
         travel_class = self.master.booking.segments[0][0].travel_class
 
         for n, passenger in enumerate(self.master.booking.passengers, 1):
+            seat = self.master.booking.segments[0][0].selected[n-1]
+            if seat is not None:
+                seat = seat.number
+            else:
+                seat = 'Not specified'
+
+            self.seleted_seat_label = Label(self,
+                text=seat
+            ).grid(row=n+m+3, column=4)
+            
             self.passenger_name_summary_result_label = Label(self, 
                 text = passenger.name
             ).grid(
@@ -761,6 +793,8 @@ class SummeryPage(Page):
             self.each_class_label = Label(self,
                 text=TravelClass(travel_class).name
             ).grid(row=n+m+3, column=3)
+
+            
 
         i = m+3 + len(self.master.booking.passengers)
         
@@ -852,7 +886,7 @@ class SummeryPage(Page):
             text="Cancel", 
             command = self.cancel
         ).grid(row=i+12, column=0)
-        
+
         self.purchase_button = Button(self, 
             text="Purchase", 
             command=self.next
@@ -942,50 +976,123 @@ class PaymentPage(Page):
 
 
 class SelectSeatSection(SubSection):
-    def __init__(self, master, 
-        itinerary: list[
-            
-            body.ItineraryBody
-        ],
-    ):
-        self.itinerary = itinerary
-        self.seats: list[body.SeatBody] = []
-        super().__init__(master)    
+    def __init__(self, master, booking: body.BookingInfoBody):
+        self.booking = booking
+        super().__init__(master)
 
     def procedure(self):
-        search_page = SearchPage(self)
-        self.stack(search_page)
-        
-        self.pax, itinerarys = search_page.returned()
-        
+        for segment_index, segment in enumerate(self.booking.segments):
+            for reservation_index, reservation in enumerate(segment):
+                selected_seats: list[str] = []
+                available_seats = self.get_avaliable_seats(reservation.flight, reservation.travel_class)
+                
+                for passenger in self.booking.passengers:
+                    seat = self.peek(
+                        SelectSeatPage(self, passenger, reservation, available_seats)
+                    ).returned()
+                    print(seat)
+                    available_seats.remove(seat)
+                    selected_seats.append(seat)
 
-    def returned(self):
-        return ...
+                self.selecting(
+                    segment_index, 
+                    reservation_index,
+                    selected_seats
+                )
+
+    def selecting(self, 
+        segment_index: int,
+        reservation_index: int,
+        seats: list[str]
+    ):
+        response = requests.post(
+            f'{url}/account/{self.root.username}/{self.booking.reference}/select-seat', 
+            json=seats, params={
+                'segment_index': segment_index,
+                'reservation_index': reservation_index,
+            },
+        )
+        
+    def get_avaliable_seats(self, flight: body.FlightInfoBody, travel_class: TravelClass) -> list[str]:
+        response = requests.get(f'{url}/avaliable-seat', params={
+                'date': flight.date.isoformat(),
+                'designator': flight.designator,
+                'travel_class': travel_class,
+            }
+        )
+        return response.json()
 
 
 class SelectSeatPage(Page):
     def __init__(self, master, 
-        itinerary: body.ItineraryBody,
-        
+        passenger: body.PassengerBody,
+        reservation: body.FlightReservationBody,
+        avaliable_seats: list[str],
     ):
-        self.itinerary = itinerary
-        self.seats: list[body.SeatBody] = []
+        self.passenger = passenger
+        self.reservation = reservation
+        self.avaliable_seats = avaliable_seats
         super().__init__(master)
 
-
     def select(self):
-        
+        self.seat = self.selected_seats_entry.get()
         self.next()
 
+    def returned(self):
+        super().returned()
+        return self.seat
+
     def add_widgets(self):
-        self.seat_frame = Frame(self).pack(side=RIGHT)
+        flight = self.reservation.flight
+        travel_class = self.reservation.travel_class
+        
+        model = flight.aircraft_model
+        aircraft = self.root.aircraft[model]
+        cabin_no, cabin = next(
+            (n, cabin) for n, cabin in enumerate(aircraft.desks[0])
+            if cabin.travel_class == travel_class
+        )
+        
+        Label(self,
+            text = f'aircraft: {model}'
+        ).pack()
+        Label(self,
+            text = f'cabin no.{cabin_no}'
+        ).pack()
+        Label(self,
+            text = f'passenger: {self.passenger.name}'
+        ).pack()
+        
+        
+        seat_frame = Frame(self).pack()
+        Label(seat_frame,
+            text = 'avaliable seats: '+ ', '.join(self.avaliable_seats)
+        ).pack()
 
-        for seat in self.seats:
-            seat = Button(self.seat_frame, 
-                text=seat.number, 
-                command=partial(self.select)
-            ).pack(side=LEFT)
+        
+        # for seat in self.seats:
+        #     seat = Button(self.seat_frame, 
+        #         text = seat.number, 
+        #         command = partial(self.select, )
+        #     ).pack(side=LEFT)
 
+        self.confirm_frame = Frame(self).pack()
+
+        self.selected_seats_label = Label(
+            self.confirm_frame,
+            text='Selected seats: '               
+        ).grid(row=0, column=0)
+        
+        self.selected_seats_entry = Entry(
+            self.confirm_frame,
+        ).grid(row=0, column=1)
+
+        self.confirm_button = Button(
+            self.confirm_frame,
+            text='Confirm selection',
+            command=self.select
+        ).grid(row=2, column=1)
+                
 
 class ViewBookingSection(SubSection):
     def procedure(self):
@@ -996,16 +1103,16 @@ class ViewBookingSection(SubSection):
         ).returned()
 
         if selected: 
+            booking = self.root.get_booking(selected)
             will_pay = self.peek(
-                BookingPage(self, selected)
+                BookingPage(self, booking)
             ).returned()
             
             if will_pay:
                 self.peek(
-                    ReviewSection(self, selected)
+                    ReviewSection(self, booking)
                 )
             
-
     def get_all_bookings(self):
         response = requests.get(f'{url}/account/{self.root.username}/my-bookings')
         return [
@@ -1068,8 +1175,8 @@ class ViewBookingsPage(Page):
 class BookingPage(Page):
     master: ViewBookingSection
 
-    def __init__(self, master, selected: UUID):
-        self.booking = self.root.get_booking(selected)
+    def __init__(self, master, booking: body.BookingInfoBody):
+        self.booking = booking
         self.will_pay = False
         super().__init__(master)
 
@@ -1113,6 +1220,6 @@ class BookingPage(Page):
 
         if self.booking.payment is None:
             self.paybutton = Button(self,
-            text="pay",
-            command=self.pay
-        ).grid(row=6, column=1)
+                text="pay",
+                command=self.pay
+            ).grid(row=6, column=1)

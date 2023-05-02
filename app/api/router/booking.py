@@ -1,5 +1,4 @@
 from .base import *
-from ..body_template import BookingBody
 
 router = APIRouter(
     prefix='/account',
@@ -7,7 +6,7 @@ router = APIRouter(
 )
 
 
-@router.get("{username}/{booking_id}")
+@router.get("/{username}/{booking_id}")
 async def view_booking(username: str, booking_id: UUID):
     customer = Airline.accounts.get(username)
     assert isinstance(customer, src.Customer)
@@ -16,7 +15,7 @@ async def view_booking(username: str, booking_id: UUID):
     return BookingInfoBody.transform(booking)
 
 
-@router.post("{username}/{booking_id}/select-seat")
+@router.post("/{username}/{booking_id}/select-seat")
 async def select_seat(username: str,
     booking_id: UUID,
     segment_index: int,

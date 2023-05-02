@@ -236,7 +236,7 @@ class CabinBody(BaseModel):
             cls.transform(cabin) for cabin in objs
         ]
         
-    
+
 class AircraftBody(BaseModel):
     model: str
     desks: list[list[CabinBody]]
