@@ -617,7 +617,7 @@ class SelectContactPage(Page):
         self.back_button = Button(self, 
             text = 'cancel', 
             command = partial(self.jump, MenuPage)
-        ).grid(row=19, column=1)
+        ).grid(row=19, column=0)
         
         self.contact_combobox.insert(0, "Choose whose contact")
         self.phone_entry.insert(0, "Phone number")
