@@ -791,9 +791,7 @@ class SummeryPage(Page):
 
             self.each_class_label = Label(self,
                 text=TravelClass(travel_class).name
-            ).grid(row=n+m+3, column=3)
-
-            
+            ).grid(row=n+m+3, column=3)           
 
         i = m+3 + len(self.master.booking.passengers)
         
@@ -988,6 +986,8 @@ class SelectSeatSection(SubSection):
                     seat = self.peek(
                         SelectSeatPage(self, passenger, reservation, available_seats)
                     ).returned()
+                    print(seat)
+                    print(available_seats)
                     available_seats.remove(seat)
                     selected_seats.append(seat)
 
