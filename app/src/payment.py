@@ -13,10 +13,6 @@ class Payment:
         self._total_price = total_price
         self._transaction_id = transaction_id or uuid4()
         self._datetime = dt.datetime.now()
-        self._status = PaymentStatus.PENDING
-    
-    def __bool__(self):
-        return self._status is PaymentStatus.COMPLETED
     
     @property
     def total_price(self):
@@ -29,10 +25,6 @@ class Payment:
     @property
     def datetime(self):
         return self._datetime
-    
-    @property
-    def status(self):
-        return self._status
 
     @classmethod
     def pay(cls, booking: Booking, **data):

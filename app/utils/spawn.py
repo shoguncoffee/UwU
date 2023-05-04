@@ -50,8 +50,8 @@ def add_aircrafts(system: Airline):
 @timmer
 def add_flights(system: Airline):
     airline_designator = system.designator
-    first_100 = system.airports[:100]
-    first_10 = system.airports[:10]
+    first_100 = system.airports
+    first_10 = system.airports[:13]
     bkk = system.airports.get('bkk')
     
     # for assign flight number
@@ -73,22 +73,22 @@ def add_flight_plans(system: Airline):
             [7_000, 7_500, 8_000, 9_000] # seat price
         ), 
         TravelClass.BUSSINESS: (
-            [33_000, 26_000, 23_000], 
+            [33_000, 26_000, 21_000], 
             [20_000, 25_000, 28_000, 30_000]
         ), 
         TravelClass.FIRST: (
-            [78_000, 67_000, 50_000], 
-            [45_000, 46_000, 47_000, 53_000]
+            [68_000, 57_000, 48_000], 
+            [35_000, 36_000, 37_000, 33_000]
         )
     }
     distort = lambda prices: [
-        price * (1 + random()) for price in prices
+        price * (1 + random()//1.5) for price in prices
     ]
     fares: list[list[tuple[TravelClass, Fare]]] = []
     
     for _ in range(10):
         price: list[tuple[TravelClass, Fare]] = []
-        
+
         for travel_class, (passenger_price, seat_price) in base_fare.items():
             passenger_fare = [
                 *zip(PassengerType, distort(passenger_price))
@@ -110,10 +110,10 @@ def add_flight_plans(system: Airline):
         random_fare = choice(fares)
         
         plan = FlightPlan(flight, 
-            dt.date(2023, 12, 1), 
+            dt.date(2023, 7, 1), 
             random_aircraft, 
             random_fare,
-            dt.date(2023, 12, 5), 
+            dt.date(2023, 8, 31), 
         )
         system.plans.add(plan)
 
@@ -134,7 +134,7 @@ def add_accounts(system: Airline):
 def search(system: Airline,
     origin: str, 
     destination: str,
-    date: dt.date = dt.date(2023, 12, 2)
+    date: dt.date = dt.date(2023, 7, 1)
 ):
     """
         test search journey

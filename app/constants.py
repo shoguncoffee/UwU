@@ -62,20 +62,6 @@ GenderType = IntEnum(
         'FEMALE',
     )
 )
-PaymentStatus = IntEnum(
-    'PaymentStatus', (
-        'PENDING', 
-        'FAILED', 
-        'COMPLETED',
-    )
-)
-PaymentMethod = IntEnum(
-    'PaymentMethod', (
-        'PAYPAL', 
-        'INTERNET_BANKING',
-        'CREDIT_CARD',
-    )
-)
 with open('data/countries.txt') as _f:
     Country = StrEnum(
         'Country', _f.read().splitlines()

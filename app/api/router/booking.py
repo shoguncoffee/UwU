@@ -50,7 +50,6 @@ async def select_seat(username: str,
 @router.post("/{username}/{booking_id}/payment")
 async def pay(username: str,
     booking_id: UUID,
-    method: PaymentMethod,
     data: dict
 ):
     customer = system.accounts.get(username)

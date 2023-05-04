@@ -10,8 +10,9 @@ for individual submodule in this package:
 """
 from app.airline import Airline
 
-# if new system?
-if True:
+
+if False:
+    # start new system
     system = Airline('UwU Airline', 'UW')
     
     from app.utils.spawn import *
@@ -24,19 +25,18 @@ if True:
 
 
     ### test flight seaching
-    # print_results(search(system, 'sin', 'doh'))
-    # print_results(search(system, 'LHR', 'cai'))
-    # print_results(search(system, 'sfo', 'sin'))
-    # print_results(search(system, 'zrh', 'icn'))
-    # print_results(search(system, 'zrh', 'bkk'))
-    # print_results(search(system, 'bkk', 'icn'))
-    # print_results(search(system, 'bkk', 'vie'))
+    print_results(search(system, 'sin', 'doh'))
+    print_results(search(system, 'LHR', 'cai'))
+    print_results(search(system, 'sfo', 'sin'))
+    print_results(search(system, 'zrh', 'icn'))
+    print_results(search(system, 'zrh', 'bkk'))
+    print_results(search(system, 'bkk', 'icn'))
+    print_results(search(system, 'bkk', 'vie'))
     
 
     ### example of booking
     
     results = search(system, 'bkk', 'icn')
-    
     plum = system.accounts.get('Plum123')
     
     passenger1 = Passenger(
@@ -91,13 +91,8 @@ if True:
     
     system.pay(booking, {})
 
-    import pickle
-    with open('data/system.pkl', 'wb') as f:
-        pickle.dump(system, f)
-
-
 else:
-    # เฉพาะกรณีต้องการโหลดข้อมูลจากไฟล์
+    # เฉพาะกรณีต้องการความเร็วด้วยการโหลดข้อมูลจากไฟล์
     import pickle
     
     with open('data/system.pkl', 'rb') as f:

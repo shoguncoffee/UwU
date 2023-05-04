@@ -898,7 +898,6 @@ class PaymentPage(Page):
     def pay(self):
         respone = requests.post(
             f'{URL}/account/{self.root.username}/{self.master.booking.reference}/payment', 
-            params={'method': PaymentMethod.CREDIT_CARD},
             json={
                 'data': {
                     'method': self.method_combobox.get(),
@@ -1395,10 +1394,6 @@ class BookingPage(Page):
             self.payment_time_label = Label(self,
                 text="Payment time: ",                           
             ).grid(row=i+10, column=0)
-
-            self.payment_result_label = Label(self,
-                text=payment.status,  
-            ).grid(row=i+8, column=1)
 
             self.transaction_id_result_label = Label(self,
                 text=str(payment.transaction_id),                           
