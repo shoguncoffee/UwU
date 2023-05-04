@@ -1190,36 +1190,214 @@ class BookingPage(Page):
     
     def add_widgets(self):        
         self.label1 = Label(self,
-            text="Booking Details"
+            text="Booking details", 
+            font="bold"
         ).grid(row=0, column=0)
 
-        self.reference_label = Label(self,
-            text=f"passenger: {self.booking.passengers}"                            
+        self.origin_summary_label = Label(self, 
+            text="Origin"
         ).grid(row=1, column=0)
+        
+        self.destination_summary_label = Label(self, 
+            text="Destination"
+        ).grid(row=1, column=1)
+        
+        self.departure_summary_label = Label(self,               
+            text="Departuer"
+        ).grid(row=1, column=2)
+        
+        self.arrival_summary_label = Label(self, 
+            text="Arrival"
+        ).grid(row=1, column=3)
 
-        self.datetime_label = Label(self,
-            text=f"payment: {self.booking.payment}"                            
-        ).grid(row=2, column=0)
+        self.date_summary_label = Label(self, 
+            text="Date"
+        ).grid(row=1, column=4)
 
-        self.status_label = Label(self,
-            text=f"price: {self.booking.price}"                            
-        ).grid(row=3, column=0)
+        m = 2 
+        for segment in self.booking.segments:
+            for reservation in segment:
+                flight = reservation.flight
+                
+                self.each_origin_label = Label(self,
+                    text=flight.origin
+                ).grid(row=m, column=0)
 
-        self.pax_label = Label(self,
-            text=f"contact: {self.booking.contact}"                            
-        ).grid(row=4, column=0)
+                self.each_destination_label = Label(self,
+                    text=flight.destination
+                ).grid(row=m, column=1)
 
-        self.trip_label = Label(self,
-            text=f'Trip: {self.booking.segments}'                            
-        ).grid(row=5, column=0)
+                self.each_departure_label = Label(self,
+                    text=str(flight.departure)
+                ).grid(row=m, column=2)
+
+                self.each_arrival_label = Label(self,
+                    text=str(flight.arrival)
+                ).grid(row=m, column=3)
+
+                self.each_date_label = Label(self,
+                    text=str(flight.date)
+                ).grid(row=m, column=4)
+                m += 1
+
+        self.label1 = Label(self, 
+            text=""
+        ).grid(row=m+1, column=1)
+
+        self.passenger_detail_summary_label = Label(self, 
+            text="Passenger details", 
+            font="bold"
+        ).grid(row=m+2, column=0)
+
+        self.passenger_name_summary_label = Label(self, 
+            text="Passenger name"
+        ).grid(row=m+3, column=0)
+        
+        self.date_of_birth_summary_label = Label(self, 
+            text="Date of birth"
+        ).grid(row=m+3, column=1)
+        
+        self.type_summary_label = Label(self, 
+            text="Type"
+        ).grid(row=m+3, column=2)
+
+        self.class_summary_label = Label(self, 
+            text="Class"
+        ).grid(row=m+3, column=3)
+
+        self.seat_summary_label = Label(self, 
+            text="Seat"
+        ).grid(row=m+3, column=4)
+
+        travel_class = self.booking.segments[0][0].travel_class
+
+        for n, passenger in enumerate(self.booking.passengers, 1):
+            
+            self.passenger_name_summary_result_label = Label(self, 
+                text = passenger.name
+            ).grid(
+                row=n+m+3, column=0
+            )
+            self.date_of_birth_summary_result_label = Label(self, 
+                text = str(passenger.birthdate)
+            ).grid(row=n+m+3, column=1)
+            
+            self.type_summary_result_label = Label(self, 
+                text = passenger.type.name
+            ).grid(row=n+m+3, column=2)
+
+            self.each_class_label = Label(self,
+                text=TravelClass(travel_class).name
+            ).grid(row=n+m+3, column=3)
+
+            seat = self.booking.segments[0][0].selected[n-1]
+            if seat is not None:
+                seat = seat.number
+            else:
+                seat = 'Not specified'
+
+            self.seleted_seat_label = Label(self,
+                text=seat
+            ).grid(row=n+m+3, column=4)
+
+        i = m+3 + len(self.booking.passengers)
+
+        self.label2 = Label(self, 
+            text=""
+        ).grid(row=i+1, column=1)
+
+        self.contact_detail_label = Label(self, 
+            text="Contact details", 
+            font="bold"
+        ).grid(row=i+2, column=0)
+        
+        self.passenger_name_contact_label = Label(self, 
+            text="Passenger name"
+        ).grid(row=i+3, column=0)
+        
+        self.email_contact_label = Label(self, 
+            text="E-mail"
+        ).grid(row=i+3, column=1)
+        
+        self.phone_contact_label = Label(self, 
+            text="Phone number"
+        ).grid(row=i+3, column=2)
+
+        contact = self.booking.contact
+        passenger_name = self.booking.passengers[contact.index].name
+        email = contact.email
+        phone = contact.phone
+
+        self.passenger_name_contact_result_label = Label(self, 
+            text=passenger_name
+        ).grid(row=i+4, column=0)
+        
+        self.email_contact_result_label = Label(self, 
+            text=email
+        ).grid(row=i+4, column=1)
+        
+        self.phone_contact_result_label = Label(self, 
+            text=phone
+        ).grid(row=i+4, column=2)
+
+        self.label3 = Label(self, 
+            text=""
+        ).grid(row=i+5, column=1)
+
+        self.total_price_label = Label(self, 
+            text="Total price", 
+            font="bold"
+        ).grid(row=i+6, column=0)
+        
+        self.payable_amount_label = Label(self, 
+            text="Payable amount : ", 
+            font="bold"
+        ).grid(row=i+7, column=0)
+
+        total_price = self.booking.price
+        payment = self.booking.payment
+
+        self.payable_amount_result_label = Label(self,
+            text=total_price,
+            font=("bold")   
+        ).grid(row=i+7, column=1)
 
         self.back_button = Button(self,
             text="Back",
             command=self.back
-        ).grid(row=6, column=0)
+        ).grid(row=i+11, column=0)
 
-        if self.booking.payment is None:
+        if payment is None:
             self.paybutton = Button(self,
                 text="pay",
                 command=self.pay
-            ).grid(row=6, column=1)
+            ).grid(row=i+11, column=1)
+
+            self.cancel_booking_button = Button(self,
+                text='Cancel booking',
+                command=...
+            ).grid(row=i+11, column=2)
+        else:
+            self.payment_label = Label(self,
+                text="Payment : ",                           
+            ).grid(row=i+8, column=0)
+
+            self.transaction_id_label = Label(self,
+                text="Transaction ID : ",                           
+            ).grid(row=i+9, column=0)
+
+            self.payment_time_label = Label(self,
+                text="Payment time : ",                           
+            ).grid(row=i+10, column=0)
+
+            self.payment_result_label = Label(self,
+                text=payment.status,  
+            ).grid(row=i+8, column=1)
+
+            self.transaction_id_result_label = Label(self,
+                text=str(payment.transaction_id),                           
+            ).grid(row=i+9, column=1)
+
+            self.payment_time_result_label = Label(self,
+                text=str(payment.payment_time),                           
+            ).grid(row=i+10, column=1)  
