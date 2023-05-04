@@ -8,7 +8,7 @@ for this package:
 for individual submodule in this package:
 - `\UwU> python -m app.<module>`
 """
-from airline import Airline
+from app.airline import Airline
 
 
 if input('new system? (Y/n)') != 'n':
