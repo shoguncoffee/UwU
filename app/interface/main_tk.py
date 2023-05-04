@@ -3,6 +3,7 @@ https://tkdocs.com/tutorial/concepts.html
 http://tkdocs.com/pyref/index.html
 """
 from __future__ import annotations
+from urllib import response
 from .base import *
 
 
@@ -163,7 +164,7 @@ class BookingSection(SubSection):
                 
         if want_select_seat:
             self.open(
-                SelectSeatSection(self, self.root.get_booking(booking_id))
+                SelectSeatSection(self, booking_id)
             ).returned()
         
         self.open(
@@ -274,16 +275,19 @@ class SearchPage(Page):
         
         self.departure_day_spinbox = Combobox(self,
             width=6,
+            state='readonly',
             values=[str(s) for s in range(1, 31)],
         ).grid(row=1, column=3)
 
         self.departure_month_spinbox = Combobox(self,
             width=6,
-            values=[str(s) for s in range(1, 13)],
+            state='readonly',
+            values=['7', '8'],
         ).grid(row=2, column=3,)
         
         self.departure_year_spinbox = Combobox(self,
             width=6,
+            state='readonly',
             values=['2023'],
         ).grid(row=3, column=3,)
 
@@ -430,7 +434,7 @@ class ResultPage(Page):
                     ...
 
 
-class PassengerSection(SubSection):    
+class PassengerSection(SubSection): 
     def __init__(self, master, pax: src.Pax):
         self.pages = [(
             type(f'{FillPassengerPage.__name__}{n}', (FillPassengerPage,), {}), passenger_type
@@ -655,15 +659,15 @@ class ReviewSection(SubSection):
             if paynow:
                 self.peek(PaymentPage(self)).returned()
         else:
-            self.temp_booking()
+            self.cancel_booking()
 
     def pend_booking(self):
         if self.booking.status is BookingStatus.INCOMPLETE:
             requests.put(f'{URL}/account/{self.root.username}/{self.booking.reference}/pend')
 
-    def temp_booking(self):
+    def cancel_booking(self):
         if self.booking.status is BookingStatus.INCOMPLETE:
-            requests.delete(f'{URL}/account/{self.root.username}/{self.booking.reference}/temp')
+            requests.delete(f'{URL}/account/{self.root.username}/{self.booking.reference}/cancel')
 
 
 class SummeryPage(Page):
@@ -974,28 +978,33 @@ class PaymentPage(Page):
 
 
 class SelectSeatSection(SubSection):
-    def __init__(self, master, booking: body.BookingInfoBody):
-        self.booking = booking
+    def __init__(self, master, booking_id: UUID):
+        self.booking_id = booking_id
+        self.booking = self.root.get_booking(booking_id)
         super().__init__(master)
 
     def procedure(self):
-        for segment_index, segment in enumerate(self.booking.segments):
-            for reservation_index, reservation in enumerate(segment):
-                selected_seats: list[str] = []
-                available_seats = self.get_avaliable_seats(reservation.flight, reservation.travel_class)
-                
-                for passenger in self.booking.passengers:
-                    seat = self.peek(
-                        SelectSeatPage(self, passenger, reservation, available_seats)
-                    ).returned()
-                    available_seats.remove(seat)
-                    selected_seats.append(seat)
+        while 1: 
+            segment_index, reservation_index = self.open(
+                SelectSeatMenu(self)
+            ).returned()
+            
+            reservation = self.booking.segments[segment_index][reservation_index]
+            available_seats = self.get_avaliable_seats(reservation)
+            selected_seats: list[str] = []
+            
+            for passenger in self.booking.passengers:
+                seat = self.open(
+                    SelectSeatPage(self, passenger, reservation, available_seats)
+                ).returned()
+                available_seats.remove(seat)
+                selected_seats.append(seat)
 
-                self.selecting(
-                    segment_index, 
-                    reservation_index,
-                    selected_seats
-                )
+            self.selecting(
+                segment_index, 
+                reservation_index,
+                selected_seats
+            )
 
     def selecting(self, 
         segment_index: int,
@@ -1010,17 +1019,68 @@ class SelectSeatSection(SubSection):
             },
         )
         
-    def get_avaliable_seats(self, flight: body.FlightInfoBody, travel_class: TravelClass) -> list[str]:
+    def get_avaliable_seats(self, reservation: body.FlightReservationBody) -> list[str]:
         response = requests.get(f'{URL}/avaliable-seat', params={
-                'date': flight.date.isoformat(),
-                'designator': flight.designator,
-                'travel_class': travel_class,
+                'date': reservation.flight.date.isoformat(),
+                'designator': reservation.flight.designator,
+                'travel_class': reservation.travel_class,
             }
         )
         return response.json()
 
 
+class SelectSeatMenu(Page):
+    master: SelectSeatSection
+
+    def predefine(self):
+        super().predefine()
+        self.booking = self.root.get_booking(self.master.booking_id)
+
+    def select(self, segment_index: int, reservation_index: int):
+        self.indexs = segment_index, reservation_index
+        self.next()
+
+    def returned(self):
+        super().returned()
+        return self.indexs
+    
+    def add_widgets(self):
+        Label(self,
+            text = f'Select seat menu',
+        ).pack(pady=12)
+        
+        for segment_index, segment in enumerate(self.booking.segments):
+            first = segment[0].flight
+            last = segment[-1].flight
+            
+            frame = LabelFrame(self,
+                text = f'{first.origin} -> {last.destination} on {first.date: %d/%m/%Y}',
+                width = 70,
+            ).pack(pady=8)
+            
+            for reservation_index, reservation in enumerate(segment):
+                flight = reservation.flight
+                is_assigned = reservation.is_assigned
+                
+                Label(frame,
+                    text = f'{flight.designator}',
+                ).grid(row=reservation_index, column=0)
+                
+                Label(frame,
+                    text = f'{flight.origin} -> {flight.destination}',
+                ).grid(row=reservation_index, column=1)
+                
+                Button(frame,
+                    command = partial(self.select, segment_index, reservation_index),
+                    text = 'Select' if not is_assigned else 'Selected',
+                    state = DISABLED if is_assigned else NORMAL,
+                ).grid(row=reservation_index, column=2)
+                
+                
+
 class SelectSeatPage(Page):
+    master: SelectSeatSection
+    
     def __init__(self, master, 
         passenger: body.PassengerBody,
         reservation: body.FlightReservationBody,
@@ -1095,7 +1155,7 @@ class ViewBookingSection(SubSection):
     def procedure(self):
         self.all_bookings = self.get_all_bookings()
         
-        selected = self.peek(
+        selected = self.open(
             ViewBookingsPage(self)
         ).returned()
 
@@ -1146,22 +1206,25 @@ class ViewBookingsPage(Page):
         ).pack(side=LEFT)
         
         for booking in self.master.all_bookings:
-            button = LabelFrame(self,
-                text=f'{booking.datetime: %d %b %Y %H:%M}'
+            frame = LabelFrame(self,
+                text = f'{booking.datetime: %d %b %Y %H:%M}',
+                width = 70,
             ).pack(ipadx=5, ipady=5, padx=5, pady=6)
 
-            Button(button, 
+            Button(frame, 
                 text=booking.status.name,
                 width=12,
                 command=partial(self.choose, booking.reference)
-            ).pack(side=LEFT)
+            ).grid(row=0, column=0)
             
-            Label(button, 
+            Label(frame, 
                 text=' '.join(f'{type.name} {number}' for type, number in booking.pax),
                 width=9,
-            ).pack(side=LEFT)            
+            ).grid(row=0, column=1)          
             
-            itinerary = Frame(button).pack(side=RIGHT)
+            itinerary = Frame(frame
+            ).grid(row=0, column=2)
+            
             for n, (origin, destination, departure, arrival) in enumerate(booking.trip):
                 Label(itinerary, 
                     text=f'{origin.code} -> {destination.code}',
@@ -1171,7 +1234,7 @@ class ViewBookingsPage(Page):
                 Label(itinerary, 
                     text=f'{departure: %a, %d %b %Y} - {arrival: %a, %d %b %Y}',
                     width=15,
-                ).grid(row=n, column=35)
+                ).grid(row=n, column=1)
 
 
 class BookingPage(Page):
@@ -1191,7 +1254,10 @@ class BookingPage(Page):
         return self.will_pay
 
     def cancel(self):
-        ...
+        response = requests.delete(
+            f'{URL}/account/{self.root.username}/{self.booking.reference}/cancel'
+        )
+        self.next()
     
     def add_widgets(self):        
         self.label1 = Label(self,
@@ -1359,11 +1425,9 @@ class BookingPage(Page):
             font="bold"
         ).grid(row=i+7, column=0)
 
-        total_price = self.booking.price
-        payment = self.booking.payment
 
         self.payable_amount_result_label = Label(self,
-            text=total_price,
+            text=self.booking.price,
             font=("bold")   
         ).grid(row=i+7, column=1)
 
@@ -1371,7 +1435,9 @@ class BookingPage(Page):
             text="Back",
             command=self.back
         ).grid(row=i+11, column=0)
-
+        
+        payment = self.booking.payment
+        
         if payment is None:
             self.paybutton = Button(self,
                 text="pay",
@@ -1382,6 +1448,7 @@ class BookingPage(Page):
                 text='Cancel booking',
                 command=self.cancel
             ).grid(row=i+11, column=2)
+            
         else:
             self.payment_label = Label(self,
                 text="Payment: ",                           

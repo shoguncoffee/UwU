@@ -66,8 +66,8 @@ async def pending(username: str, booking_id: UUID):
     return system.pending_booking(booking)
 
 
-@router.delete("/{username}/{booking_id}/temp")
-async def temping(username: str, booking_id: UUID):
+@router.delete("/{username}/{booking_id}/cancel")
+async def canceling(username: str, booking_id: UUID):
     customer = system.accounts.get(username)
     booking = customer.get_booking(booking_id)
     
