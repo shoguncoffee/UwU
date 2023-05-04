@@ -173,7 +173,7 @@ class FlightClass:
     def booking_record(self):
         return self.__booking_record
         
-    def get_comfirmed(self):
+    def get_confirmed(self):
         """
             get all confirmed reservations
         """
@@ -186,7 +186,7 @@ class FlightClass:
             get all reserved seats that have be paid (reservation status is confirmed)
         """
         return {
-            selected.seat for reservation in self.get_comfirmed()
+            selected.seat for reservation in self.get_confirmed()
             for selected in reservation.selected if selected.seat
         }
         
@@ -205,7 +205,7 @@ class FlightClass:
         """
         all_seats = self.host.aircraft.get_seats_of(self.travel_class)
         return len(all_seats) - sum(
-            len(reservation.selected) for reservation in self.get_comfirmed()
+            len(reservation.selected) for reservation in self.get_confirmed()
         )
         
     def bookable(self, pax: Pax):
