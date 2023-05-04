@@ -8,10 +8,9 @@ router = APIRouter(
 
 @router.get("/{username}/{booking_id}")
 async def view_booking(username: str, booking_id: UUID):
-    customer = Airline.accounts.get(username)
-    assert isinstance(customer, src.Customer)
-    
+    customer = system.accounts.get(username)    
     booking = customer.get_booking(booking_id)
+    
     return BookingInfoBody.transform(booking)
 
 
@@ -33,15 +32,14 @@ async def select_seat(username: str,
         - list of seat number e.g. ['C12', 'K13']
         - sequence corresponds to index of passenger in booking
     """
-    customer = Airline.accounts.get(username)
-    assert isinstance(customer, src.Customer)
-    
+    customer = system.accounts.get(username)    
     booking = customer.get_booking(booking_id)
+    
     assert len(booking.passengers) == len(selected)
     
     reservation = booking.reservations[segment_index][reservation_index]
     aircraft = reservation.provider.host.aircraft
-    return Airline.select_seats(
+    return system.select_seats(
         reservation, [
             (passenger, aircraft.get_seat(seat_number)) 
             for passenger, seat_number in zip(booking.passengers, selected)
@@ -55,26 +53,23 @@ async def pay(username: str,
     method: PaymentMethod,
     data: dict
 ):
-    customer = Airline.accounts.get(username)
-    assert isinstance(customer, src.Customer)
-
+    customer = system.accounts.get(username)
     booking = customer.get_booking(booking_id)
-    return Airline.pay(booking, method, data)
+    
+    return system.pay(booking, data)
 
 
 @router.put("/{username}/{booking_id}/pend")
 async def pending(username: str, booking_id: UUID):
-    customer = Airline.accounts.get(username)
-    assert isinstance(customer, src.Customer)
-
+    customer = system.accounts.get(username)
     booking = customer.get_booking(booking_id)
-    return Airline.pend(booking)
+    
+    return system.pending_booking(booking)
 
 
 @router.delete("/{username}/{booking_id}/temp")
 async def temping(username: str, booking_id: UUID):
-    customer = Airline.accounts.get(username)
-    assert isinstance(customer, src.Customer)
-
+    customer = system.accounts.get(username)
     booking = customer.get_booking(booking_id)
-    return Airline.temp(booking)
+    
+    return system.cancel_booking(booking)

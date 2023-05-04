@@ -18,10 +18,10 @@ class AccountBody(BaseModel):
     username: str
     email: str
     phone: str
-    status: AccountStatus = AccountStatus.PENDING
+    status: AccountStatus = AccountStatus.INACTIVE
     
     @classmethod
-    def transform(cls, obj: src.Account):
+    def transform(cls, obj: src.Customer):
         return cls(
             username=obj.username,
             email=obj.email,
@@ -30,7 +30,7 @@ class AccountBody(BaseModel):
         )
     
     def convert(self, password: str):
-        return src.Account(
+        return src.Customer(
             self.username,
             password,
             self.email,
@@ -96,8 +96,8 @@ class FlightInfoBody(BaseModel):
         flight = obj.flight
         return cls(
             designator=flight.designator,
-            origin=flight.origin.location_code,
-            destination=flight.destination.location_code,
+            origin=flight.origin.code,
+            destination=flight.destination.code,
             departure=flight.departure,
             arrival=flight.arrival,
             date=obj.date,
@@ -153,7 +153,7 @@ class FlightInstanceBody(BaseModel):
     designator: str
     
     def convert(self):
-        schedule = Airline.schedules.get(self.date)
+        schedule = system.schedules.get(self.date)
         return schedule.get(self.designator)
     
     @classmethod
@@ -239,14 +239,14 @@ class CabinBody(BaseModel):
 
 class AircraftBody(BaseModel):
     model: str
-    desks: list[list[CabinBody]]
+    decks: list[list[CabinBody]]
     
     @classmethod
     def transform(cls, obj: src.Aircraft):
         return cls(
             model=obj.model,
-            desks=[
-                CabinBody.transforms(desk) for desk in obj.desks
+            decks=[
+                CabinBody.transforms(deck) for deck in obj.decks
             ]
         )
 
@@ -259,7 +259,7 @@ class AirportBody(BaseModel):
     @classmethod
     def transform(cls, obj: src.Airport):
         return cls(
-            code=obj.location_code,
+            code=obj.code,
             name=obj.name,
             country=obj.country,
         )
@@ -295,7 +295,7 @@ class PaymentBody(BaseModel):
     
     @classmethod
     def transform(cls, obj: Optional[src.Payment]):
-        if obj:
+        if obj is not None:
             return cls(
                 transaction_id=obj.transaction_id,
                 payment_time=obj.datetime,
@@ -335,7 +335,7 @@ class BookingBody(BaseModel):
             reference=obj.reference,
             datetime=obj.datetime,
             status=obj.status,
-            pax=list(obj.pax),
+            pax=list(obj.get_pax()),
             trip=trip
         )
 

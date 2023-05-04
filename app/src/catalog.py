@@ -7,7 +7,7 @@ from app.utils import search
 from . import *
 
 
-class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
+class FlightScheduling(list[FlightPlan]):
     """
     #### A tools to manage and organize flight in advance
         - keep continuity for the flight-booking system
@@ -25,14 +25,14 @@ class FlightScheduling(list[FlightPlan]): # may be dict[Flight, [Interval]]?
         self.update()
     
     def update(self, *plans: FlightPlan):
-        from app.system import Airline
+        from app.__main__ import system
         
         for date in daterange(self.advance_days):
             try:
-                schedule = Airline.schedules.get(date)
+                schedule = system.schedules.get(date)
             except KeyError:
                 schedule = ScheduleDate(date)
-                Airline.schedules.append(schedule)
+                system.schedules.append(schedule)
             
             for plan in self.on_date(date, plans):
                 schedule.append(
@@ -175,7 +175,7 @@ class AirportCatalog(list[Airport]):
         if isinstance(key, str):
             key = key.upper()
             for airport in self:
-                if airport.location_code == key:
+                if airport.code == key:
                     return True
 
         elif isinstance(key, Airport):
@@ -183,7 +183,7 @@ class AirportCatalog(list[Airport]):
                 return True
             
             for airport in self:
-                if airport.location_code == key.location_code:
+                if airport.code == key.code:
                     return True
         
         return False
@@ -199,7 +199,7 @@ class AirportCatalog(list[Airport]):
     def get(self, key: str):
         key = key.upper()
         for airport in self:
-            if airport.location_code == key:
+            if airport.code == key:
                 return airport
             
         raise KeyError
@@ -246,14 +246,14 @@ class AircraftCatalog(list[Aircraft]):
     #             self.add(Aircraft(*arg))
     
     
-class AccountCatalog(list[Account]):
-    def __contains__(self, key: str | Account):
+class AccountCatalog(list[Customer]):
+    def __contains__(self, key: str | Customer):
         if isinstance(key, str):
             for account in self:
                 if account.username == key or account.email == key:
                     return True
                                 
-        elif isinstance(key, Account):
+        elif isinstance(key, Customer):
             if super().__contains__(key):
                 return True
             

@@ -5,19 +5,15 @@ if TYPE_CHECKING:
     from . import Booking, FlightClass, Passenger, Seat
 
 
-@dataclass(slots=True)
 class FlightReservation:
-    __holder: Booking # type: ignore
-    __provider: FlightClass # type: ignore
-    
-    __selected: tuple[SeatReservation, ...] = field(init=False)
-    __is_assigned: bool = field(init=False, default=False)
-
-    def __post_init__(self):
+    def __init__(self, holder: Booking, provider: FlightClass):
+        self.__holder = holder
+        self.__provider = provider
         self.__selected = tuple(
             SeatReservation(passenger) 
-            for passenger in self.holder.passengers
+            for passenger in holder.passengers
         )
+        self.__is_assigned = False
     
     @property
     def holder(self):

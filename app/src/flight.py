@@ -4,7 +4,6 @@ from app.base import *
 from dataclasses import InitVar
 if TYPE_CHECKING:
     from . import Aircraft, Airport, Pax, FlightReservation, Fare
-    from app.type_alias import fares_param
 
 
 @dataclass(slots=True)
@@ -64,12 +63,12 @@ class FlightInstance:
     __date: dt.date # type: ignore
     __flight: Flight # type: ignore
     __aircraft: Aircraft # type: ignore
-    fares: InitVar[fares_param]
+    fares: InitVar[Sequence[tuple[TravelClass, Fare]]]
     
     __components: tuple[FlightClass, ...] = field(init=False)
     __status: FlightStatus = field(init=False, default=FlightStatus.SCHEDULED)
     
-    def __post_init__(self, fares: fares_param):
+    def __post_init__(self, fares: Sequence[tuple[TravelClass, Fare]]):
         self.__components = tuple(
             FlightClass(self, travel_class, fare) 
             for travel_class, fare in fares
@@ -214,6 +213,7 @@ class FlightClass:
 
     def booked(self, reservation: FlightReservation):
         self.booking_record.append(reservation)
+
     
 """
 ถ้าครอบครัวประกอบไปด้วยคนแต่ละคน

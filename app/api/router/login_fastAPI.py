@@ -7,8 +7,8 @@ router = APIRouter(
         
 @router.post("/login")
 def login_account(username: str, password: str):
-    if username in Airline.accounts:
-        if Airline.login(username, password):
+    if username in system.accounts:
+        if system.login(username, password):
             return {"message": "Login successful!"}
         else:
             raise HTTPException(status_code=401, detail="Incorrect username or password")

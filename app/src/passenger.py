@@ -2,7 +2,7 @@ from __future__ import annotations
 from app.base import *
 
 
-@dataclass(slots=True, unsafe_hash=True)
+@dataclass(unsafe_hash=True)
 class Passenger:
     __forename: str # type: ignore
     __surname: str # type: ignore
@@ -44,11 +44,8 @@ class Passenger:
     def fullname(self):
         return f'{self.forename} {self.surname}'
 
-    def change_forename(self, name: str):
-        self.__forename = name
 
-
-@dataclass(slots=True)
+@dataclass
 class ContactInformation:
     __passenger: Passenger # type: ignore
     __phone: str # type: ignore
@@ -76,11 +73,10 @@ class Pax(tuple[tuple[PassengerType, int], ...]):
     ### number of passengers for each type
         `tuple` of 
         (<PassengerType>, <int>) `->` "type of passenger", "number of passengers"
-    
-    ### example:
-        >>> ...
-        
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    
     def __len__(self):
         """
         total number of all passengers, including infants
@@ -111,7 +107,7 @@ class Pax(tuple[tuple[PassengerType, int], ...]):
         )
     
     @classmethod
-    def init(cls, passengers: Iterable[Passenger]):
+    def count(cls, passengers: Iterable[Passenger]):
         """
         initialize Pax from a group of Passenger
         """

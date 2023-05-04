@@ -7,7 +7,7 @@ from geopy.distance import great_circle
 @dataclass(slots=True, frozen=True)
 class Airport:
     __name: str # type: ignore
-    __location_code: str # type: ignore
+    __code: str # type: ignore
     __country: str # type: ignore
     __coordinates: tuple[float, float] # type: ignore
     
@@ -16,8 +16,8 @@ class Airport:
         return self.__name
     
     @property
-    def location_code(self):
-        return self.__location_code
+    def code(self):
+        return self.__code
 
     @property
     def country(self):

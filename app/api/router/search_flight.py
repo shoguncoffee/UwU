@@ -25,7 +25,7 @@ async def route_parameters(
     destination: Annotated[str, Query(max_length=3)]
 ):
     return [
-        Airline.airports.get(code) 
+        system.airports.get(code) 
         for code in (origin, destination)
     ]
 
@@ -54,7 +54,7 @@ async def one_way_flight(
     - `infant`: `int`
         - passenger number for each type
     """
-    results = Airline.search_journey(
+    results = system.search_journey(
         *route, date, pax
     )
     return [

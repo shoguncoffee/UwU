@@ -31,14 +31,10 @@ async def get_avaliable_seat(
     designator: str,
     travel_class: TravelClass,
 ):
-    schedule = Airline.schedules.get(date)
+    schedule = system.schedules.get(date)
     flight_instance = schedule.get(designator)
     remaining = flight_instance.get_class(travel_class).get_remain_seats()
     
     return [
          seat.number for seat in remaining
     ]
-
-
-from app.system import Airline
-Airline.load()

@@ -9,8 +9,8 @@ router = APIRouter(
  
 @router.get("/{username}/my-account")
 async def get_account(username: str):
-    if username in Airline.accounts:
-        account = Airline.accounts.get(username)
+    if username in system.accounts:
+        account = system.accounts.get(username)
         return AccountBody.transform(account)
     else:
         raise HTTPException(status_code=404, detail="Account not found")
@@ -18,9 +18,9 @@ async def get_account(username: str):
 
 @router.get("/{username}/my-bookings")
 async def get_bookings(username: str):
-    if username in Airline.accounts:
-        customer = Airline.accounts.get(username)
-        assert isinstance(customer, src.Customer)
+    if username in system.accounts:
+        customer = system.accounts.get(username)
+        
         return [
             BookingBody.transform(booking) for booking in customer.bookings
         ]
@@ -39,11 +39,10 @@ async def book(username: str,
     - `contact`: `ContactInfoBody`
         - contact information
     """
-    customer = Airline.accounts.get(username)
-    assert isinstance(customer, src.Customer)
-    
+    customer = system.accounts.get(username)    
     journey, contact, passengers = data.convert()
-    return Airline.create_booking(customer,
+    
+    return system.create_booking(customer,
         contact,
         passengers,
         journey,

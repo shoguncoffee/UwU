@@ -3,10 +3,6 @@ https://tkdocs.com/tutorial/concepts.html
 http://tkdocs.com/pyref/index.html
 """
 from __future__ import annotations
-from cProfile import label
-from tkinter import Grid
-
-from app.src import booking
 from .base import *
 
 
@@ -74,16 +70,19 @@ class LoginPage(StaticPage):
         self.submit_button = Button(self, 
             command=self.submit, 
             text="Login",
+            width=10,
         ).pack()
         
         self.register_button = Button(self, 
             command=partial(self.jump, RegisterPage), 
             text="Register",
+            width=10,
         ).pack()
         
         self.back_button = Button(self, 
             command=partial(self.jump, MenuPage), 
             text="Back",
+            width=10,
         ).pack()
         
         self.response_label = Label(self, 
@@ -990,7 +989,6 @@ class SelectSeatSection(SubSection):
                     seat = self.peek(
                         SelectSeatPage(self, passenger, reservation, available_seats)
                     ).returned()
-                    print(seat)
                     available_seats.remove(seat)
                     selected_seats.append(seat)
 
@@ -1049,7 +1047,7 @@ class SelectSeatPage(Page):
         model = flight.aircraft_model
         aircraft = self.root.aircraft[model]
         cabin_no, cabin = next(
-            (n, cabin) for n, cabin in enumerate(aircraft.desks[0])
+            (n, cabin) for n, cabin in enumerate(aircraft.decks[0])
             if cabin.travel_class == travel_class
         )
         
@@ -1112,7 +1110,8 @@ class ViewBookingSection(SubSection):
                 self.peek(
                     ReviewSection(self, booking)
                 )
-            
+        self.jump(MenuPage)
+        
     def get_all_bookings(self):
         response = requests.get(f'{url}/account/{self.root.username}/my-bookings')
         return [
@@ -1141,35 +1140,39 @@ class ViewBookingsPage(Page):
         self.label1 = Label(top_frame,
             text="View Booking"                   
         ).grid(row=0, column=0)
-
+        
+        Button(top_frame,
+            text='back',
+            command=self.next
+        ).pack(side=LEFT)
+        
         for booking in self.master.all_bookings:
             button = LabelFrame(self,
                 text=f'{booking.datetime: %d %b %Y %H:%M}'
-            ).pack()
-            
-            Button(
-                text='back',
-                command=self.next
-            ).pack(side=LEFT)
+            ).pack(ipadx=5, ipady=5, padx=5, pady=6)
 
             Button(button, 
                 text=booking.status.name,
+                width=12,
                 command=partial(self.choose, booking.reference)
             ).pack(side=LEFT)
             
             Label(button, 
-                text=' '.join(f'{type.name} {number}' for type, number in booking.pax)
+                text=' '.join(f'{type.name} {number}' for type, number in booking.pax),
+                width=9,
             ).pack(side=LEFT)            
             
             itinerary = Frame(button).pack(side=RIGHT)
             for n, (origin, destination, departure, arrival) in enumerate(booking.trip):
                 Label(itinerary, 
-                    text=f'{origin.code} -> {destination.code}'
+                    text=f'{origin.code} -> {destination.code}',
+                    width=15,
                 ).grid(row=n, column=0)
                 
                 Label(itinerary, 
-                    text=f'{departure: %a, %d %b %Y} - {arrival: %a, %d %b %Y}'
-                ).grid(row=n, column=1)
+                    text=f'{departure: %a, %d %b %Y} - {arrival: %a, %d %b %Y}',
+                    width=15,
+                ).grid(row=n, column=35)
 
 
 class BookingPage(Page):

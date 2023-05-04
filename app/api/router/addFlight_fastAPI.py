@@ -12,9 +12,9 @@ async def get_flights():
             "designator": flight.designator,
             "departure": flight.departure,
             "arrival": flight.arrival,
-            "origin": flight.origin.location_code,
-            "destination": flight.destination.location_code,
-        } for flight in Airline.flights
+            "origin": flight.origin.code,
+            "destination": flight.destination.code,
+        } for flight in system.flights
     ]
 
 @router.post("/add_flight")
@@ -29,8 +29,8 @@ async def create_flight(
         designator,
         departure,
         arrival,
-        Airline.airports.get(origin),
-        Airline.airports.get(destination),
+        system.airports.get(origin),
+        system.airports.get(destination),
     )
-    Airline.flights.append(flight1)
+    system.flights.append(flight1)
     return {"Data": "create new flight successful."}

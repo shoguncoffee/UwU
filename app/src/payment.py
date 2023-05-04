@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from . import Booking
 
 
-class Payment(ABC):
+class Payment:
     def __init__(self, 
         total_price: int,
         transaction_id: Optional[UUID] = None,
@@ -36,35 +36,9 @@ class Payment(ABC):
 
     @classmethod
     def pay(cls, booking: Booking, **data):
-        if cls.send_api(**data):
+        if True:
             return cls(booking.get_price())
     
     @classmethod
-    @abstractmethod
     def send_api(self, **data): 
         """send api to payment provider"""
-
-
-class CreditCardPayment(Payment):
-    @classmethod
-    def send_api(self, **data): ...
-
-
-class InternetBankingPayment(Payment):
-    @classmethod
-    def send_api(self, **data): ...
-
-
-class PaypalPayment(Payment):
-    @classmethod
-    def send_api(self, **data): ...
-        
-
-payment_map: dict[PaymentMethod, Type[Payment]] = {
-    PaymentMethod.CREDIT_CARD: 
-        CreditCardPayment,
-    PaymentMethod.INTERNET_BANKING: 
-        InternetBankingPayment,
-    PaymentMethod.PAYPAL: 
-        PaypalPayment,
-}

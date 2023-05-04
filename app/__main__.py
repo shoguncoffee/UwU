@@ -8,34 +8,91 @@ for this package:
 for individual submodule in this package:
 - `\UwU> python -m app.<module>`
 """
-from app.system import *
-from multiprocessing import Process
-import uvicorn
+from airline import Airline
 
-if 0:
-    def run_server():
-        Airline.load()            
-        uvicorn.run('app.api:web', 
-            host='UWU', port=8000,
-            reload=True,
-        )
-        
-        
-    def run_interface():
-        import app.interface
+
+if input('new system? (Y/n)') != 'n':
+    system = Airline('UwU Airline', 'UW')
     
+    from app.utils.spawn import *
+
+    add_airports(system)
+    add_aircrafts(system)
+    add_flights(system)
+    add_flight_plans(system)
+    add_accounts(system)    
+
+
+    ### test flight seaching
+    # print_results(search('sin', 'doh'))
+    # print_results(search('LHR', 'cai'))
+    # print_results(search('sfo', 'sin'))
+    # print_results(search('zrh', 'icn'))
+    # print_results(search('zrh', 'bkk'))
+    # print_results(search('bkk', 'icn'))
+    # print_results(search('bkk', 'vie'))
+
+
+    ### example of booking
     
-    if __name__ == '__main__':
-        for func in run_server, run_interface:
-            Process(target=func).start()
+    results = search(system, 'bkk', 'icn')
+    
+    plum = system.accounts.get('Plum123')
+    
+    passenger1 = Passenger(
+        'Plum', 'Arpleum',
+        dt.date(1999, 1, 1),
+        'Thai', '254123543',
+        GenderType.MALE,
+        PassengerType.ADULT,
+    )
+    contact1 = ContactInformation(
+        passenger1, 
+        '0812345678', 
+        '516516@kmitl.com'
+    )
+    
+    # user choice first result with economy class
+    choosen_itinerary = results[0], TravelClass.ECONOMY
 
-Process(
-    target=uvicorn.run, 
-    args=('app.api:web',),
-    kwargs={'reload': True}
-).start()
+    # create booking
+    booking_id = system.create_booking(
+        plum, contact1, [passenger1], [choosen_itinerary], 
+    )
 
-Process(
-    target=__import__, 
-    args=('app.interface',)
-).start()
+    # check booking is created; if can't create booking it will return None
+    assert booking_id is not None
+
+    # get booking instance from booking reference (id)
+    booking = plum.get_booking(booking_id)
+
+    # confirm pending, change status from incomplete to pending
+    system.pending_booking(booking)
+
+    # pick reservation of first flight in this booking
+    reservation = booking.all_reservations[0]
+
+    # get flightclass of that reservation
+    flightclass = reservation.provider
+
+    # get all remaining seats of that flightclass
+    seats = flightclass.get_remain_seats()
+
+    # pick first available seat
+    seat1 = next(iter(seats))
+
+    # choose seat and passenger
+    choosen_seat = passenger1, seat1
+    
+    # select seat for this reservation
+    system.select_seats(
+        reservation, [choosen_seat]
+    )
+
+
+else:
+    # เฉพาะกรณีต้องการโหลดข้อมูลจากไฟล์
+    import pickle
+    
+    with open('data/system.pkl', 'rb') as f:
+        system: Airline = pickle.load(f)

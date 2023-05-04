@@ -4,8 +4,7 @@ from __future__ import annotations
 from app.base import *
 
 if TYPE_CHECKING:
-    from . import Aircraft, Flight
-    from app.type_alias import fares_param
+    from . import Aircraft, Flight, Fare
     
     
 @dataclass(slots=True)
@@ -54,12 +53,10 @@ class FlightPlan:
     """
     __flight: Flight # type: ignore
     __start: dt.date # type: ignore
+    __default_aircraft: Aircraft # type: ignore
+    __default_fares: Sequence[tuple[TravelClass, Fare]] # type: ignore
     __end: dt.date = dt.date.max # type: ignore
-    __exception: Deviation = field(default_factory=Deviation) # type: ignore
-    
-    _: KW_ONLY
-    default_aircraft: Aircraft
-    default_fares: fares_param 
+    __exception: Deviation = field(default_factory=Deviation) # type: ignore    
     
     def __contains__(self, value: dt.date | Self):
         """
@@ -86,6 +83,14 @@ class FlightPlan:
                     return True
                 
             return False
+
+    @property
+    def default_aircraft(self):
+        return self.__default_aircraft
+
+    @property
+    def default_fares(self):
+        return self.__default_fares
     
     @property
     def flight(self):
