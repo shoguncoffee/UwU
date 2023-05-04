@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from . import Pax
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True)
 class Fare:
     __passenger_fare: list[tuple[PassengerType, int]] # type: ignore
     __seat_fare: list[tuple[SeatType, int]] # type: ignore

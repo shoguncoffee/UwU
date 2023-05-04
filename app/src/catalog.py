@@ -7,7 +7,7 @@ class FlightScheduling:
     """
         A tools to manage and organize flight in advance
     """
-    def __init__(self, advance_days: int = 365):
+    def __init__(self, advance_days: int = 150):
         self.__plans: list[FlightPlan] = []
         self.set_advance_days(advance_days)
     
@@ -61,7 +61,7 @@ class ScheduleDate:
         self.__date = date
 
     def __iter__(self):
-        return iter(self.__flight_instances)
+        yield from self.__flight_instances
     
     def __contains__(self, key: str | FlightInstance):
         if isinstance(key, FlightInstance):

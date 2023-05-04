@@ -318,7 +318,6 @@ class PaymentBody(BaseModel):
     transaction_id: UUID
     payment_time: dt.datetime
     total_price: int
-    status: PaymentStatus
     
     @classmethod
     def transform(cls, obj: Optional[src.Payment]):
@@ -327,7 +326,6 @@ class PaymentBody(BaseModel):
                 transaction_id=obj.transaction_id,
                 payment_time=obj.datetime,
                 total_price=obj.total_price,
-                status=obj.status,
             )
     
     

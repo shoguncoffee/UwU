@@ -9,7 +9,7 @@ class SearchHelper:
         target: Airport,
         date: dt.date,
         pool: Collection[FlightInstance],
-        multiplier: float = 2,
+        multiplier: float = 1.55,
         limit_transit: dt.timedelta = dt.timedelta(hours=24),
     ):
         self.pool = pool
