@@ -1,4 +1,6 @@
-from app.system import *
+from app.base import *
+from app.src import *
+from string import ascii_uppercase
 
 
 class SearchHelper:
@@ -18,10 +20,7 @@ class SearchHelper:
         condition = lambda i: i.flight.origin is start and i.date == date
         self.leadings = filter(condition, pool)
 
-    def __iter__(self):
-        return self.yielder()
-
-    def yielder(self): 
+    def result(self): 
         for first in self.leadings:
             if first.flight.destination is self.target:
                 yield FlightItinerary([first])
@@ -36,8 +35,6 @@ class SearchHelper:
         that can take from origin to destination in limit duration
             - path: `tuple[FlightInstance, ...]`
                 - len(path) > 1
-            - limit: `datetime.timedelta`
-                - maximum flight time of the path
         """
         limit_flight_time = self.limit_duration - FlightItinerary.flight_time(path)
         prev = path[-1]
@@ -65,7 +62,7 @@ def approx_time(
     common: dt.timedelta = dt.timedelta(minutes=5)
 ):
     """
-    ...
+    approximate flight time between two airports
         - speed: `float`
             - average speed in km/h
     """
@@ -77,12 +74,12 @@ def approx_time(
 
 
 def generate_flight(
-    number: int,
+    designator: str,
     origin: Airport,
     destination: Airport,
 ):
     """
-        randomize flight time
+        randomize flight departure time and calculate arrival time
     """
     time = dt.timedelta(
         hours=randrange(24), 
@@ -90,43 +87,102 @@ def generate_flight(
     )
     departure = dt.datetime.min + time
     arrival = departure + approx_time(origin, destination)
-    
-    return Flight(
-        f'{Airline.designator}{number}',
+
+    flight = Flight(
+        designator,
         departure.time(), arrival.time(),
         origin, destination,
     )
+    return flight
 
 
 def P2P_flights(
     airports: Iterable[Airport], 
-    numbers: Iterator[int],
+    designators: Iterator[str],
     times: int = 1,
 ):
     """
     ### Point-to-point
-    
-        https://en.wikipedia.org/wiki/Point-to-point_transit
+        - https://en.wikipedia.org/wiki/Point-to-point_transit
     """
-    for route in combinations(airports, 2):
+    for origin, destination in combinations(airports, 2):
         for _ in range(times):
-            yield generate_flight(next(numbers), *route)
-            yield generate_flight(next(numbers), *reversed(route))
+            yield generate_flight(next(designators), origin, destination)
+            yield generate_flight(next(designators), destination, origin)
             
 
 def hub_flights(
+    airports: Iterable[Airport],
     hub: Airport, 
-    numbers: Iterator[int],
+    designators: Iterator[str],
     times: int = 1,
 ):
     """
     ### Spoke-Hub
-    
-        https://en.wikipedia.org/wiki/Airline_hub
-        https://en.wikipedia.org/wiki/Spoke%E2%80%93hub_distribution_paradigm  
+        - https://en.wikipedia.org/wiki/Airline_hub
+        - https://en.wikipedia.org/wiki/Spoke%E2%80%93hub_distribution_paradigm  
     """
-    for destination in Airline.airports:
+    for destination in airports:
         if destination is not hub:
             for _ in range(times):
-                yield generate_flight(next(numbers), hub, destination)
-                yield generate_flight(next(numbers), destination, hub)
+                yield generate_flight(next(designators), hub, destination)
+                yield generate_flight(next(designators), destination, hub)
+
+
+def generate_cabin(
+    travel_class: TravelClass,
+    initial_row: int,
+    layouts: Sequence[Sequence[int]],
+):
+    """
+    generate a `Cabin`, for using in spawn.py
+    """
+    seats: list[Seat] = []
+    relative_row = 0
+    
+    for lenght, *config in layouts:
+        width = sum(config)
+        gaps = len(config) - 1
+        aisle_columns = {
+            sum(config[:column+1]) - i
+            for column, i in product(range(gaps), range(2)) 
+        }
+        for row, column in product(range(lenght), range(width)):
+            conditions = {
+                SeatType.AISLE: column in aisle_columns,
+                SeatType.WINDOW: column in (0, width-1),
+                SeatType.LEGROOM: relative_row + row == 0,
+            }
+            type = reduce(
+                operator.or_, 
+                compress(conditions, conditions.values()), 
+                SeatType(0)
+            )
+            absolute_row = initial_row + relative_row + row
+            seat_number = f'{ascii_uppercase[column]}{1 + absolute_row}'
+            
+            seat = Seat(absolute_row, column, seat_number, type)
+            seats.append(seat)
+            
+        relative_row += lenght
+        
+    return Cabin(travel_class, seats)
+
+
+def generate_deck(
+    cabin_layout: Iterable[tuple[
+        TravelClass, Sequence[Sequence[int]]
+    ]]
+):
+    """
+    generate a `Deck`, for use in spawn.py
+    """
+    cabins = []
+    row = 0
+    for travel_class, layout in cabin_layout:
+        cabin = generate_cabin(travel_class, row, layout)
+        
+        cabins.append(cabin)
+        row += sum(lenght for lenght, *_ in layout) 
+
+    return Deck(cabins)

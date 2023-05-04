@@ -6,7 +6,7 @@ https://fastapi.tiangolo.com/sq/tutorial/path-params/#working-with-python-enumer
 function-call syntax
 first argument must match the name
 """
-from enum import IntEnum, Flag, StrEnum
+from enum import IntEnum, IntFlag, StrEnum
 
 
 FlightStatus = IntEnum(
@@ -34,7 +34,6 @@ TravelClass = IntEnum(
 )
 AccountStatus = IntEnum(
     'AccountStatus', (
-        'PENDING', 
         'ACTIVE', 
         'SUSPENDED', 
         'INACTIVE',
@@ -42,14 +41,14 @@ AccountStatus = IntEnum(
 )
 BookingStatus = IntEnum(
     'BookingStatus', (
-        'FAILED', 
         'INCOMPLETE', 
+        'FAILED', 
         'PENDING', 
-        'COMPLETED', 
         'CANCELLED',
+        'COMPLETED', 
     )
 )
-SeatType = Flag(
+SeatType = IntFlag(
     'SeatType', (
         'COMMON', 
         'AISLE', 

@@ -49,7 +49,7 @@ class Root(Section, tk.Tk):
 
     def get_booking(self, id: UUID):
         response = requests.get(f'{url}/account/{self.username}/{id}')
-        print(response.json())
+        print(response.text)
         return body.BookingInfoBody(**response.json())
         
 sleep(3.5)

@@ -32,7 +32,7 @@ class Fare:
             return 0
         
         for type, price in self.__seat_fare:
-            if type is seat_type:
+            if type is max(seat_type):
                 return price
             
         raise KeyError

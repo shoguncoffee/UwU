@@ -1,32 +1,30 @@
 from __future__ import annotations
 from app.base import *
 
-from dataclasses import InitVar
 from .reservation import FlightReservation
 from .passenger import Pax
 if TYPE_CHECKING:
-    from . import Customer, ContactInformation, Passenger, Payment
-    from app.type_alias import journey_param
+    from . import Customer, ContactInformation, Passenger, Payment, FlightItinerary
 
 
-@dataclass(slots=True)
 class Booking:
-    __creator: Customer # type: ignore
-    __contact: ContactInformation # type: ignore
-    __passengers: tuple[Passenger, ...] # type: ignore
-    journey: InitVar[journey_param]
-    
-    __reservations: tuple[tuple[FlightReservation, ...], ...] = field(init=False)
-    __payment: Optional[Payment] = field(init=False, default=None)
-    __datetime: dt.datetime = field(init=False, default_factory=dt.datetime.now)
-    __status: BookingStatus = field(init=False, default=BookingStatus.INCOMPLETE)
-    __reference: UUID = field(init=False, default_factory=uuid4) #!
+    def __init__(self, 
+        creator: Customer,
+        contact: ContactInformation,
+        passengers: Sequence[Passenger],
+        journey: Sequence[tuple[FlightItinerary, TravelClass]],
+    ):
+        self.__reference = uuid4()
+        self.__datetime = dt.datetime.now()
+        self.__status = BookingStatus.INCOMPLETE
+        self.__payment: Optional[Payment] = None
 
-    def __post_init__(self, journey: journey_param):
+        self.__creator = creator
+        self.__contact = contact
+        self.__passengers = tuple(passengers)
         self.__reservations = tuple(
             tuple(
-                FlightReservation(self, instance.get_class(travel_class)) 
-                for instance in itinerary
+                FlightReservation(self, instance.get_class(travel_class)) for instance in itinerary
             ) for itinerary, travel_class in journey 
         )
     
@@ -44,8 +42,10 @@ class Booking:
     
     @property
     def all_reservations(self):
-        for segment in self.reservations:
-            yield from segment
+        return [
+            reservation for segment in self.reservations 
+            for reservation in segment
+        ]
     
     @property
     def passengers(self):
@@ -71,9 +71,9 @@ class Booking:
     def creation_time(self):
         return self.__datetime
     
-    @property
-    def pax(self):
-        return Pax.init(self.passengers)
+    def get_pax(self):
+        pax = Pax.count(self.passengers)
+        return pax
 
     def update_payment(self, payment: Payment):
         self.__payment = payment
@@ -84,7 +84,7 @@ class Booking:
         
     def pending(self):
         self.__status = BookingStatus.PENDING        
-        
+
     def get_price(self):
         prices: list[int] = []
         for reservation in self.all_reservations:

@@ -2,6 +2,8 @@ from .airport import Airport
 from .itinerary import FlightItinerary
 from .fare import Fare
 from .booking import Booking
+from .account import Customer
+from .payment import Payment
 from .schedule import (
     FlightPlan, 
     Deviation,
@@ -9,11 +11,6 @@ from .schedule import (
 from .reservation import (
     SeatReservation, 
     FlightReservation,
-)
-from .account import (
-    Account, 
-    Customer, 
-    Admin,
 )
 from .passenger import (
     Passenger, 
@@ -27,16 +24,9 @@ from .flight import (
 )
 from .aircraft import (
     Aircraft, 
-    Desk, 
+    Deck, 
     Cabin, 
     Seat,
-)
-from .payment import (
-    Payment, 
-    CreditCardPayment, 
-    InternetBankingPayment, 
-    PaypalPayment,
-    payment_map,
 )
 from .catalog import (
     AccountCatalog,

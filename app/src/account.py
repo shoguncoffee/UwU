@@ -3,45 +3,36 @@ from app.base import *
 
 if TYPE_CHECKING:
     from . import Booking
-    
 
-@dataclass(slots=True)
-class Account:
-    _username: str
-    _password: str
-    _email: str
-    _phone: str
-    _status: AccountStatus = field(init=False, default=AccountStatus.PENDING)
-    # _reference: str = field(init=False)
-    
+
+@dataclass
+class Customer:
+    __username: str # type: ignore
+    __password: str # type: ignore
+    __email: str # type: ignore
+    __phone: str # type: ignore
+    __status: AccountStatus = field(init=False, default=AccountStatus.INACTIVE)
+    __bookings: list[Booking] = field(init=False, default_factory=list)
+
     @property
     def username(self):
-        return self._username
+        return self.__username
     
     @property
     def email(self):
-        return self._email
+        return self.__email
     
     @property
     def phone(self):
-        return self._phone
+        return self.__phone
     
     @property
     def status(self):
-        return self._status
+        return self.__status
 
     @property
-    def hash_password(self):
-        return hash(self._password)
-
-@dataclass(slots=True)
-class Admin(Account):
-    ...
-
-
-@dataclass(slots=True)
-class Customer(Account):
-    __bookings: list[Booking] = field(init=False, default_factory=list)
+    def password(self):
+        return self.__password
     
     @property
     def bookings(self):
