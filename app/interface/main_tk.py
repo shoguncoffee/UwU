@@ -978,8 +978,8 @@ class PaymentPage(Page):
 class SelectSeatSection(SubSection):
     def __init__(self, master, booking_id: UUID):
         self.booking_id = booking_id
-        self.booking = self.root.get_booking(booking_id)
         super().__init__(master)
+        self.booking = self.root.get_booking(booking_id)
 
     def procedure(self):
         while 1: 
@@ -1053,7 +1053,7 @@ class SelectSeatMenu(Page):
             
             frame = LabelFrame(self,
                 text = f'{first.origin} -> {last.destination} on {first.date: %d/%m/%Y}',
-                width = 70,
+                width = 100,
             ).pack(pady=8)
             
             for reservation_index, reservation in enumerate(segment):
@@ -1144,7 +1144,7 @@ class SelectSeatPage(Page):
 
         self.confirm_button = Button(
             self.confirm_frame,
-            text='Confirm selection',
+            text='Next',
             command=self.select
         ).grid(row=2, column=1)
                 
