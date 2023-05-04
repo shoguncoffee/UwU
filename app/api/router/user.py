@@ -12,7 +12,7 @@ async def get_account(username: str):
         account = system.accounts.get(username)
         return AccountBody.transform(account)
     else:
-        raise HTTPException(status_code=404, detail="Account not found")
+        raise HTTPException(404, "Account not found")
 
 
 @router.get("/{username}/my-bookings")
@@ -24,7 +24,7 @@ async def get_bookings(username: str):
             BookingBody.transform(booking) for booking in customer.bookings
         ]
     else:
-        raise HTTPException(status_code=404, detail="Account not found")
+        raise HTTPException(404, "Account not found")
 
 
 @router.post("/{username}/book")

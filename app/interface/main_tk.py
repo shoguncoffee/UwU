@@ -39,7 +39,7 @@ class LoginPage(StaticPage):
 
     def submit(self):
         username = self.username_entry.get()
-        response = requests.post(url + API_EndPoint2, params={
+        response = requests.post(URL + API_EndPoint2, params={
             "username": username, 
             "password": self.password_entry.get()
         })
@@ -94,7 +94,7 @@ class RegisterPage(StaticPage):
     master: Root
 
     def submit(self):
-        response = requests.post(url + API_EndPoint1, params={
+        response = requests.post(URL + API_EndPoint1, params={
             "username": self.username_entry.get(), 
             "password": self.password_entry.get(), 
             "email": self.email_entry.get(), 
@@ -185,7 +185,7 @@ class BookingSection(SubSection):
             ],
         )
         response = requests.post(
-            f'{url}/account/{self.root.username}/book', 
+            f'{URL}/account/{self.root.username}/book', 
             prebooking.json()
         )
         return UUID(response.json())
@@ -225,7 +225,7 @@ class SearchPage(Page):
             for passenger_type, spinbox in self.pax_spinbox.items()
         }.items())
         
-        response = requests.get(url + API_Endpoint3, params={
+        response = requests.get(URL + API_Endpoint3, params={
             "origin": self.origin_entry.get(),
             "destination": self.destination_entry.get(),
             "date": f'{departure_year}-{departure_month}-{departure_day}',
@@ -659,11 +659,11 @@ class ReviewSection(SubSection):
 
     def pend_booking(self):
         if self.booking.status is BookingStatus.INCOMPLETE:
-            requests.put(f'{url}/account/{self.root.username}/{self.booking.reference}/pend')
+            requests.put(f'{URL}/account/{self.root.username}/{self.booking.reference}/pend')
 
     def temp_booking(self):
         if self.booking.status is BookingStatus.INCOMPLETE:
-            requests.delete(f'{url}/account/{self.root.username}/{self.booking.reference}/temp')
+            requests.delete(f'{URL}/account/{self.root.username}/{self.booking.reference}/temp')
 
 
 class SummeryPage(Page):
@@ -897,7 +897,7 @@ class PaymentPage(Page):
     
     def pay(self):
         respone = requests.post(
-            f'{url}/account/{self.root.username}/{self.master.booking.reference}/payment', 
+            f'{URL}/account/{self.root.username}/{self.master.booking.reference}/payment', 
             params={'method': PaymentMethod.CREDIT_CARD},
             json={
                 'data': {
@@ -1004,7 +1004,7 @@ class SelectSeatSection(SubSection):
         seats: list[str]
     ):
         response = requests.post(
-            f'{url}/account/{self.root.username}/{self.booking.reference}/select-seat', 
+            f'{URL}/account/{self.root.username}/{self.booking.reference}/select-seat', 
             json=seats, params={
                 'segment_index': segment_index,
                 'reservation_index': reservation_index,
@@ -1012,7 +1012,7 @@ class SelectSeatSection(SubSection):
         )
         
     def get_avaliable_seats(self, flight: body.FlightInfoBody, travel_class: TravelClass) -> list[str]:
-        response = requests.get(f'{url}/avaliable-seat', params={
+        response = requests.get(f'{URL}/avaliable-seat', params={
                 'date': flight.date.isoformat(),
                 'designator': flight.designator,
                 'travel_class': travel_class,
@@ -1113,7 +1113,7 @@ class ViewBookingSection(SubSection):
         self.jump(MenuPage)
         
     def get_all_bookings(self):
-        response = requests.get(f'{url}/account/{self.root.username}/my-bookings')
+        response = requests.get(f'{URL}/account/{self.root.username}/my-bookings')
         return [
             body.BookingBody(**data) for data in response.json()
         ]
@@ -1190,6 +1190,9 @@ class BookingPage(Page):
     def returned(self):
         super().returned()
         return self.will_pay
+
+    def cancel(self):
+        ...
     
     def add_widgets(self):        
         self.label1 = Label(self,
@@ -1378,19 +1381,19 @@ class BookingPage(Page):
 
             self.cancel_booking_button = Button(self,
                 text='Cancel booking',
-                command=...
+                command=self.cancel
             ).grid(row=i+11, column=2)
         else:
             self.payment_label = Label(self,
-                text="Payment : ",                           
+                text="Payment: ",                           
             ).grid(row=i+8, column=0)
 
             self.transaction_id_label = Label(self,
-                text="Transaction ID : ",                           
+                text="Transaction ID: ",                           
             ).grid(row=i+9, column=0)
 
             self.payment_time_label = Label(self,
-                text="Payment time : ",                           
+                text="Payment time: ",                           
             ).grid(row=i+10, column=0)
 
             self.payment_result_label = Label(self,

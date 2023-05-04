@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from . import Root
 
 
-url = 'http://127.0.0.1:8000'
+URL = 'http://127.0.0.1:8000'
 
 API_EndPoint1 = "/account/createAccount"
 API_EndPoint2 = "/account/login"

@@ -91,8 +91,9 @@ if True:
     
     system.pay(booking, {})
 
-    # with open('data/system.pkl', 'rb') as f:
-    #     system: Airline = pickle.load(f)
+    import pickle
+    with open('data/system.pkl', 'wb') as f:
+        pickle.dump(system, f)
 
 
 else:

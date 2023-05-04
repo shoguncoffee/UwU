@@ -30,7 +30,7 @@ class FlightReservation:
     @property
     def selected(self):
         """
-        selected seats
+            selected seats
         """
         return self.__selected
     
