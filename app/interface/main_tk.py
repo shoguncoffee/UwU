@@ -1139,7 +1139,7 @@ class ViewBookingsPage(Page):
         
         self.label1 = Label(top_frame,
             text="View Booking"                   
-        ).grid(row=0, column=0)
+        ).pack()
         
         Button(top_frame,
             text='back',
