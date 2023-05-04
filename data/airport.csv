@@ -1,76 +1,665 @@
 Code;Name;Country;Latitude;Longitude
-SYD;Kingsford Smith;Australia;-33.94419861;151.1757965
-VIE;Vienna International;Austria;48.11109924;16.55830002
-BRU;Brussels Airport;Belgium;50.90140152;4.484399796
-GRU;Guarulhos Intl;Brazil;-23.43499947;-46.47280121
-YVR;Vancouver Intl;Canada;49.18719864;-123.1853027
-YYZ;Toronto Lester B. Pearson Intl;Canada;43.67969894;-79.625
-CAN;Baiyun International;China;23.39249992;113.2996979
-PEK;Capital International;China;40.06669998;116.5999985
-PVG;Pudong International;China;31.14389992;121.7913971
-PRG;Ruzyne;Czech Republic;50.09999847;14.26669979
-CPH;Kastrup;Denmark;55.60810089;12.63329983
-CAI;Cairo International Airport;Egypt;30.13750076;31.40690041
-HEL;Helsinki-Vantaa;Finland;60.32559967;24.97170067
-CDG;Charles De Gaulle;France;49.00970078;2.548599958
-ORY;Orly;France;48.72890091;2.357199907
-DUS;Duesseldorf International;Germany;51.28110123;6.752799988
-FRA;Frankfurt International Airport;Germany;50.03889847;8.570599556
-MUC;Franz Josef Strauss International;Germany;48.34999847;11.7833004
-TXL;Tegel;Germany;52.56060028;13.29559994
-ATH;Eleftherios Venizelos Airport;Greece;37.93640137;23.94440079
-HKG;Hong Kong Intl;Hong Kong (SAR);22.30360031;113.9205017
-BUD;Liszt Ferenc International;Hungary;47.43330002;19.23329926
-DEL;Indira Gandhi Intl;India;28.57360077;77.10079956
-CGK;Soekarno-Hatta Intl;Indonesia;-6.125800133;106.6577988
-DUB;Dublin International;Ireland;53.43249893;-6.252200127
-TLV;Ben Gurion Intl;Israel;32.0121994;34.8824997
-FCO;Fiumicino;Italy;41.8003006;12.23890019
-MXP;Malpensa;Italy;45.63280106;8.732199669
-HND;Tokyo Intl (Haneda);Japan;35.55360031;139.7657929
-KIX;Kansai International;Japan;34.42499924;135.2471924
-NRT;Narita;Japan;35.76390076;140.391098
-KWI;Kuwait Intl;Kuwait;29.2303009;47.97529984
-KUL;Kuala Lumpur International Airport;Malaysia;2.745599985;101.7098999
-CUN;Cancun International;Mexico;21.0333004;-86.86669922
-MEX;Benito Juarez Intl;Mexico;19.43530083;-99.07279968
-AMS;Schiphol;Netherlands;52.30830002;4.768099785
-OSL;Oslo Airport;Norway;60.20000076;11.08329964
-MCT;Muscat International Airport;Oman;23.5916996;58.27920151
-PTY;Tocumen Intl, Panama R;Panama;9.069999695;-79.38359833
-MNL;Ninoy Aquino Intl;Philippines;14.50860024;121.0193024
-WAW;Okecie;Poland;52.16669846;20.9666996
-LIS;Lisboa;Portugal;38.7818985;-9.133299828
-DOH;Hamad International Airport;Qatar;25.27440071;51.60829926
-SVO;Sheremetyevo;Russian Federation;55.98329926;37.41669846
-JED;King Abdulaziz Intl;Saudi Arabia;21.67130089;39.15969849
-SIN;Changi;Singapore;1.357800007;103.990799
-ICN;Incheon International Airport;South Korea;37.46020126;126.4406967
-AGP;Malaga Airport;Spain;36.67169952;-4.498099804
-BCN;Barcelona;Spain;41.2969017;2.078299999
-MAD;Adolfo Suarez-Barajas;Spain;40.47359848;-3.561100006
-PMI;Palma de Mallorca;Spain;39.55360031;2.727799892
-ARN;Arlanda;Sweden;59.66189957;17.93390083
-GVA;Geneva International Airport;Switzerland;46.23809815;6.10890007
-ZRH;Zurich;Switzerland;47.45830154;8.551699638
-TPE;Taiwan Taoyuan International Airport;Taiwan;25.08259964;121.2285004
-BKK;Suvarnabhumi - New Bangkok International Airport;Thailand;13.70269966;100.7455978
-DMK;Don Mueang International Airport;Thailand;13.91110039;100.6082993
-AYT;Antalya;Turkey;36.9056015;30.79059982
-IST;Istanbul Airport;Turkey;40.97669983;28.81529999
-AUH;Abu Dhabi Intl;United Arab Emirates;24.43309975;54.64889908
 DXB;Dubai International;United Arab Emirates;25.25;55.35779953
-LGW;Gatwick;United Kingdom;51.14810181;-0.196700007
 LHR;Heathrow;United Kingdom;51.47140122;-0.452800006
-LTN;Luton International;United Kingdom;51.87440109;-0.366400003
+HKG;Hong Kong Intl;Hong Kong (SAR);22.30360031;113.9205017
+ICN;Incheon International Airport;South Korea;37.46020126;126.4406967
+SIN;Changi;Singapore;1.357800007;103.990799
+CDG;Charles De Gaulle;France;49.00970078;2.548599958
+AMS;Schiphol;Netherlands;52.30830002;4.768099785
+FRA;Frankfurt International Airport;Germany;50.03889847;8.570599556
+BKK;Suvarnabhumi - New Bangkok International Airport;Thailand;13.70269966;100.7455978
+IST;Istanbul Airport;Turkey;40.97669983;28.81529999
+KUL;Kuala Lumpur International Airport;Malaysia;2.745599985;101.7098999
+TPE;Taiwan Taoyuan International Airport;Taiwan;25.08259964;121.2285004
+DOH;Hamad International Airport;Qatar;25.27440071;51.60829926
+MAD;Adolfo Suarez-Barajas;Spain;40.47359848;-3.561100006
+MUC;Franz Josef Strauss International;Germany;48.34999847;11.7833004
+LGW;Gatwick;United Kingdom;51.14810181;-0.196700007
+JFK;John F Kennedy Intl;United States;40.6385994;-73.77690125
+PVG;Pudong International;China;31.14389992;121.7913971
+BCN;Barcelona;Spain;41.2969017;2.078299999
+NRT;Narita;Japan;35.76390076;140.391098
+FCO;Fiumicino;Italy;41.8003006;12.23890019
+YYZ;Toronto Lester B. Pearson Intl;Canada;43.67969894;-79.625
+ZRH;Zurich;Switzerland;47.45830154;8.551699638
+VIE;Vienna International;Austria;48.11109924;16.55830002
+DUB;Dublin International;Ireland;53.43249893;-6.252200127
+PEK;Capital International;China;40.06669998;116.5999985
+CPH;Kastrup;Denmark;55.60810089;12.63329983
+LAX;Los Angeles Intl;United States;33.94219971;-118.4072037
+SVO;Sheremetyevo;Russian Federation;55.98329926;37.41669846
+BRU;Brussels Airport;Belgium;50.90140152;4.484399796
+LIS;Lisboa;Portugal;38.7818985;-9.133299828
+MIA;Miami International;United States;25.79249954;-80.2861023
+KIX;Kansai International;Japan;34.42499924;135.2471924
 MAN;Manchester Airport;United Kingdom;53.35329819;-2.27670002
+MNL;Ninoy Aquino Intl;Philippines;14.50860024;121.0193024
+JED;King Abdulaziz Intl;Saudi Arabia;21.67130089;39.15969849
 STN;Stansted;United Kingdom;51.88280106;0.233899996
+MXP;Malpensa;Italy;45.63280106;8.732199669
+TLV;Ben Gurion Intl;Israel;32.0121994;34.8824997
+ARN;Arlanda;Sweden;59.66189957;17.93390083
+DUS;Duesseldorf International;Germany;51.28110123;6.752799988
+AUH;Abu Dhabi Intl;United Arab Emirates;24.43309975;54.64889908
+ORY;Orly;France;48.72890091;2.357199907
+CAN;Baiyun International;China;23.39249992;113.2996979
+MEX;Benito Juarez Intl;Mexico;19.43530083;-99.07279968
+PMI;Palma de Mallorca;Spain;39.55360031;2.727799892
+HEL;Helsinki-Vantaa;Finland;60.32559967;24.97170067
+HND;Tokyo Intl (Haneda);Japan;35.55360031;139.7657929
+CAI;Cairo International Airport;Egypt;30.13750076;31.40690041
 ATL;Hartsfield-Jackson Int;United States;33.64080048;-84.42720032
 EWR;Newark Liberty Intl;United States;40.69580078;-74.17169952
-IAH;George Bush Intercontinental;United States;29.98329926;-95.33999634
-JFK;John F Kennedy Intl;United States;40.6385994;-73.77690125
-LAX;Los Angeles Intl;United States;33.94219971;-118.4072037
-MIA;Miami International;United States;25.79249954;-80.2861023
-ORD;O'Hare International;United States;41.97809982;-87.90609741
+GVA;Geneva International Airport;Switzerland;46.23809815;6.10890007
+CUN;Cancun International;Mexico;21.0333004;-86.86669922
+DEL;Indira Gandhi Intl;India;28.57360077;77.10079956
+SYD;Kingsford Smith;Australia;-33.94419861;151.1757965
+DMK;Don Mueang International Airport;Thailand;13.91110039;100.6082993
+KWI;Kuwait Intl;Kuwait;29.2303009;47.97529984
+OSL;Oslo Airport;Norway;60.20000076;11.08329964
+CGK;Soekarno-Hatta Intl;Indonesia;-6.125800133;106.6577988
+ATH;Eleftherios Venizelos Airport;Greece;37.93640137;23.94440079
+PRG;Ruzyne;Czech Republic;50.09999847;14.26669979
+MCT;Muscat International Airport;Oman;23.5916996;58.27920151
+WAW;Okecie;Poland;52.16669846;20.9666996
+PTY;Tocumen Intl, Panama R;Panama;9.069999695;-79.38359833
 SFO;San Francisco Intl;United States;37.61940002;-122.3728027
+ORD;O'Hare International;United States;41.97809982;-87.90609741
+TXL;Tegel;Germany;52.56060028;13.29559994
 SGN;Tan Son Nhat International Airport;Vietnam;10.81719971;106.6577988
+LTN;Luton International;United Kingdom;51.87440109;-0.366400003
+BUD;Liszt Ferenc International;Hungary;47.43330002;19.23329926
+AGP;Malaga Airport;Spain;36.67169952;-4.498099804
+IAH;George Bush Intercontinental;United States;29.98329926;-95.33999634
+AYT;Antalya;Turkey;36.9056015;30.79059982
+YVR;Vancouver Intl;Canada;49.18719864;-123.1853027
+GRU;Guarulhos Intl;Brazil;-23.43499947;-46.47280121
+SAW;Sabiha Gokcen;Turkey;40.8993988;29.30920029
+DPS;Ngurah Rai;Indonesia;-8.748600006;115.1650009
+ADD;Bole International;Ethiopia;8.977800369;38.79809952
+YUL;Pierre E. Trudeau Intl;Canada;45.46390152;-73.75
+RUH;King Khalid Intl;Saudi Arabia;24.95919991;46.69609833
+DFW;Dallas/Ft Worth Intl;United States;32.89640045;-97.04109955
+BOM;Mumbai (Chhatrapati Shivaji) International;India;19.08810043;72.85169983
+OTP;Henri Coanda Airport;Romania;44.56669998;26.10000038
+HAM;Hamburg;Germany;53.63389969;9.994999886
+ALC;Alicante Airport;Spain;38.28250122;-0.558300018
+HAN;Noi Bai International;Vietnam;21.03580093;105.8899994
+EZE;Ministro Pistarini;Argentina;-34.8199997;-58.53390122
+JNB;O.R. Tambo International Airport;South Africa;-26.14030075;28.24279976
+LIM;Jorge Chavez Intl;Peru;-12.02670002;-77.12280273
+MEL;Melbourne Airport;Australia;-37.6617012;144.8332977
+SCL;Arturo Merino Benitez Airport;Chile;-33.38669968;-70.78500366
+AKL;Auckland Intl;New Zealand;-37.01110077;174.7991943
+BHX;Birmingham Airport;United Kingdom;52.4530983;-1.746399999
+BOG;El Dorado Intl;Colombia;4.706099987;-74.14219666
+SHJ;Sharjah;United Arab Emirates;25.3458004;55.39580154
+BAH;Bahrain Intl;Bahrain;26.27079964;50.63750076
+DME;Domodedovo;Russian Federation;55.40000153;37.88330078
+CMN;Mohammed V;Morocco;33.36669922;-7.586699963
+KBP;Boryspil International;Ukraine;50.33739853;30.89419937
+CMB;Bandaranaike Intl;Sri Lanka;7.175000191;79.88469696
+FLL;Ft Lauderdale Intl;United States;26.07419968;-80.15170288
+OPO;Porto;Portugal;41.23809815;-8.674699783
+HKT;Phuket Intl;Thailand;8.110600472;98.3125
+SXF;Schoenefeld;Germany;52.5;13.50829983
+VCE;Marco Polo;Italy;45.5;12.35000038
+NCE;Cote D'Azur;France;43.66389847;7.21750021
+PUS;Gimhae Intl;South Korea;35.17079926;129.1306
+IAD;Dulles International;United States;38.94169998;-77.45749664
+STR;Stuttgart Airport;Germany;48.68830109;9.210000038
+AMM;Queen Alia Intl;Jordan;31.71699905;36
+BOS;Logan International;United States;42.36360169;-71.00610352
+BGY;Bergamo/Orio Al Serio;Italy;45.66830063;9.700300217
+BEY;Rafic Hariri International;Lebanon;33.81280136;35.49029923
+EDI;Turnhouse;United Kingdom;55.94860077;-3.350300074
+CGN;Cologne/Bonn Airport;Germany;50.86579895;7.141900063
+TFS;Tenerife-Sur;Spain;28.0428009;-16.57060051
+DAC;Hazrat Shahjalal International;Bangladesh;23.78059959;90.38610077
+BSL;EuroAirport Swiss;Switzerland;47.59030151;7.53030014
+MFM;Macau International;Macau (SAR);22.23329926;113.5832977
+LYS;Satolas;France;45.7256012;5.081699848
+NGO;Chubu Centrair Intl;Japan;34.85900116;136.8144989
+MCO;Orlando Intl;United States;28.43169975;-81.3246994
+RIX;Riga-Arpt Internaitonal;Latvia;57.01670075;24.04999924
+FAO;Faro;Portugal;37.01440048;-7.970799923
+NBO;Jomo Kenyatta Intl;Kenya;-1.316699982;36.93080139
+CRL;Brussels S. Charleroi;Belgium;50.45920181;4.45389986
+IKA;Imam Khomeini International;Iran;35.40969849;51.1507988
+VKO;Vnukovo;Russian Federation;55.58330154;37.26670075
+KRK;John Paul Ii Balice In;Poland;50.08330154;19.7833004
+BLQ;Guglielmo Marconi;Italy;44.5306015;11.29249954
+MLA;Luqa International;Malta;35.83670044;14.5472002
+KEF;Keflavik Intl;Iceland;63.98529816;-22.60420036
+BRS;Bristol Airport;United Kingdom;51.38169861;-2.708899975
+CTU;Shuangliu International;China;30.57999992;103.949997
+PUJ;Punta Cana International;Dominican Republic;18.56669998;-68.38330078
+NAP;Capodichino;Italy;40.88610077;14.29170036
+LCA;Larnaca;Cyprus;34.87779999;33.63059998
+SEA;Seattle-Tacoma Intl;United States;47.44919968;-122.3080978
+BNE;Brisbane Intl;Australia;-27.38500023;153.1163025
+FUK;Fukuoka;Japan;33.5821991;130.4532929
+TUN;Carthage;Tunisia;36.85250092;10.22939968
+PNH;Phnom Penh International;Cambodia;11.54609966;104.8478012
+DAD;Da Nang International;Vietnam;16.04220009;108.203598
+SJO;Juan Santamaria Intl;Costa Rica;9.993900299;-84.20890045
+LED;Pulkovo;Russian Federation;59.79999924;30.29999924
+SZX;Bao'an International;China;22.54999924;113.9167023
+SOF;Sofia-Vrazhdebna;Bulgaria;42.70000076;23.39999962
+MRS;Marignane;France;43.43560028;5.216400147
+ALG;Houari Boumediene;Algeria;36.69329834;3.217200041
+HAV;Jose Marti Intl;Cuba;22.98940086;-82.40750122
+DTW;Metropolitan Wayne County;United States;42.21670151;-83.3443985
+BEG;Nikola Tesla Airport;Serbia;44.81919861;20.31220055
+YYC;Calgary Intl;Canada;51.1128006;-114.0196991
+VLC;Valencia Airport;Spain;39.48860169;-0.481900007
+CIA;Ciampino;Italy;41.79940033;12.59329987
+EIN;Eindhoven;Netherlands;51.45330048;5.388899803
+PHL;Philadelphia Intl;United States;39.86809921;-75.24859619
+MAA;Chennai International Airport;India;12.99330044;80.17690277
+RAK;Menara;Morocco;31.60829926;-8.038299561
+KHH;Kaohsiung Intl;Taiwan;22.57250023;120.3452988
+HNL;Honolulu Intl;United States;21.32189941;-157.925293
+MSP;Minneapolis International;United States;44.88610077;-93.21779633
+MBJ;Sangster Intl;Jamaica;18.50189972;-77.91249847
+AUA;Reina Beatrix;Aruba;12.50220013;-70.01390076
+HGH;Xiaoshan International;China;30.23600006;120.4389038
+GOT;Goteborg-Landvetter Airport;Sweden;57.66669846;12.2833004
+KMG;Changshui International;China;25.10390091;102.9428024
+LPA;Gran Canaria;Spain;27.93190002;-15.38329983
+SAL;El Salvador Intl;El Salvador;13.43999958;-89.05999756
+HAJ;Hannover;Germany;52.46110153;9.68500042
+DMM;King Fahad International Airport;Saudi Arabia;26.4666996;49.78329849
+RGN;Yangon International;Myanmar;16.90640068;96.13890076
+LUX;Findel;Luxembourg;49.62779999;6.206699848
+LCY;City Airport;United Kingdom;51.51670075;-0.066699997
+CLT;Charlotte-Douglas International Airport;United States;35.21920013;-80.93579865
+BLR;Kempegowda International;India;13.20300007;77.70580292
+TLS;Blagnac;France;43.63000107;1.363600016
+KTM;Tribhuvan International;Nepal;27.70059967;85.36309815
+MLE;Velana International;Maldives;4.201399803;73.5243988
+GLA;Glasgow International;United Kingdom;55.87170029;-4.431900024
+SDQ;Las Americas International;Dominican Republic;18.42919922;-69.66919708
+GDN;Gdansk Lech Walesa;Poland;54.36669922;18.64999962
+HER;Nikos Kazantzakis Airport;Greece;35.33969879;25.18029976
+BOD;Bordeaux;France;44.82939911;-0.714399993
+TAO;Liuting International;China;36.26679993;120.3830032
+GDL;Miguel Hidalgo Intl;Mexico;20.52389908;-103.3125
+MED;Mohammad Bin Abdulaziz Airport;Saudi Arabia;24.54500008;39.72109985
+MSQ;Minsk International;Belarus;53.86669922;27.5333004
+VNO;Vilnius International;Lithuania;54.63330078;25.2833004
+COK;Kochi International Airport;India;9.944399834;76.27189636
+PER;Perth International;Australia;-31.93169975;115.9682999
+SIP;Simferopol International;Ukraine;45.01670075;34
+CEB;Mactan International;Philippines;10.33170033;123.9067001
+SKG;Makedonia;Greece;40.52080154;22.97220039
+GYD;Heydar Aliyev;Azerbaijan;40.46659851;50.05250168
+KHI;Jinnah Intl;Pakistan;24.90559959;67.1568985
+IBZ;Ibiza;Spain;38.87360001;1.372799993
+SJD;Los Cabos Intl;Mexico;23.15530014;-109.7249985
+NTE;Nantes Atlantique Airport;France;47.15829849;-1.609699965
+GIG;Galeao-A.C.Jobim Intl;Brazil;-22.80780029;-43.24330139
+PEN;Penang International;Malaysia;5.289700031;100.2724991
+XMN;Gaoqi International;China;24.4666996;118.1166992
+CTS;New Chitose;Japan;42.79579926;141.6692047
+ACE;Lanzarote;Spain;28.94249916;-13.60470009
+DEN;Denver International;United States;39.85829926;-104.6669006
+GMP;Gimpo International;South Korea;37.5503006;126.7835999
+EMA;East Midlands;United Kingdom;52.83000183;-1.329399943
+NAS;Lynden Pindling Intl;Bahamas;25.04059982;-77.47190094
+LAS;Mccarran Intl;United States;36.07970047;-115.1588974
+TBS;Tbilisi International Airport;Georgia;41.66939926;44.95510101
+MRU;Sir S. Ramgoolam International;Mauritius;-20.42749977;57.67639923
+REP;Angkor International;Cambodia;13.40890026;103.8158035
+ECN;Ercan;Cyprus;35.15969849;33.48830032
+LIN;Linate;Italy;45.44169998;9.277799606
+ISB;Benazir Bhutto Intl;Pakistan;33.5483017;72.82499695
+NKG;Lukou International;China;31.99530029;118.8116989
+TAS;Tashkent-Vostochny International;Uzbekistan;41.31669998;69.38330078
+LPL;John Lennon Airport;United Kingdom;53.3382988;-2.866699934
+NCL;Newcastle International Airport;United Kingdom;55.03779984;-1.686699987
+PSA;Galileo Galilei;Italy;43.68059921;10.39280033
+HRG;Hurghada International Airport;Egypt;27.18580055;33.7989006
+HYD;Rajiv Gandhi International;India;17.25;78.41670227
+LHE;Allama Iqbal Intl;Pakistan;31.52079964;74.40280151
+OKA;Naha;Japan;26.1990757;127.6446762
+CXR;Cam Rahn International;Vietnam;11.99359989;109.2249985
+CNX;Chiang Mai Intl;Thailand;18.77190018;98.96829987
+PVR;G. Diaz Ordaz Intl;Mexico;20.68190002;-105.2482987
+GUA;La Aurora International;Guatemala;14.58189964;-90.52749634
+BVA;Beauvais-Tille;France;49.4557991;2.112499952
+BGW;Baghdad International Airport;Iraq;33.26670075;44.5
+SVQ;Sevilla Airport;Spain;37.41500092;-5.897500038
+LOS;Murtala Muhammed International;Nigeria;6.588900089;3.326400042
+CTA;Fontanarossa;Italy;37.40280151;14.92310047
+BKI;Kota Kinabalu International;Malaysia;5.94080019;116.0500031
+GUM;Antonio B. Won Pat International Airport;United States;13.48169994;144.7933044
+TSN;Binhai International;China;39.1189003;117.3469009
+TIA;Rinas;Albania;41.41690064;19.7166996
+CKG;Jiangbei International;China;29.49580002;106.3597031
+CCU;Subhas Chandra Bose Airport;India;22.65250015;88.44920349
+XIY;Xianyang International;China;34.36669922;108.699997
+SHA;Hongqiao International;China;31.19809914;121.3364029
+LBA;Leeds/Bradford Airport;United Kingdom;53.86529923;-1.654700041
+NUE;Nuremberg;Germany;49.49969864;11.08170033
+KTW;Pyrzowice;Poland;50.48329926;19.08329964
+FUE;Fuerteventura;Spain;28.44809914;-13.86190033
+ZAG;Franjo Tudman;Croatia;45.74309921;16.07029915
+ADB;Adnan Menderes;Turkey;38.29430008;27.15620041
+BLL;Billund;Denmark;55.74029923;9.152799606
+KRT;Khartoum Civil International;Sudan;15.59939957;32.55609894
+TSA;Songshan;Taiwan;25.07110024;121.543602
+TLL;Lennart Meri;Estonia;59.41669846;24.81669998
+EVN;Zvartnots International Airport;Armenia;40.15420151;44.40140152
+WUH;Tianhe International;China;30.5977993;114.2427979
+RHO;Diagoras;Greece;36.38470078;28.11829948
+ALA;Almaty International;Kazakhstan;43.34999847;77.03330231
+TAE;Daegu International;South Korea;35.89030075;128.6605988
+KIV;Kishinev International;Moldova;46.93330002;28.93330002
+CSX;Huanghua International Airport;China;28.19659996;113.2207031
+ABJ;Felix Houphouet-Boigny;Ivory Coast (Cote d'Ivoire);5.256400108;-3.92689991
+CCJ;Calicut International;India;11.13329983;75.95279694
+LGA;La Guardia;United States;40.77939987;-73.87580109
+SPU;Split Airport;Croatia;43.52500153;16.29220009
+CPT;Cape Town Intl.;South Africa;-33.96469879;18.60219955
+WMI;Modlin;Poland;52.4510994;20.65169907
+CJU;Jeju International;South Korea;33.50559998;126.4950028
+FLR;Peretola;Italy;43.81029892;11.19779968
+WRO;Strachowice;Poland;51.09999847;16.88330078
+ESB;Esenboga;Turkey;40.12919998;32.99670029
+PHX;Sky Harbor Intl;United States;33.43610001;-112.0089035
+BIO;Bilbao Airport;Spain;43.30279923;-2.921700001
+DSS;Blaise Diagne International Airport;Senegal;14.67109966;-17.06690025
+PFO;Paphos International;Cyprus;34.7193985;32.48469925
+ORK;Cork International;Ireland;51.84080124;-8.488900185
+ACC;Kotoka International;Ghana;5.595300198;-0.1708
+SUB;Juanda;Indonesia;-7.218100071;112.7208023
+POS;Piarco International;Trinidad and Tobago;10.5916996;-61.33969879
+UIO;Mariscal Sucre Intl;Ecuador;-0.137799993;-78.48609924
+BGO;Flesland;Norway;60.29359818;5.219399929
+RUN;Roland Garros;Reunion;-20.87719917;55.52140045
+CFU;Ioannis Kapodistrias Airport;Greece;39.60189819;19.9116993
+HBE;Borg el Arab Airport;Egypt;30.91979981;29.69630051
+DBV;Dubrovnik;Croatia;42.56330109;18.26530075
+BRI;Palese Macchie;Italy;41.14110184;16.78829956
+DLC;Zhoushuizi International;China;38.91669846;121.6500015
+GYE;Jose Joaquin de Olmedo;Ecuador;-2.15440011;-79.87560272
+FOC;Changle International;China;26.10000038;119.2833023
+IEV;Zhuliany International;Ukraine;50.40190125;30.45079994
+KNO;Kuala Namu;Indonesia;3.642199993;98.88529968
+DTM;Dortmund Airport;Germany;51.51670075;7.466700077
+BGI;Grantley Adams International;Barbados;13.07219982;-59.49309921
+CLJ;Napoca;Romania;46.78329849;23.68330002
+DLM;Dalaman;Turkey;36.71250153;28.79220009
+BWN;Brunei International;Brunei Darussalam;4.925000191;114.927803
+SKP;Skopje International Airport;Macedonia;41.9618988;21.61809921
+NAN;Nadi International;Fiji;-17.75309944;177.4477997
+VRN;Verona;Italy;45.46670151;10.93330002
+NYO;Skavsta;Sweden;58.78919983;16.90690041
+VTE;Wattay Intl;Laos;17.98469925;102.5667038
+TRN;Citta Di Torino;Italy;45.2010994;7.648099899
+BFS;Belfast Intl;United Kingdom;54.65420151;-6.224999905
+KIN;Norman Manley Intl;Jamaica;17.95000076;-76.73329926
+NJF;Al-Ashraf International Airport;Iraq;31.98999977;44.40299988
+TRV;Trivandrum International;India;8.479700089;76.91970062
+TSF;Venice-Treviso;Italy;45.68330002;12.08329964
+MTY;Mariano Escobedo Intl;Mexico;25.78000069;-100.1100006
+MVD;Carrasco;Uruguay;-34.84000015;-56.03030014
+PRN;Pristina International;Serbia;42.57360077;21.03560066
+LAD;4 De Fevereiro;Angola;-8.853099823;13.2361002
+BTS;M.R. Stefanik;Slovakia;48.16669846;17.2166996
+TSE;Astana International;Kazakhstan;51.20000076;71.44999695
+CGO;Xinzheng International;China;34.75;113.6667023
+SEN;Southend;United Kingdom;51.57279968;0.701399982
+SHE;Taoxian International;China;41.79999924;123.449997
+EBB;Entebbe International;Uganda;0.0425;32.43809891
+KGL;Kigali International Airport;Rwanda;-1.967800021;30.13999939
+EBL;Erbil International Airport;Iraq;36.23329926;43.96670151
+KOS;Sihanoukville International;Cambodia;10.5795002;103.6369019
+LJU;Joze Pucnik;Slovenia;46.22470093;14.46080017
+BOJ;Burgas;Bulgaria;42.56969833;27.51530075
+RTM;Rotterdam Airport;Netherlands;51.95830154;4.444399834
+CHC;Christchurch Intl;New Zealand;-43.48830032;172.5332947
+MDE;Jose Marie Cordova;Colombia;6.220799923;-75.5931015
+SXM;Prinses Juliana International;Sint Maarten;18.04360008;-63.11190033
+KGS;Ippokratis Airport;Greece;36.79330063;27.0916996
+KLO;Kalibo International;Philippines;11.68280029;122.3771973
+PMO;Punta Raisi;Italy;38.18109894;13.10499954
+GCM;Owen Roberts Intl;Cayman Islands;19.29249954;-81.35810089
+BWI;Baltimore/Wash Intl;United States;39.17499924;-76.66999817
+TRF;Torp;Norway;59.18780136;10.26029968
+PTP;Le Raizet;Guadeloupe;16.26749992;-61.52640152
+GRO;Costa Brava;Spain;41.90919876;2.763299942
+CRK;Clark Intl Airport;Philippines;15.18060017;120.5567017
+SLC;Salt Lake City Intl;United States;40.78419876;-111.9669037
+CCS;Simon Bolivar International;Venezuela;10.60529995;-66.98809815
+LIR;D. Oduber Quiros Intl;Costa Rica;10.58969975;-85.55000305
+STI;Cibao Intl;Dominican Republic;19.46920013;-70.70030212
+FMM;Allgaeu Airport;Germany;47.99250031;10.24359989
+AMD;S. VallabhBhai Patel;India;23.06640053;72.62419891
+KBL;Kabul International;Afghanistan;34.56389999;69.21389771
+LEJ;Leipzig;Germany;51.40000153;12.41670036
+SNN;Shannon International;Ireland;52.70059967;-8.918600082
+SSH;Sharm el-Sheikh Interrnational;Egypt;27.97500038;34.38970184
+DAR;Julius Nyerere International;Tanzania;-6.875299931;39.20190048
+YEG;Edmonton Intl;Canada;53.30419922;-113.5916977
+POZ;Lawica;Poland;52.41690064;16.88330078
+PAP;Toussaint Louverture;Haiti;18.56060028;-72.3289032
+SZG;Salzburg;Austria;47.79309845;13.00559998
+SVG;Sola;Norway;58.87969971;5.634699822
+OVB;Tolmachevo;Russian Federation;55.01670075;82.65000153
+AGA;Agadir-Al Massira Airport;Morocco;30.38059998;-9.545800209
+LWO;Lviv International;Ukraine;49.81669998;23.85000038
+FRU;Manas International;Kyrgyzstan;42.84999847;74.58329773
+SVX;Koltsovo Airport;Russian Federation;56.73329926;60.79999924
+PLS;Providenciales Intl;Turks and Caicos Islands;21.77280045;-72.26830292
+NNG;Wuxu International;China;22.60960007;108.1716995
+MAH;Menorca;Spain;39.8614006;4.215300083
+CUR;Hato International;Curacao;12.19419956;-68.96060181
+CWL;Cardiff-Wales;United Kingdom;51.39749908;-3.346699953
+FNC;Madeira Airport;Portugal;32.69419861;-16.77809906
+RMQ;Cingcyuangang;Taiwan;24.14999962;120.6800003
+VVO;Vladivostok;Russian Federation;43.21670151;131.6667023
+OLB;Costa Smeralda;Italy;40.89720154;9.522199631
+HAK;Meilan International;China;19.93860054;110.4621964
+VVI;Viru Viru Intl;Bolivia;-17.64109993;-63.13389969
+ORN;Ahmed Ben Bella;Algeria;35.62779999;-0.610599995
+BRE;Bremen;Germany;53.04669952;8.789999962
+FDF;Martinique A. Cesaire;Martinique;14.58969975;-61.0060997
+ASU;Silvio Pettirossi Intl;Paraguay;-25.23920059;-57.51919937
+BZE;Belize International;Belize;17.53610039;-88.30999756
+TNA;Yaoqiang International;China;36.75;116.9666977
+CHQ;Ioannis Daskalogiannis Airport;Greece;35.5316658;24.14972305
+YOW;Macdonald-Cartier Intl;Canada;45.32080078;-75.67279816
+FEZ;Sais;Morocco;33.92860031;-4.976699829
+DYU;Dushanbe International;Tajikistan;38.54359818;68.82360077
+CAG;Elmas;Italy;39.24720001;9.061100006
+TRZ;Tiruchchirappalli;India;10.7638998;78.70890045
+MDL;Mandalay International;Myanmar;21.93919945;96.09140015
+SAN;San Diego International Airport;United States;32.73360062;-117.1866989
+HHN;Hahn;Germany;49.95000076;7.266699791
+TPA;Tampa International;United States;27.97310066;-82.53530121
+SEZ;Seychelles Intl;Seychelles;-4.672200203;55.52249908
+VRA;Juan G. Gomez Intl;Cuba;23.12579918;-81.29720306
+KBV;Krabi Airport;Thailand;8.099100113;98.9835968
+NGB;Lishe International;China;29.83329964;121.5333023
+BDA;L.F. Wade International;Bermuda;32.36529923;-64.69000244
+RYG;Moss Airport;Norway;59.37879944;10.78549957
+DJE;Zarsis Airport;Tunisia;33.87419891;10.7833004
+ZIA;Zhukovsky;Russian Federation;55.55329895;38.15169907
+TGD;Golubovci;Montenegro;42.35829926;19.25189972
+SAP;Ramon V. Morales Intl;Honduras;15.4513998;-87.92420197
+DWC;Al Maktoum Intl Emirates;United Arab Emirates;24.91810036;55.1753006
+PEW;Bacha Khan Intl;Pakistan;33.99440002;71.51670075
+HRE;RG Mugabe International Airport;Zimbabwe;-17.92280006;31.10140038
+TNG;Boukhalef;Morocco;35.72829819;-5.917500019
+SJC;San Jose Municipal;United States;37.36109924;-121.9255981
+SJJ;Sarajevo International Airport;Bosnia and Herzegovina;43.81890106;18.33810043
+ZTH;Dionisios Solomos;Greece;37.75579834;20.88829994
+ULN;Chinggis Khaan Intl;Mongolia;47.84999847;106.7667007
+HOU;William P Hobby;United States;29.64500046;-95.2786026
+MIR;Habib Bourguiba International Airport;Tunisia;35.75690079;10.75279999
+CLO;Alfonso B Aragon International;Colombia;3.546099901;-76.38500214
+SJU;Luis Munoz Marin Int;United States;18.44140053;-66.00219727
+ODS;Odessa International;Ukraine;46.42979813;30.6772995
+VAR;Varna;Bulgaria;43.23189926;27.82500076
+DSA;Robin Hood;United Kingdom;53.49000168;-1
+BJV;Milas Airport;Turkey;37.25;27.64999962
+FKB;Baden Airpark;Germany;48.77944565;8.080555916
+NRN;Weeze Airport;Germany;51.60309982;6.144199848
+WDH;Windhoek Intl;Namibia;-22.48329926;17.4666996
+ADL;Adelaide International;Australia;-34.94829941;138.5346985
+SYX;Phoenix International;China;18.30349922;109.4123993
+WUX;Sunan Shuofang;China;31.58329964;120.3167038
+JJN;Jinjiang;China;24.89999962;118.5832977
+ABZ;Dyce;United Kingdom;57.20420075;-2.19810009
+MUX;Multan International;Pakistan;30.20280075;71.41809845
+MGA;Augusto C Sandino Intl;Nicaragua;12.14109993;-86.16860199
+TSR;Timisoara;Romania;45.81669998;21.33329964
+SID;Amilcar Cabral Intl;Cape Verde;16.74500084;-22.95170021
+YTZ;Billy Bishop Toronto City Airport;Canada;43.65000153;-79.38330078
+CTG;Rafael Nunez International;Colombia;10.4467001;-75.51059723
+ASB;Ashgabat International;Turkmenistan;37.9817009;58.3608017
+KUN;Kaunas International;Lithuania;54.90000153;23.91670036
+LFW;G. Eyadema International;Togo;6.162499905;1.254199982
+MHD;Shahid Hashemi Nejad;Iran;36.23669815;59.64170075
+ANU;V C Bird Intl;Antigua and Barbuda;17.13750076;-61.79000092
+BJX;Del Bajio International;Mexico;20.99349976;-101.4807968
+YNT;Penglai International;China;37.54999924;121.3332977
+TIV;Tivat;Montenegro;42.40359879;18.72559929
+RBA;Sale;Morocco;34.04999924;-6.756899834
+MDW;Chicago Midway International;United States;41.78499985;-87.75189972
+PDX;Portland Intl;United States;45.58919907;-122.5950012
+WLG;Wellington Intl;New Zealand;-41.32389832;174.8014069
+URC;Diwopu International;China;43.9068985;87.47409821
+OOL;Coolangatta;Australia;-28.16670036;153.5083008
+BKO;Senou International;Mali;12.63220024;-8.02670002
+GRZ;Graz;Austria;46.99330139;15.43999958
+LUN;Lusaka Intl;Zambia;-15.32919979;28.45280075
+ATQ;Sri Guru Ram Dass Jee;India;31.70689964;74.79720306
+ABV;Nnamdi Azikiwe International Airport;Nigeria;9.005599976;7.26609993
+TIP;Tripoli Intl;Libya;32.66139984;13.15999985
+DLA;Douala International;Cameroon;4.013299942;9.709199905
+RMU;Corvera International;Spain;37.79330063;-1.140300036
+YWG;J.A. Richardson Intl;Canada;49.90000153;-97.23329926
+JMK;Mykonos;Greece;37.43500137;25.34810066
+VCP;Viracopos-Campinas Intl;Brazil;-23.00670052;-47.13439941
+CGP;Shah Amanat International Airport;Bangladesh;22.2574997;91.82559967
+JTR;Santorini;Greece;36.39916611;25.4794445
+SPN;Saipan International;United States;15.12030029;145.7303009
+REU;Reus;Spain;41.15000153;1.169399977
+KHN;Changbei International;China;28.68330002;115.8833008
+HRB;Taiping International;China;45.62210083;126.2482987
+IAS;Iasi;Romania;47.18330002;27.60000038
+TNR;Ivato International;Madagascar;-18.79640007;47.48609924
+KRR;Krasnodar;Russian Federation;45.03329849;39.15000153
+SKT;Sialkot International;Pakistan;32.53329849;74.5
+INN;Innsbruck airport;Austria;47.26029968;11.34389973
+AEP;Jorge Newbery;Argentina;-34.55889893;-58.41579819
+BSR;Basrah International;Iraq;30.55559921;47.79140091
+KUT;Kutaisi International Airport;Georgia;42.25;42.70000076
+ZNZ;Zanzibar International;Tanzania;-6.219200134;39.22190094
+KZN;Kazan International;Russian Federation;55.78359985;49.21670151
+ADA;Adana Sakirpasa Airport;Turkey;36.98360062;35.28079987
+NOC;Ireland West Knock Airport;Ireland;53.91669846;-8.816699982
+HFE;Xinqiao International;China;31.99279976;116.9733963
+COR;Pajas Blancas;Argentina;-31.31310082;-64.19940186
+GOA;Cristoforo Colombo;Italy;44.4131012;8.837800026
+OAK;Metro Oakland Intl;United States;37.72359848;-122.2155991
+UVF;Hewanorra Intl;Saint Lucia;13.73560047;-60.95220184
+YHZ;Halifax Intl;Canada;44.88330078;-63.51670075
+TGU;Toncontin Intl;Honduras;14.05970001;-87.21749878
+RMF;Marsa Alam International Airport;Egypt;25.63330078;34.56940079
+ZQN;Queenstown;New Zealand;-45.02140045;168.7389069
+BSB;J. Kubitschek Intl;Brazil;-15.86060047;-47.91529846
+OSS;Osh;Kyrgyzstan;40.54999924;72.80000305
+COO;Cadjehoun;Benin;6.354199886;2.38560009
+FIH;N'Djili International;Democratic Republic of the Congo;-4.384699822;15.4449997
+OUA;Ouagadougou;Burkina Faso;12.35219955;-1.513299942
+PPT;Faaa;French Polynesia;-17.54719925;-149.6139069
+MPM;Maputo International;Mozambique;-25.92110062;32.56940079
+CNS;Cairns International;Australia;-16.88330078;145.7516937
+LKO;Chaudhary Charan Singh;India;26.76029968;80.88030243
+MWX;Muan International Airport;South Korea;34.99140167;126.3827972
+NDR;Nador;Morocco;35.20000076;-2.916699886
+POM;Jackson Field;Papua New Guinea;-9.444999695;147.2102966
+KWE;Longdongbao International;China;26.54059982;106.8003006
+LBV;Leon M'ba International;Gabon;0.459199995;9.415300369
+SNU;Abel Santamaria;Cuba;22.49189949;-79.94190216
+POP;Gregorio Luperon Intl;Dominican Republic;19.78109932;-70.66889954
+ELQ;Gassim;Saudi Arabia;26.30330086;43.77080154
+LPQ;Luang Prabang International;Laos;19.89579964;102.1639023
+CKY;Conakry Intl;Guinea;9.576399803;-13.61079979
+NBE;Hammamet;Tunisia;36.07559967;10.43830013
+BOH;Bournemouth International Airport;United Kingdom;50.7806015;-1.836899996
+MMX;Sturup;Sweden;55.53030014;13.37170029
+YNJ;Chaoyangchuan;China;42.65000153;129.5
+TRD;Vaernes;Norway;63.45970154;10.93690014
+ZAD;Zadar;Croatia;44.09780121;15.35669994
+MPL;Mediterranee;France;43.58060074;3.970299959
+SUF;Lamezia Terme Airport;Italy;38.90919876;16.23889923
+RDU;Raleigh-Durham International;United States;35.87530136;-78.7818985
+UTP;Rayong-Pattaya Intl;Thailand;12.67780018;101.0092011
+LIL;Lesquin;France;50.56439972;3.088099957
+HRK;Osnova International;Ukraine;49.93330002;36.28329849
+BDS;Papola Casale;Italy;40.65810013;17.94669914
+SBZ;Sibiu;Romania;45.78329849;24.08329964
+CNN;Kannur International Airport;India;11.9158001;75.54579926
+PBM;Johan A. Pengel Intl;Suriname;5.451399803;-55.19110107
+MJI;Mitiga, Tripoli Airport;Libya;32.89410019;13.27600002
+AUS;Austin-Bergstrom International Airport;United States;30.19449997;-97.66989899
+JHB;Senai Intl;Malaysia;1.638900042;103.6707993
+NIM;Diori Hamani International Airport;Niger;13.48330021;2.170799971
+PUY;Pula;Croatia;44.89170075;13.9236002
+IKT;Irkutsk;Russian Federation;52.26670075;104.4000015
+SOU;Southampton;United Kingdom;50.9516983;-1.351899982
+LBD;Khujand International;Tajikistan;40.21670151;69.69999695
+BDO;Husein Sastranegara;Indonesia;-6.90170002;107.575798
+CJJ;Cheongju International;South Korea;36.65000153;127.5167007
+HOG;Frank Pais International;Cuba;20.7852993;-76.31500244
+DAM;Damascus Intl;Syria;33.41389847;36.51779938
+FOR;Pinto Martins International;Brazil;-3.77670002;-38.53440094
+WEH;Dashuibo;China;37.1867981;122.2291031
+PQC;Phu Quoc Island International;Vietnam;10.23330021;103.9666977
+SCQ;Santiago de Compostela;Spain;42.89500046;-8.414999962
+CZL;Mohamed Boudiaf;Algeria;36.27690125;6.630000114
+SLL;Salalah;Oman;17.03639984;54.10169983
+WNZ;Yongqiang International;China;27.95000076;120.6333008
+GEO;Cheddi Jagan International;Guyana;6.500299931;-58.25419998
+IXE;Mangalore Airport;India;12.96389961;74.89389801
+CGQ;Longjia International;China;43.91669846;125.3332977
+NOU;La Tontouta;New Caledonia;-22.01689911;166.2108002
+PIK;Prestwick;United Kingdom;55.50310135;-4.575600147
+KCH;Kuching International;Malaysia;1.484200001;110.3407974
+FMO;Osnabruck International;Germany;52.13610077;7.685599804
+REC;Guararapes International;Brazil;-8.125800133;-34.9239006
+SSG;Santa Isabel International;Equatorial Guinea;3.752799988;8.705599785
+SWA;Jieyang Chaoshan;China;23.36669922;116.6667023
+JAI;Jaipur International;India;26.82169914;75.80609894
+QRO;Queretaro Intercontinental;Mexico;20.60000038;-100.3833008
+ROV;Platov Airport;Russian Federation;47.25;39.81669998
+YQB;Jean Lesage Intl;Canada;46.78919983;-71.39810181
+GND;Maurice Bishop International;Grenada and South Grenadines;12.14389992;-61.61669922
+DEB;Debrecen;Hungary;47.49029923;21.61389923
+EFL;Kefallinia Airport;Greece;38.11809921;20.50559998
+HMB;International Airport;Egypt;26.34280014;31.74279976
+KUF;Kurumoch Intl;Russian Federation;53.50740051;50.15439987
+BUS;Batumi;Georgia;41.6108017;41.6006012
+AAL;Aalborg;Denmark;57.0931015;9.850000382
+SAT;San Antonio Intl;United States;29.5333004;-98.4693985
+EXT;Exeter;United Kingdom;50.73419952;-3.421700001
+POA;Salgado Filho Intl;Brazil;-29.99329948;-51.17079926
+BJL;Banjul Intl;Gambia;13.33720017;-16.65439987
+JRO;Kilimanjaro International;Tanzania;-3.42779994;37.07220078
+TZL;Tuzla International Airport;Bosnia and Herzegovina;44.45859909;18.72400093
+BBU;Baneasa - Aurel Vlaicu;Romania;44.5;26.10000038
+KSC;Barca;Slovakia;48.66669846;21.25
+DRS;Dresden;Germany;51.13330078;13.76669979
+GOI;Dabolim;India;15.3828001;73.82810211
+MLH;EuroAirport French FR;France;47.59000015;7.53000021
+SYZ;Shahid Dastghaib International;Iran;29.54030037;52.59080124
+GBE;Sir Seretse Khama Intl;Botswana;-24.6541996;25.94169998
+ASM;Asmara International;Eritrea;15.29109955;38.91030121
+OUD;Les Angades;Morocco;34.78329849;-1.933300018
+PBH;Paro International;Bhutan;27.43330002;89.41670227
+XRY;Jerez Airport;Spain;36.74530029;-6.05889988
+TYN;Wusu International;China;37.82889938;112.5550003
+USM;Ko Samui;Thailand;9.550000191;100.0667038
+SFG;Grand-Case L'Esperance;Saint Martin;18.10059929;-63.0489006
+DUR;King Shaka Intl;South Africa;-29.61440086;31.11639977
+RZE;Jasionka;Poland;50.11669922;22.01670075
+GIB;North Front;Gibraltar;36.15000153;-5.347199917
+ISU;Sulaymaniyah Airport;Iraq;35.56079865;45.31470108
+MDZ;El Plumerillo;Argentina;-32.83190155;-68.78469849
+JIB;Ambouli International;Djibouti;11.54669952;43.15779877
+CCC;Jardines del Rey;Cuba;22.51390076;-78.50830078
+SXB;Entzheim;France;48.53689957;7.627500057
+LPB;El Alto International;Bolivia;-16.50690079;-68.20140076
+LEI;Almeria;Spain;36.8443985;-2.372200012
+LHW;Zhongchuan;China;36.01670075;103.75
+PAD;Paderborn;Germany;51.61500168;8.621100426
+AHB;Abha;Saudi Arabia;18.23719978;42.65890122
+KOJ;Kagoshima;Japan;31.80190086;130.7203064
+PSP;Palm Springs Muni;United States;33.8266983;-116.5049973
+AVV;Avalon;Australia;-38.04079819;144.4680939
+INI;Nis Constantine the Great Airport;Serbia;43.33390045;21.85169983
+CRA;Craioya;Romania;44.31890106;23.88640022
+SSA;Luis E. Magalhaes Intl;Brazil;-12.91559982;-38.33610153
+CVG;Northern Kentucky International;United States;39.04610062;-84.66390228
+MLM;F.J. Mujica Intl;Mexico;19.85000038;-101.0299988
+SDR;Santander Airport;Spain;43.42919922;-3.826400042
+LYP;Faisalabad International;Pakistan;31.36919975;72.99810028
+BCM;Bacau;Romania;46.59859848;26.88190079
+DCA;Ronald Reagan National;United States;38.85169983;-77.03690338
+NKC;Nouakchott;Mauritania;18.09189987;-15.95189953
+AER;Sochi International;Russian Federation;43.45000076;39.93330002
+APW;Faleolo International Airport;Western Samoa;-13.83329964;-172
+JUB;Juba;South Sudan;4.870600224;31.60390091
+LLW;Kamuzu Intl;Malawi;-13.7894001;33.78070068
+KJA;Krasnoyarsk Airport;Russian Federation;56.04999924;92.90000153
+BTJ;Sultan Iskandar Muda;Indonesia;5.519999981;95.41940308
+MBA;Mombasa;Kenya;-4.031400204;39.5931015
+TIF;Taif;Saudi Arabia;21.48830032;40.54330063
+KWL;Liangjiang International;China;25.21590042;110.0472031
+JOG;Adisutjipto;Indonesia;-7.789700031;110.430603
+CZM;Cozumel International;Mexico;20.51670075;-86.9332962
+MGQ;Mogadishu Intl;Somalia;2.013299942;45.31330109
+SDJ;Sendai;Japan;38.13610077;140.9239044
+RAI;Praia International;Cape Verde;14.92529964;-23.50309944
+MST;Maastricht;Netherlands;50.91109848;5.773600102
+KKJ;Kitakyushu;Japan;33.83309937;130.9494019
+PVK;Aktion;Greece;38.92639923;20.76580048
+OGG;Kahului;United States;20.90060043;-156.4335938
+BRQ;Turany;Czech Republic;49.15140152;16.69440079
+BMA;Bromma;Sweden;59.35279846;17.94639969
+YNB;Yanbo;Saudi Arabia;24.14170075;38.06669998
+MDC;Sam Ratulangi;Indonesia;1.543900013;124.9235992
+OST;Oostende/Brugge;Belgium;51.1996994;2.863600016
+SMF;Sacramento International;United States;38.6955986;-121.5896988
+FSZ;Mount Fuji;Japan;34.66669846;138.1667023
+AAR;Aarhus Airport;Denmark;56.31029892;10.61810017
+TKU;Turku;Finland;60.51470184;22.2656002
+SKD;Samarkand International;Uzbekistan;39.70000076;67
+PLQ;Palanga;Lithuania;55.91669846;21.04999924
+VLI;Bauerfield International;Vanuatu;-17.69330025;168.3099976
+STL;Lambert International;United States;38.74720001;-90.36440277
+CNF;Tancredo Never International;Brazil;-19.63330078;-43.96670151
+RSW;Southwest Florida International;United States;26.53610039;-81.75499725
+BON;Flamingo International Airport;Bonaire, Saint Eustatius & Saba;12.1342001;-68.27330017
+NSI;Nsimalen Intl;Cameroon;3.716700077;11.55000019
+SKB;Robert L. Bradshaw Intl;Saint Kitts and Nevis;17.30809975;-62.72140122
+CEI;Mae Fah Luang Intl;Thailand;19.88640022;99.83059692
+LGK;Langkawi International;Malaysia;6.366700172;99.83329773
+EIS;Terrance B. Lettsome;British Virgin Islands;18.44389916;-64.5428009
+AOI;Falconara;Italy;43.61750031;13.36419964
+BNA;Nashville International;United States;36.12670136;-86.68190002
+VFA;Victoria Falls International;Zimbabwe;-18.09309959;25.84029961
+DRW;Darwin International;Australia;-12.41670036;130.8721924
+HIJ;Hiroshima Airport;Japan;34.43569946;132.919693
+DOK;Donetsk International Airport;Ukraine;48.08330154;37.75
+LNZ;Blue Danube;Austria;48.23329926;14.1875
+MRV;Mineral Nyye Vody;Russian Federation;44.21670151;43.08330154
+BZG;Ignacy Jan Paderewski;Poland;53.09669876;17.97859955
+GZT;Oguzeli;Turkey;36.94810104;37.47829819
+CZX;Benniu;China;31.70000076;119.9666977
+PSR;Liberi;Italy;42.43389893;14.18439961
+TRS;Ronchi Dei Legionari;Italy;45.8266983;13.47220039
+FNA;Lungi International;Sierra Leone;8.617500305;-13.19690037
+CAY;Felix Eboue;French Guiana;4.820000172;-52.36330032
+ROS;Islas Malvinas;Argentina;-32.9056015;-60.7867012
+SJW;Zhengding International;China;38.04999924;114.4666977
+PKU;Sultan Syarif Kasim II;Indonesia;0.46419999;101.4385986
+BVC;Rabil Airport;Cape Verde;16.08329964;-22.83329964
+IXM;Madurai;India;9.832500458;78.08809662
+UFA;Ufa;Russian Federation;54.73329926;55.93330002
+TZX;Trabzon;Turkey;40.99860001;39.77640152
+AHO;Fertilia;Italy;40.63059998;8.288900375
+LRM;Casa de Campo Intl;Dominican Republic;18.4102993;-68.9417038
+MZT;Rafael Buelna Intl;Mexico;23.16250038;-106.2739029
+BZV;Maya-Maya Airport;Congo;-4.251900196;15.25469971
+GZP;Gazipasa;Turkey;36.29809952;32.29029846
+PDG;Minangkabau;Indonesia;-0.87559998;100.3499985
+ATZ;Asyut;Egypt;27.04999924;31.01670075
+CCF;Salvaza;France;43.21580124;2.306900024
+NDJ;Ndjamena;Chad;12.13469982;15.03499985
+BAQ;Ernesto Cortissoz International;Colombia;10.89610004;-74.77890015

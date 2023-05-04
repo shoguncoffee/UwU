@@ -1,11 +1,9 @@
-from __future__ import annotations
 from app.base import *
 from app.src import *
-from app.utils import algorithm
-from time import time
 
-if TYPE_CHECKING:
-    from app.airline import Airline
+from app.airline import Airline
+from . import algorithm
+from time import time
 
 
 def timmer(func: Callable):
@@ -52,17 +50,17 @@ def add_aircrafts(system: Airline):
 @timmer
 def add_flights(system: Airline):
     airline_designator = system.designator
-    all_airport = system.airports
-    first_ten = system.airports[:10]
+    first_100 = system.airports[:100]
+    first_10 = system.airports[:10]
     bkk = system.airports.get('bkk')
     
     # for assign flight number
-    numbers = (f'{airline_designator}{n}' for n in range(10_000))
-        
+    numbers = (f'{airline_designator}{n}' for n in range(1, 10_000))
+
     system.flights.extend(
         chain(
-            algorithm.P2P_flights(first_ten, numbers, 1),
-            algorithm.hub_flights(all_airport, bkk, numbers, 2)
+            algorithm.P2P_flights(first_10, numbers, 1),
+            algorithm.hub_flights(first_100, bkk, numbers, 2)
         )
     )
 
@@ -84,7 +82,7 @@ def add_flight_plans(system: Airline):
         )
     }
     distort = lambda prices: [
-        price * (1 + random()//2) for price in prices
+        price * (1 + random()) for price in prices
     ]
     fares: list[list[tuple[TravelClass, Fare]]] = []
     
@@ -117,7 +115,9 @@ def add_flight_plans(system: Airline):
             random_fare,
             dt.date(2023, 12, 5), 
         )
-        system.plans.append(plan)
+        system.plans.add(plan)
+
+    system.update_flight()
 
 
 def add_accounts(system: Airline):
@@ -147,12 +147,13 @@ def search(system: Airline,
 
 def print_results(results: list[FlightItinerary]):
     for itinerary in results:
-        print('\n-', end=' ')
+        print('-', end=' ')
         
         for instance in itinerary:
             flight = instance.flight
             print(
                 f'{flight.designator: <6} {instance.date} |',
-                f'{flight.origin.code} {flight.departure} -> {flight.destination.code} {flight.arrival}',
+                f'{flight.origin.code} {flight.departure: %H:%M} -> {flight.destination.code} {flight.arrival: %H:%M}',
                 end = ' '*3
             )
+        print()

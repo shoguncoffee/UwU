@@ -77,6 +77,7 @@ def generate_flight(
     designator: str,
     origin: Airport,
     destination: Airport,
+    duration: Optional[dt.timedelta] = None,
 ):
     """
         randomize flight departure time and calculate arrival time
@@ -86,7 +87,8 @@ def generate_flight(
         minutes=randrange(0, 60, 5)
     )
     departure = dt.datetime.min + time
-    arrival = departure + approx_time(origin, destination)
+    duration = duration or approx_time(origin, destination)
+    arrival = departure + duration
 
     flight = Flight(
         designator,
@@ -106,9 +108,11 @@ def P2P_flights(
         - https://en.wikipedia.org/wiki/Point-to-point_transit
     """
     for origin, destination in combinations(airports, 2):
-        for _ in range(times):
-            yield generate_flight(next(designators), origin, destination)
-            yield generate_flight(next(designators), destination, origin)
+        duration = approx_time(origin, destination)
+        if duration > dt.timedelta(minutes=30):
+            for _ in range(times):
+                yield generate_flight(next(designators), origin, destination, duration)
+                yield generate_flight(next(designators), destination, origin, duration)
             
 
 def hub_flights(
@@ -123,10 +127,11 @@ def hub_flights(
         - https://en.wikipedia.org/wiki/Spoke%E2%80%93hub_distribution_paradigm  
     """
     for destination in airports:
-        if destination is not hub:
+        duration = approx_time(hub, destination)
+        if destination is not hub and duration > dt.timedelta(minutes=30):
             for _ in range(times):
-                yield generate_flight(next(designators), hub, destination)
-                yield generate_flight(next(designators), destination, hub)
+                yield generate_flight(next(designators), hub, destination, duration)
+                yield generate_flight(next(designators), destination, hub, duration)
 
 
 def generate_cabin(

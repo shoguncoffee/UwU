@@ -10,8 +10,8 @@ for individual submodule in this package:
 """
 from app.airline import Airline
 
-
-if input('new system? (Y/n)') != 'n':
+# if new system?
+if True:
     system = Airline('UwU Airline', 'UW')
     
     from app.utils.spawn import *
@@ -20,18 +20,18 @@ if input('new system? (Y/n)') != 'n':
     add_aircrafts(system)
     add_flights(system)
     add_flight_plans(system)
-    add_accounts(system)    
+    add_accounts(system)
 
 
     ### test flight seaching
-    # print_results(search('sin', 'doh'))
-    # print_results(search('LHR', 'cai'))
-    # print_results(search('sfo', 'sin'))
-    # print_results(search('zrh', 'icn'))
-    # print_results(search('zrh', 'bkk'))
-    # print_results(search('bkk', 'icn'))
-    # print_results(search('bkk', 'vie'))
-
+    # print_results(search(system, 'sin', 'doh'))
+    # print_results(search(system, 'LHR', 'cai'))
+    # print_results(search(system, 'sfo', 'sin'))
+    # print_results(search(system, 'zrh', 'icn'))
+    # print_results(search(system, 'zrh', 'bkk'))
+    # print_results(search(system, 'bkk', 'icn'))
+    # print_results(search(system, 'bkk', 'vie'))
+    
 
     ### example of booking
     
@@ -88,6 +88,11 @@ if input('new system? (Y/n)') != 'n':
     system.select_seats(
         reservation, [choosen_seat]
     )
+    
+    system.pay(booking, {})
+
+    # with open('data/system.pkl', 'rb') as f:
+    #     system: Airline = pickle.load(f)
 
 
 else:

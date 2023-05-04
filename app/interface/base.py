@@ -7,7 +7,7 @@ from tkinter.constants import *
 
 from app.utils import search
 import app.src as src
-import app.api.body_template as body
+import app.utils.body_template as body
 import requests
 
 if TYPE_CHECKING:

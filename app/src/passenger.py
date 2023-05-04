@@ -74,8 +74,8 @@ class Pax(tuple[tuple[PassengerType, int], ...]):
         `tuple` of 
         (<PassengerType>, <int>) `->` "type of passenger", "number of passengers"
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
     
     def __len__(self):
         """

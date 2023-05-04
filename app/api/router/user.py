@@ -1,5 +1,4 @@
 from .base import *
-from . import booking
 
 router = APIRouter(
     prefix="/account",

@@ -8,10 +8,35 @@ which done automatically by fastapi (read more in link above)
 ...
 with these implementation, we can use pydantic model as a type hint and know specified attribute which can't done by raw dict
 """
-from .base import *
+from app.base import *
 
 from pydantic import BaseModel
-from . import descriptions
+import app.src as src
+
+
+travel_class_description: dict[TravelClass, list[str]] = {
+    TravelClass.ECONOMY: [
+        'economy',
+    ],
+    TravelClass.BUSSINESS: [
+        'bussiness',
+    ],
+    TravelClass.FIRST: [
+        'first',
+    ],
+}
+
+seat_description: dict[SeatType, list[str]] = {
+    SeatType.WINDOW: [
+        'window',
+    ],
+    SeatType.AISLE: [
+        'aisle',
+    ],
+    SeatType.LEGROOM: [
+        'middle',
+    ],
+} #!
 
 
 class AccountBody(BaseModel):
@@ -133,7 +158,7 @@ class ItineraryBody(BaseModel):
                     travel_class=travel_class,
                     seat_left=obj.get_seats_left(travel_class),
                     price=obj.get_price(pax, travel_class),
-                    info=descriptions.travel_class[travel_class],
+                    info=travel_class_description[travel_class],
                  ) for travel_class in obj.all_travel_class
             ]
         )
@@ -153,6 +178,8 @@ class FlightInstanceBody(BaseModel):
     designator: str
     
     def convert(self):
+        from app.__main__ import system
+        
         schedule = system.schedules.get(self.date)
         return schedule.get(self.designator)
     
@@ -203,7 +230,7 @@ class SeatBody(BaseModel):
             type=obj.type,
             descriptions=[
                 description for subtype in obj.type
-                for description in descriptions.seat[subtype]
+                for description in seat_description[subtype]
             ]
         )
             

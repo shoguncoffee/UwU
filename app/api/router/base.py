@@ -1,2 +1,2 @@
 from ..base import *
-from ..body_template import *
+from app.utils.body_template import *

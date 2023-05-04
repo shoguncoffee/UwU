@@ -28,7 +28,7 @@ class Fare:
             )
 
     def get_seat_price(self, seat_type: Optional[SeatType]):
-        if seat_type is None:
+        if not seat_type:
             return 0
         
         for type, price in self.__seat_fare:

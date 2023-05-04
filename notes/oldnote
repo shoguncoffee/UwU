@@ -2,3 +2,6 @@ hold booking 4 days rule -> https://www.qatarairways.com/en/payment-options/hold
 meal -> https://www.qatarairways.com/en/services-special/special-meals.html
 fleet -> https://www.qatarairways.com/en/fleet.html
 IATA
+
+py-moneyed
+tdqm

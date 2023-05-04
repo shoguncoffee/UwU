@@ -1,4 +1,3 @@
-from __future__ import annotations
 from app.base import *
 from app.src import *
 
@@ -47,6 +46,23 @@ class Airline:
     @property
     def plans(self):
         return self.__plans
+
+    def update_flight(self, *plans: FlightPlan):
+        for date in daterange(self.plans.advance_days):
+            try:
+                schedule = self.schedules.get(date)
+            except KeyError:
+                schedule = ScheduleDate(date)
+                self.schedules.append(schedule)
+            
+            for plan in self.plans.on_date(date, plans):
+                schedule.add(
+                    FlightInstance(date, 
+                        plan.flight, 
+                        plan.default_aircraft, 
+                        deepcopy(plan.default_fares)
+                    )
+                )
     
     def create_booking(self,
         creator: Customer,

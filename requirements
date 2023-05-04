@@ -1,6 +1,5 @@
 fastapi[all]
 numpy
 geopy
-py-moneyed
-tdqm
 rapidfuzz
+sv_ttk
