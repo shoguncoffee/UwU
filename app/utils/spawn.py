@@ -51,7 +51,7 @@ def add_aircrafts(system: Airline):
 def add_flights(system: Airline):
     airline_designator = system.designator
     first_100 = system.airports
-    first_10 = system.airports[:13]
+    first_10 = system.airports[:15]
     bkk = system.airports.get('bkk')
     
     # for assign flight number
