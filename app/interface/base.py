@@ -106,7 +106,7 @@ class Section(tk.Misc):
     def peek(self, page: StaticPage) -> StaticPage: ...
     def peek(self, page: StaticPage):
         for layer in self.layers:
-            if type(layer) == type(page):
+            if type(layer) is type(page):
                 page.destroy()
                 return layer
             

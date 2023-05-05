@@ -3,7 +3,6 @@ https://tkdocs.com/tutorial/concepts.html
 http://tkdocs.com/pyref/index.html
 """
 from __future__ import annotations
-from urllib import response
 from .base import *
 
 
@@ -1115,7 +1114,8 @@ class SelectSeatPage(Page):
 
     def select(self):
         self.seat = self.selected_seats_entry.get()
-        self.next()
+        if self.seat in self.avaliable_seats:
+            self.next()
 
     def returned(self):
         super().returned()
@@ -1147,13 +1147,6 @@ class SelectSeatPage(Page):
         Label(seat_frame,
             text = 'avaliable seats: '+ ', '.join(self.avaliable_seats)
         ).pack()
-
-        
-        # for seat in self.seats:
-        #     seat = Button(self.seat_frame, 
-        #         text = seat.number, 
-        #         command = partial(self.select, )
-        #     ).pack(side=LEFT)
 
         self.confirm_frame = Frame(self).pack()
 
@@ -1196,9 +1189,10 @@ class ViewBookingSection(SubSection):
 class ViewBookingsMenu(Page):
     master: ViewBookingSection
 
-    def __init__(self, master):
+    def predefine(self):
+        super().predefine()
         self.selected_id = None
-        super().__init__(master)
+        self.all_bookings = self.get_all_bookings()
 
     def get_all_bookings(self):
         response = requests.get(f'{URL}/account/{self.root.username}/my-bookings')
@@ -1213,10 +1207,6 @@ class ViewBookingsMenu(Page):
     def returned(self):
         super().returned()
         return self.selected_id
-
-    def back(self):
-        self.selected_id = None
-        self.next()
     
     def add_widgets(self):
         top_frame = Frame(self).pack(side=TOP)
@@ -1227,7 +1217,7 @@ class ViewBookingsMenu(Page):
         
         Button(top_frame,
             text='back',
-            command=self.back
+            command=self.next
         ).pack()
         
         for booking in self.get_all_bookings():

@@ -35,5 +35,5 @@ async def get_avaliable_seat(
     remaining = flight_instance.get_class(travel_class).get_remain_seats()
     
     return [
-        seat.number for seat in remaining
+        seat.number for seat in sorted(remaining)
     ]
