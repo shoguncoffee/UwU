@@ -481,7 +481,7 @@ class FillPassengerPage(Page):
             birthdate = dt.date.fromisoformat(self.birth_entry.get()),
             nationality = self.nationality_combobox.get(),
             passport_id = self.passport_detail_entry.get(),
-            gender = GenderType[self.gender_combobox.get()],
+            gender = GenderType(self.gender_combobox.current()),
             type = self.passenger_type
         )
 
@@ -491,7 +491,8 @@ class FillPassengerPage(Page):
         ).grid(row=0, column=0)
         self.title_combobox = Combobox(self, 
             height=5, width=15,
-            values=["Mr.", "Mrs.", "Ms."]
+            state = 'readonly',
+            values = ["Mr.", "Mrs.", "Ms."]
         ).grid(row=1,column=0)
 
         self.firstname_label = Label(self, 
@@ -523,11 +524,12 @@ class FillPassengerPage(Page):
         ).grid(row=6, column=0)
         self.gender_combobox = Combobox(self,
             height=5, width=15, 
-            values=[gender.name for gender in GenderType]
+            state = 'readonly',
+            values = [gender.name.capitalize() for gender in GenderType]
         ).grid(row=7, column=0)
 
         self.label2 = Label(self, 
-            text = f'{self.number+1}. {self.passenger_type.name}'
+            text = f'{self.number+1}. {self.passenger_type.name.capitalize()}'
         ).grid(row=0, column=1)
 
         self.label3 = Label(self, 
@@ -1047,7 +1049,7 @@ class SelectSeatMenu(Page):
         super().predefine()
         self.booking = self.root.get_booking(self.master.booking_id)
         self.indexs = -1, -1
-
+    
     def select(self, segment_index: int, reservation_index: int):
         self.c = segment_index, reservation_index
         self.next()
@@ -1064,7 +1066,7 @@ class SelectSeatMenu(Page):
         Button(self,
             text = 'next',
             command = self.next,
-        ).pack(side=RIGHT)
+        ).pack()
         
         for segment_index, segment in enumerate(self.booking.segments):
             first = segment[0].flight
@@ -1081,16 +1083,19 @@ class SelectSeatMenu(Page):
                 
                 Label(frame,
                     text = f'{flight.designator}',
+                    width = 10,
                 ).grid(row=reservation_index, column=0)
                 
                 Label(frame,
                     text = f'{flight.origin} -> {flight.destination}',
+                    width = 12,
                 ).grid(row=reservation_index, column=1)
                 
                 Button(frame,
                     command = partial(self.select, segment_index, reservation_index),
                     text = 'Select' if not is_assigned else 'Selected',
                     state = DISABLED if is_assigned else NORMAL,
+                    width = 10,
                 ).grid(row=reservation_index, column=2)
                 
 

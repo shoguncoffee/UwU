@@ -56,6 +56,7 @@ GenderType = IntEnum(
     )
 )
 with open('data/countries.txt') as _f:
+    all_country = _f.read().splitlines()
     Country = StrEnum(
-        'Country', _f.read().splitlines()
+        'Country', all_country
     )
