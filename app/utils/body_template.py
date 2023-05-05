@@ -43,7 +43,6 @@ class AccountBody(BaseModel):
     username: str
     email: str
     phone: str
-    status: AccountStatus = AccountStatus.INACTIVE
     
     @classmethod
     def transform(cls, obj: src.Customer):
@@ -51,7 +50,6 @@ class AccountBody(BaseModel):
             username=obj.username,
             email=obj.email,
             phone=obj.phone,
-            status=obj.status,
         )
     
     def convert(self, password: str):

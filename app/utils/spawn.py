@@ -10,7 +10,7 @@ def timmer(func: Callable):
         start = time()
         return_value = func(*arg, **kw)
         ms = (time() - start) * 1000
-        print(f'Generate {func.__qualname__} >> {round(ms, 2)} ms')
+        print(f'Generate/test {func.__qualname__} >> {round(ms, 2)} ms')
         
         return return_value
     return new

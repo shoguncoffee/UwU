@@ -27,12 +27,13 @@ class MenuPage(StaticPage):
             width=15,
             text="Login",
         ).pack()
-        
-        Button(self,
-            command=partial(self.jump, ViewBookingSection),
-            width=15,
-            text="View Booking"
-        ).pack()
+
+        if self.root.username is not None:
+            Button(self,
+                command=partial(self.jump, ViewBookingSection),
+                width=15,
+                text="View Booking"
+            ).pack()
 
 
 class LoginPage(StaticPage):
@@ -49,6 +50,7 @@ class LoginPage(StaticPage):
                 text="Login successful!"
             )
             self.root.username = username
+            self.jump(MenuPage)
         else:
             self.response_label.configure(
                 text=f'Error: {response.json()["detail"]}', 
@@ -652,12 +654,16 @@ class ReviewSection(SubSection):
         super().__init__(master)
 
     def procedure(self):
-        confirm, paynow = self.peek(SummeryPage(self)).returned()
+        confirm, paynow = self.peek(
+            SummeryPage(self)
+        ).returned()
 
         if confirm:
             self.pend_booking()
             if paynow:
-                self.peek(PaymentPage(self)).returned()
+                self.peek(
+                    PaymentPage(self)
+                ).returned()
         else:
             self.cancel_booking()
 
@@ -979,22 +985,29 @@ class SelectSeatSection(SubSection):
     def __init__(self, master, booking_id: UUID):
         self.booking_id = booking_id
         super().__init__(master)
-        self.booking = self.root.get_booking(booking_id)
+
+    def predefine(self):
+        self.booking = self.root.get_booking(self.booking_id)
+        super().predefine()
 
     def procedure(self):
         while 1: 
-            segment_index, reservation_index = self.open(
+            segment_index, reservation_index = self.peek(
                 SelectSeatMenu(self)
             ).returned()
+            
+            if segment_index == -1:
+                break
             
             reservation = self.booking.segments[segment_index][reservation_index]
             available_seats = self.get_avaliable_seats(reservation)
             selected_seats: list[str] = []
             
             for passenger in self.booking.passengers:
-                seat = self.open(
+                seat = self.peek(
                     SelectSeatPage(self, passenger, reservation, available_seats)
                 ).returned()
+                
                 available_seats.remove(seat)
                 selected_seats.append(seat)
 
@@ -1033,9 +1046,10 @@ class SelectSeatMenu(Page):
     def predefine(self):
         super().predefine()
         self.booking = self.root.get_booking(self.master.booking_id)
+        self.indexs = -1, -1
 
     def select(self, segment_index: int, reservation_index: int):
-        self.indexs = segment_index, reservation_index
+        self.c = segment_index, reservation_index
         self.next()
 
     def returned(self):
@@ -1046,6 +1060,11 @@ class SelectSeatMenu(Page):
         Label(self,
             text = f'Select seat menu',
         ).pack(pady=12)
+
+        Button(self,
+            text = 'next',
+            command = self.next,
+        ).pack(side=RIGHT)
         
         for segment_index, segment in enumerate(self.booking.segments):
             first = segment[0].flight
@@ -1073,7 +1092,6 @@ class SelectSeatMenu(Page):
                     text = 'Select' if not is_assigned else 'Selected',
                     state = DISABLED if is_assigned else NORMAL,
                 ).grid(row=reservation_index, column=2)
-                
                 
 
 class SelectSeatPage(Page):
@@ -1152,21 +1170,21 @@ class SelectSeatPage(Page):
 class ViewBookingSection(SubSection):
     def procedure(self):
         self.all_bookings = self.get_all_bookings()
+        selected = self.peek(
+            ViewBookingsMenu(self)
+        ).returned()            
         
-        selected = self.open(
-            ViewBookingsPage(self)
-        ).returned()
-
         if selected: 
             booking = self.root.get_booking(selected)
             will_pay = self.peek(
-                BookingPage(self, booking)
+                ViewBookingPage(self, booking)
             ).returned()
             
             if will_pay:
                 self.peek(
                     ReviewSection(self, booking)
                 )
+        
         self.jump(MenuPage)
         
     def get_all_bookings(self):
@@ -1176,14 +1194,14 @@ class ViewBookingSection(SubSection):
         ]
 
 
-class ViewBookingsPage(Page):
+class ViewBookingsMenu(Page):
     master: ViewBookingSection
 
     def __init__(self, master):
         self.selected_id = None
         super().__init__(master)
 
-    def choose(self, selected_id: UUID):
+    def select(self, selected_id: UUID):
         self.selected_id = selected_id
         self.next()
 
@@ -1201,23 +1219,22 @@ class ViewBookingsPage(Page):
         Button(top_frame,
             text='back',
             command=self.next
-        ).pack(side=LEFT)
+        ).pack()
         
         for booking in self.master.all_bookings:
             frame = LabelFrame(self,
                 text = f'{booking.datetime: %d %b %Y %H:%M}',
-                width = 70,
             ).pack(ipadx=5, ipady=5, padx=5, pady=6)
 
             Button(frame, 
                 text=booking.status.name,
-                width=12,
-                command=partial(self.choose, booking.reference)
+                width=10,
+                command=partial(self.select, booking.reference)
             ).grid(row=0, column=0)
             
             Label(frame, 
                 text=' '.join(f'{type.name} {number}' for type, number in booking.pax),
-                width=9,
+                width=12,
             ).grid(row=0, column=1)          
             
             itinerary = Frame(frame
@@ -1231,11 +1248,11 @@ class ViewBookingsPage(Page):
                 
                 Label(itinerary, 
                     text=f'{departure: %a, %d %b %Y} - {arrival: %a, %d %b %Y}',
-                    width=15,
+                    width=30,
                 ).grid(row=n, column=1)
 
 
-class BookingPage(Page):
+class ViewBookingPage(Page):
     master: ViewBookingSection
 
     def __init__(self, master, booking: body.BookingInfoBody):
@@ -1255,7 +1272,7 @@ class BookingPage(Page):
         response = requests.delete(
             f'{URL}/account/{self.root.username}/{self.booking.reference}/cancel'
         )
-        self.next()
+        self.back()
     
     def add_widgets(self):        
         self.label1 = Label(self,
@@ -1341,7 +1358,6 @@ class BookingPage(Page):
         travel_class = self.booking.segments[0][0].travel_class
 
         for n, passenger in enumerate(self.booking.passengers, 1):
-            
             self.passenger_name_summary_result_label = Label(self, 
                 text = passenger.name
             ).grid(
@@ -1394,19 +1410,17 @@ class BookingPage(Page):
 
         contact = self.booking.contact
         passenger_name = self.booking.passengers[contact.index].name
-        email = contact.email
-        phone = contact.phone
 
         self.passenger_name_contact_result_label = Label(self, 
             text=passenger_name
         ).grid(row=i+4, column=0)
         
         self.email_contact_result_label = Label(self, 
-            text=email
+            text=contact.email
         ).grid(row=i+4, column=1)
         
         self.phone_contact_result_label = Label(self, 
-            text=phone
+            text=contact.phone
         ).grid(row=i+4, column=2)
 
         self.label3 = Label(self, 
@@ -1425,13 +1439,13 @@ class BookingPage(Page):
 
 
         self.payable_amount_result_label = Label(self,
-            text=self.booking.price,
-            font=("bold")   
+            text = self.booking.price,
+            font = ("bold")   
         ).grid(row=i+7, column=1)
 
         self.back_button = Button(self,
-            text="Back",
-            command=self.back
+            text = "Back",
+            command = self.back
         ).grid(row=i+11, column=0)
         
         payment = self.booking.payment

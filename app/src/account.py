@@ -11,7 +11,6 @@ class Account:
     __password: str # type: ignore
     __email: str # type: ignore
     __phone: str # type: ignore
-    __status: AccountStatus = field(init=False, default=AccountStatus.INACTIVE)
     
     @property
     def username(self):
@@ -24,10 +23,6 @@ class Account:
     @property
     def phone(self):
         return self.__phone
-    
-    @property
-    def status(self):
-        return self.__status
 
     @property
     def password(self):

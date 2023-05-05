@@ -32,13 +32,6 @@ TravelClass = IntEnum(
         'FIRST',
     )
 )
-AccountStatus = IntEnum(
-    'AccountStatus', (
-        'ACTIVE', 
-        'SUSPENDED', 
-        'INACTIVE',
-    )
-)
 BookingStatus = IntEnum(
     'BookingStatus', (
         'INCOMPLETE', 

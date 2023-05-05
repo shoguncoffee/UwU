@@ -82,7 +82,7 @@ class Section(tk.Misc):
     #     target.predefine()
     #     target.pack()
     
-    def backwawrd(self):
+    def backward(self):
         self.current_page.destroy()
         del self.layers[self.index]
         self.index -= 1
@@ -222,7 +222,7 @@ class Page(StaticPage):
         if self.waiter.get() == 0:
             self.wait_variable(self.waiter)
             if self.waiter.get() == 2:
-                self.master.backwawrd()
+                self.master.backward()
 
 
 class SubSection(Section, Page):

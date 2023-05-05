@@ -39,10 +39,9 @@ class Root(Section, tk.Tk):
         self.aircraft = {
             model: body.AircraftBody(**attr) for model, attr in data.items()
         }
-
+        
     def get_booking(self, id: UUID):
         response = requests.get(f'{URL}/account/{self.username}/{id}')
-        print(response.text)
         return body.BookingInfoBody(**response.json())
 
 
