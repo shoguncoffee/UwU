@@ -1,31 +1,54 @@
-from rapidfuzz.process import extract
-from rapidfuzz.fuzz import *
+from app.utils.search import *
+import string, time, dataclasses, random
 
-l = (
-    'halloween', 'zxc', 'iop', 'asd',
-    'xxx', 'he', 'aaa', 'eee',
-    'zzz', 'eee', 'hello', 'qqq',
-    'haoo', 'ge', 'saAhelloqwe', 'www',
-    'h', 'e', 'l', 'l'
-)
-w = 'hello'
 
-'''for n, rati in [q for q in globals().items() if 'ratio' in q[0] and 'alignment' not in q[0]]:
-    print(n)
-    r = extract(
-        w, [(x, 0) for x in l], 
-        scorer=rati,
-        processor=lambda x: x[0],
-    )
-    print(r, end='\n\n')'''
-    
-results = [
-    partial_ratio_alignment(
-        [x], [w], score_cutoff=50,
-    ) for x in l
+alphabet = string.ascii_letters
+
+@dataclasses.dataclass(slots=True, frozen=True)
+class test:
+    name: str
+    home: str
+    # age: str
+    # love: str
+
+s = [*test.__slots__]
+size = len(s)
+n = 1
+times = 2000
+lenght = 30
+
+t = time.time()
+l = [
+    test(
+        *[
+            ''.join(
+                random.choice(alphabet) for _ in range(lenght)
+            ) for _ in range(size)
+        ]
+    ) for _ in range(times)
 ]
-results.sort(
-    key=lambda x: x.score if x is not None else 0, 
-    reverse=True
-)
-print(*results, sep='\n')
+'''l = [
+    test(*x) for x in (
+        ('halloween', 'zxc',),
+        ('hkllo', 'pppp',),
+        ('h123o', '675',),
+        ('Whelloq', 'sdawq',),
+        ('hbsbfsd', 'hi',),
+    )
+]'''
+kw = {'query': 'hello', 'pool': l}
+
+t1 = time.time()
+print(t1-t)
+
+for _ in range(n): 
+    f1 = list(multi_alignment(*s, **kw))
+t2 = time.time()
+print((t2-t1)/n)
+
+print('------------------')
+
+for _ in range(n):
+    f2 = list(multi(*s, **kw))
+t3 = time.time()
+print((t3-t2)/n)

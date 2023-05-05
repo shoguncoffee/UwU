@@ -2,29 +2,49 @@
 necessary packages
 """
 import os, sys
-import numpy
-import csv, json
-import asyncio
+import csv, json, pickle
+import datetime as dt
+
 # import tqdm
-
-from datetime import datetime, date, time, timedelta
-from dataclasses import dataclass, field, replace, KW_ONLY
-from uuid import UUID, uuid4
-from string import ascii_uppercase
-
+# import numpy as np
 # from moneyed import Money
+
+from uuid import UUID, uuid4
 from math import ceil, floor
-from random import randint
+from copy import deepcopy
+from time import sleep, time
+from random import sample, choice, randrange, random
+from dataclasses import (
+    dataclass, 
+    field, 
+    replace, 
+    KW_ONLY
+)
+# to reduce verbose function and loop 
+# https://docs.pythonorg/3/library/functools.html
+# https://docs.python.org/3/library/itertools.html
+import operator
+from functools import reduce, partial 
 from itertools import (
     product,
     repeat, 
     islice, 
     count, 
-    cycle
+    cycle,
+    combinations,
+    compress,
+    pairwise,
+    takewhile,
+    accumulate,
+    chain,
 )
+# for type check and hinting
+# https://docs.python.org/3/library/typing.html
 from abc import ABC, abstractmethod
-from types import ModuleType
+from collections.abc import Mapping
 from typing import (
+    Literal,
+    overload,
     ItemsView, 
     Any, 
     Callable, 
@@ -38,4 +58,7 @@ from typing import (
     Self,
     Collection,
     Iterable,
+    Annotated,
+    Literal,
+    Iterator,
 )

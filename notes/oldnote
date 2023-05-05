@@ -1,0 +1,14 @@
+hold booking 4 days rule -> https://www.qatarairways.com/en/payment-options/hold-my-booking.html
+meal -> https://www.qatarairways.com/en/services-special/special-meals.html
+fleet -> https://www.qatarairways.com/en/fleet.html
+IATA
+
+py-moneyed
+tdqm
+
+
+# def report_callback_exception(self, exception: Type[Exception], value, traceback):
+#     if exception is ReLoop:
+#         raise exception #.with_traceback(traceback)
+#     else:
+#         super().report_callback_exception(exception, value, traceback)
