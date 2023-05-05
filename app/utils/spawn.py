@@ -27,7 +27,7 @@ def add_airports(system: Airline):
         for code, name, country, lat, lon in lines:
             airport = Airport(name, code, country, (float(lat), float(lon)))
             
-            system.airports.append(airport)
+            system.airports.add(airport)
 
 
 @timmer
@@ -36,22 +36,23 @@ def add_aircrafts(system: Airline):
         data: dict[str, list[list[dict[str, Any]]]]
         data = json.load(f)
         
-        for model, decks in data.items():
-            desks = [
+        for model, decks_data in data.items():
+            decks = [
                 algorithm.generate_deck(
-                    (TravelClass(cabin['class']), cabin['configs']) for cabin in deck
-                ) for deck in decks
+                    (TravelClass(cabin['class']), cabin['configs']) 
+                    for cabin in deck
+                ) for deck in decks_data
             ]
             
-            aircraft = Aircraft(model, desks)
-            system.aircrafts.append(aircraft)
+            aircraft = Aircraft(model, decks)
+            system.aircrafts.add(aircraft)
 
 
 @timmer
 def add_flights(system: Airline):
     airline_designator = system.designator
-    first_100 = system.airports
-    first_10 = system.airports[:15]
+    airports = system.airports.items
+    choiced_airports = system.airports.items[:15]
     bkk = system.airports.get('bkk')
     
     # for assign flight number
@@ -59,8 +60,8 @@ def add_flights(system: Airline):
 
     system.flights.extend(
         chain(
-            algorithm.P2P_flights(first_10, numbers, 1),
-            algorithm.hub_flights(first_100, bkk, numbers, 2)
+            algorithm.P2P_flights(choiced_airports, numbers, 1),
+            algorithm.hub_flights(airports, bkk, numbers, 2)
         )
     )
 
@@ -82,7 +83,7 @@ def add_flight_plans(system: Airline):
         )
     }
     distort = lambda prices: [
-        price * (1 + random()//1.5) for price in prices
+        200 * round(price/200 * (1 + random()/2)) for price in prices
     ]
     fares: list[list[tuple[TravelClass, Fare]]] = []
     
@@ -106,14 +107,14 @@ def add_flight_plans(system: Airline):
 
 
     for flight in system.flights:
-        random_aircraft = choice(system.aircrafts)
+        random_aircraft = choice(system.aircrafts.items)
         random_fare = choice(fares)
         
         plan = FlightPlan(flight, 
-            dt.date(2023, 7, 1), 
-            random_aircraft, 
-            random_fare,
-            dt.date(2023, 8, 31), 
+            dt.date(2023, 6, 1), 
+            dt.date(2023, 6, 10), 
+            default_aircraft=random_aircraft, 
+            default_fares=random_fare,
         )
         system.plans.add(plan)
 
@@ -127,14 +128,14 @@ def add_accounts(system: Airline):
         Customer('user2', '123456789', 'user2@uwu.com', '0612345678'),
     ]
     for account in customers:        
-        system.accounts.append(account)
+        system.accounts.add(account)
         
         
 @timmer
 def search(system: Airline,
     origin: str, 
     destination: str,
-    date: dt.date = dt.date(2023, 7, 1)
+    date: dt.date = dt.date(2023, 6, 1)
 ):
     """
         test search journey

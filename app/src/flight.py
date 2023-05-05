@@ -1,7 +1,6 @@
 from __future__ import annotations
 from app.base import *
 
-from dataclasses import InitVar
 if TYPE_CHECKING:
     from . import Aircraft, Airport, Pax, FlightReservation, Fare
 
@@ -40,7 +39,6 @@ class Flight:
         return self.__destination
 
 
-@dataclass(slots=True)
 class FlightInstance:
     """
     A derivative from `Flight`, represent a process of flying 
@@ -60,15 +58,17 @@ class FlightInstance:
         - components: `tuple[FlightClass, ...]`
             - a tuple of `FlightClass` which each represent a travel class section of this `FlightInstance`
     """
-    __date: dt.date # type: ignore
-    __flight: Flight # type: ignore
-    __aircraft: Aircraft # type: ignore
-    fares: InitVar[Sequence[tuple[TravelClass, Fare]]]
-    
-    __components: tuple[FlightClass, ...] = field(init=False)
-    __status: FlightStatus = field(init=False, default=FlightStatus.SCHEDULED)
-    
-    def __post_init__(self, fares: Sequence[tuple[TravelClass, Fare]]):
+
+    def __init__(self,
+        date: dt.date,
+        flight: Flight,
+        aircraft: Aircraft,
+        fares: Sequence[tuple[TravelClass, Fare]],
+    ):
+        self.__date = date
+        self.__flight = flight
+        self.__aircraft = aircraft
+        self.__status = FlightStatus.SCHEDULED
         self.__components = tuple(
             FlightClass(self, travel_class, fare) 
             for travel_class, fare in fares
@@ -135,7 +135,6 @@ class FlightInstance:
         )
     
 
-@dataclass(slots=True)
 class FlightClass:
     """
         - One `FlightInstance` provides a service on different `TravelClass`, and each `TravelClass` is independent of each other.
@@ -144,11 +143,16 @@ class FlightClass:
         - Most of the booking process involves with specific `TravelClass`. It is suitable to sperate `FlightClass` from `FlighInstance` and get them later by `TravelClass`.
             So we can use `FlightClass`'s methods directly instead of passing `TravelClass` to every `FlightInstance`'s methods.
     """
-    __host: FlightInstance # type: ignore
-    __travel_class: TravelClass # type: ignore
-    __fare: Fare # type: ignore
-    __booking_record: list[FlightReservation] = field(init=False, default_factory=list)
-    
+    def __init__(self,
+        host: FlightInstance,
+        travel_class: TravelClass,
+        fare: Fare,
+    ):
+        self.__host = host
+        self.__travel_class = travel_class
+        self.__fare = fare
+        self.__booking_record: list[FlightReservation] = []
+
     @property
     def host(self):
         return self.__host

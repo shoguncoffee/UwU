@@ -15,5 +15,5 @@ with (
     
     for line in data:
         traffic = line.pop(2)
-        if float(traffic) > 2_000_000:
+        if float(traffic) > 700_000:
             writer.writerow(line)

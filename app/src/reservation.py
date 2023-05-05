@@ -47,7 +47,7 @@ class FlightReservation:
             return True
 
 
-@dataclass(slots=True)
+@dataclass
 class SeatReservation:
     __passenger: Passenger # type: ignore
     __seat: Optional[Seat] = None # type: ignore

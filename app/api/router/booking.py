@@ -8,7 +8,7 @@ router = APIRouter(
 
 @router.get("/{username}/{booking_id}")
 async def view_booking(username: str, booking_id: UUID):
-    customer = system.accounts.get(username)    
+    customer = system.accounts.get_customer(username)    
     booking = customer.get_booking(booking_id)
     
     return BookingInfoBody.transform(booking)
@@ -32,7 +32,7 @@ async def select_seat(username: str,
         - list of seat number e.g. ['C12', 'K13']
         - sequence corresponds to index of passenger in booking
     """
-    customer = system.accounts.get(username)    
+    customer = system.accounts.get_customer(username)    
     booking = customer.get_booking(booking_id)
     
     assert len(booking.passengers) == len(selected)
@@ -52,7 +52,7 @@ async def pay(username: str,
     booking_id: UUID,
     data: dict
 ):
-    customer = system.accounts.get(username)
+    customer = system.accounts.get_customer(username)
     booking = customer.get_booking(booking_id)
     
     return system.pay(booking, data)
@@ -60,7 +60,7 @@ async def pay(username: str,
 
 @router.put("/{username}/{booking_id}/pend")
 async def pending(username: str, booking_id: UUID):
-    customer = system.accounts.get(username)
+    customer = system.accounts.get_customer(username)
     booking = customer.get_booking(booking_id)
     
     return system.pending_booking(booking)
@@ -68,7 +68,7 @@ async def pending(username: str, booking_id: UUID):
 
 @router.delete("/{username}/{booking_id}/cancel")
 async def canceling(username: str, booking_id: UUID):
-    customer = system.accounts.get(username)
+    customer = system.accounts.get_customer(username)
     booking = customer.get_booking(booking_id)
     
     return system.cancel_booking(booking)

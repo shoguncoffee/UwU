@@ -53,7 +53,7 @@ class Airline:
                 schedule = self.schedules.get(date)
             except KeyError:
                 schedule = ScheduleDate(date)
-                self.schedules.append(schedule)
+                self.schedules.add(schedule)
             
             for plan in self.plans.on_date(date, plans):
                 schedule.add(
@@ -130,7 +130,7 @@ class Airline:
     
     def register(self, account: Customer):
         if account not in self.accounts:
-            self.accounts.append(account)
+            self.accounts.add(account)
             return True
     
     def login(self, username: str, password: str):

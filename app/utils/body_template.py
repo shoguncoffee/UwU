@@ -159,7 +159,7 @@ class ItineraryBody(BaseModel):
                     seat_left=obj.get_seats_left(travel_class),
                     price=obj.get_price(pax, travel_class),
                     info=travel_class_description[travel_class],
-                 ) for travel_class in obj.all_travel_class
+                 ) for travel_class in obj.all_travel_class()
             ]
         )
 
@@ -258,7 +258,7 @@ class CabinBody(BaseModel):
         )
     
     @classmethod
-    def transforms(cls, objs: Sequence[src.Cabin]):
+    def transforms(cls, objs: Iterable[src.Cabin]):
         return [
             cls.transform(cabin) for cabin in objs
         ]

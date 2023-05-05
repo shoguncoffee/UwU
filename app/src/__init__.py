@@ -2,8 +2,11 @@ from .airport import Airport
 from .itinerary import FlightItinerary
 from .fare import Fare
 from .booking import Booking
-from .account import Customer
 from .payment import Payment
+from .account import (
+    Account,
+    Customer,
+)
 from .schedule import (
     FlightPlan, 
     Deviation,

@@ -30,7 +30,3 @@ class Payment:
     def pay(cls, booking: Booking, **data):
         if True:
             return cls(booking.get_price())
-    
-    @classmethod
-    def send_api(self, **data): 
-        """send api to payment provider"""

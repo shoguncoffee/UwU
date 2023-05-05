@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections.abc import Iterator
 from app.base import *
 
 
@@ -68,14 +69,17 @@ class ContactInformation:
         return self.passenger.fullname
 
 
-class Pax(tuple[tuple[PassengerType, int], ...]):
+class Pax:
     """
     ### number of passengers for each type
         `tuple` of 
         (<PassengerType>, <int>) `->` "type of passenger", "number of passengers"
     """
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
+    def __init__(self, sub_pax: Optional[Iterable[tuple[PassengerType, int]]] = None):
+        self.__sub_pax = tuple(sub_pax or [])
+
+    def __iter__(self):
+        yield from self.__sub_pax
     
     def __len__(self):
         """

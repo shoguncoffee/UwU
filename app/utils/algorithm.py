@@ -9,7 +9,7 @@ class SearchHelper:
         target: Airport,
         date: dt.date,
         pool: Collection[FlightInstance],
-        multiplier: float = 1.55,
+        multiplier: float = 1.5,
         limit_transit: dt.timedelta = dt.timedelta(hours=24),
     ):
         self.pool = pool
@@ -36,7 +36,8 @@ class SearchHelper:
             - path: `tuple[FlightInstance, ...]`
                 - len(path) > 1
         """
-        limit_flight_time = self.limit_duration - FlightItinerary.flight_time(path)
+        path_itinerary = FlightItinerary(path)
+        limit_flight_time = self.limit_duration - path_itinerary.flight_time()
         prev = path[-1]
         footwork = [footprint.flight.origin for footprint in path]
         

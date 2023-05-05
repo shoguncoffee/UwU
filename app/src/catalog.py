@@ -10,6 +10,9 @@ class FlightScheduling:
     def __init__(self, advance_days: int = 150):
         self.__plans: list[FlightPlan] = []
         self.set_advance_days(advance_days)
+
+    def __iter__(self):
+        yield from self.__plans
     
     @property
     def advance_days(self):
@@ -21,7 +24,7 @@ class FlightScheduling:
     def add(self, plan: FlightPlan):
         designator = plan.flight.designator
         
-        for some_plan in self.__plans:
+        for some_plan in self:
             if some_plan.flight.designator == designator and some_plan in plan:
                 raise KeyError(f'Flight {designator} already in {some_plan}')
                 
@@ -31,7 +34,7 @@ class FlightScheduling:
         date: dt.date, 
         plans: Optional[Sequence[FlightPlan]] = None
     ):
-        for plan in plans or self.__plans:
+        for plan in plans or self:
             if date in plan:
                 yield plan
     
@@ -107,7 +110,16 @@ class ScheduleDate:
             self.__flight_instances.append(instance)
         
 
-class ScheduleCatalog(list[ScheduleDate]):
+class ScheduleCatalog:
+    def __init__(self):
+        self.__schedules_date: list[ScheduleDate] = []
+
+    def __iter__(self):
+        yield from self.__schedules_date
+
+    def add(self, schedules_date: ScheduleDate):
+        self.__schedules_date.append(schedules_date)
+    
     @property
     def first(self):
         return min(self, key=lambda schedule: schedule.date)
@@ -132,10 +144,22 @@ class ScheduleCatalog(list[ScheduleDate]):
         
         for day in daterange(delta.days - 1, first_date):
             if schedule := self.get(day):
-                self.remove(schedule)
+                self.__schedules_date.remove(schedule)
 
 
-class FlightCatalog(list[Flight]):
+class FlightCatalog:
+    def __init__(self):
+        self.__flights: list[Flight] = []
+
+    def __iter__(self):
+        yield from self.__flights
+
+    def add(self, flight: Flight):
+        self.__flights.append(flight)
+
+    def extend(self, flights: Iterable[Flight]):
+        self.__flights.extend(flights)
+    
     def search(self, designator: str):
         results = search.simple('designator', designator, self)
         return list(results)
@@ -150,10 +174,16 @@ class FlightCatalog(list[Flight]):
         ]
 
 
-class AirportCatalog(list[Airport]):
+class AirportCatalog:
+    def __init__(self):
+        self.__airports: list[Airport] = []
+
+    def __iter__(self):
+        yield from self.__airports
+    
     def __contains__(self, key: str | Airport):
         if isinstance(key, Airport):
-            if super().__contains__(key):
+            if self.__airports.__contains__(key):
                 return True
             
             key = key.code
@@ -163,6 +193,13 @@ class AirportCatalog(list[Airport]):
             return False
         else:
             return True
+
+    @property
+    def items(self):
+        return self.__airports
+
+    def add(self, airport: Airport):
+        self.__airports.append(airport)
     
     def search(self, key: str):
         results = search.multi_opt(
@@ -181,10 +218,16 @@ class AirportCatalog(list[Airport]):
         raise KeyError
 
 
-class AircraftCatalog(list[Aircraft]):
+class AircraftCatalog:
+    def __init__(self):
+        self.__aircrafts: list[Aircraft] = []
+
+    def __iter__(self):
+        yield from self.__aircrafts
+    
     def __contains__(self, key: str | Aircraft):
         if isinstance(key, Aircraft):
-            if super().__contains__(key):
+            if key in self.__aircrafts:
                 return True
             
             key = key.model
@@ -194,6 +237,13 @@ class AircraftCatalog(list[Aircraft]):
             return False
         else:
             return True
+
+    @property
+    def items(self):
+        return self.__aircrafts
+
+    def add(self, aircraft: Aircraft):
+        self.__aircrafts.append(aircraft)
     
     def search(self, model: str):
         results = search.simple('model', model, self)
@@ -207,8 +257,15 @@ class AircraftCatalog(list[Aircraft]):
         raise KeyError
 
 
-class AccountCatalog(list[Customer]):
-    def __contains__(self, key: str | Customer):
+class AccountCatalog:
+    def __init__(self):
+        super().__init__()
+        self.__accounts: list[Account] = []
+
+    def __iter__(self):
+        yield from self.__accounts
+    
+    def __contains__(self, key: str | Account):
         if isinstance(key, str):
             try:
                 self.get(key)
@@ -217,8 +274,8 @@ class AccountCatalog(list[Customer]):
             else:
                 return True
                                 
-        elif isinstance(key, Customer):
-            if super().__contains__(key):
+        elif isinstance(key, Account):
+            if key in self.__accounts:
                 return True
             
             for account in self:
@@ -226,6 +283,9 @@ class AccountCatalog(list[Customer]):
                     return True
 
         return False
+
+    def add(self, account: Account):
+        self.__accounts.append(account)
     
     def search(self, username: str):
         result = search.simple('username', username, self)
@@ -237,3 +297,10 @@ class AccountCatalog(list[Customer]):
                 return account
             
         raise KeyError
+
+    def get_customer(self, key: str):
+        account = self.get(key)
+        if not isinstance(account, Customer):
+            raise KeyError
+        
+        return account

@@ -6,14 +6,13 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class Customer:
+class Account:
     __username: str # type: ignore
     __password: str # type: ignore
     __email: str # type: ignore
     __phone: str # type: ignore
     __status: AccountStatus = field(init=False, default=AccountStatus.INACTIVE)
-    __bookings: list[Booking] = field(init=False, default_factory=list)
-
+    
     @property
     def username(self):
         return self.__username
@@ -33,6 +32,11 @@ class Customer:
     @property
     def password(self):
         return self.__password
+
+
+@dataclass
+class Customer(Account):
+    __bookings: list[Booking] = field(init=False, default_factory=list)
     
     @property
     def bookings(self):

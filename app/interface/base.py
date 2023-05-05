@@ -350,7 +350,7 @@ class AirportEntry(CustomWidget, ttk.Entry):
             item = self.suggester.item(suggestion[0])
             self.input.set(item['text'])
             self.state(["!invalid"])
-            
+    
     def on_focus_in(self, event):
         self.check()
         self.suggest_frame.place(

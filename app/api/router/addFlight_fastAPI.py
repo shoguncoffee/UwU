@@ -32,5 +32,5 @@ async def create_flight(
         system.airports.get(origin),
         system.airports.get(destination),
     )
-    system.flights.append(flight1)
+    system.flights.add(flight1)
     return {"Data": "create new flight successful."}

@@ -3,6 +3,7 @@ https://docs.python.org/3/library/enum.html#enum.Flag
 https://docs.python.org/3/howto/enum.html#flag
 """
 from __future__ import annotations
+from collections.abc import Iterator
 from app.base import *
 
 
@@ -21,13 +22,13 @@ class Seat:
         return self.__row
     
     @property
-    def number(self):
-        return self.__number
-    
-    @property
     def column(self):
         return self.__column
     
+    @property
+    def number(self):
+        return self.__number
+
     @property
     def type(self):
         return self.__type
@@ -37,6 +38,9 @@ class Cabin:
     def __init__(self, travel_class: TravelClass, seats: Iterable[Seat]):
         self.__travel_class = travel_class
         self.__seats = frozenset(seats)
+
+    def __iter__(self):
+        yield from self.__seats
     
     @property
     def travel_class(self):
@@ -47,7 +51,13 @@ class Cabin:
         return self.__seats
 
 
-class Deck(tuple[Cabin, ...]):
+class Deck:
+    def __init__(self, cabins: Sequence[Cabin]):
+        self.__cabins = tuple(cabins)
+
+    def __iter__(self):
+        yield from self.__cabins
+    
     def get_cabins_of(self, travel_class: TravelClass):
         """
             get all cabins in this deck that match with a travel class
@@ -81,8 +91,7 @@ class Aircraft:
             get all passenger's seat in aircraft
         """
         return {
-            seat for cabin in self.all_cabins
-            for seat in cabin.seats
+            seat for cabin in self.all_cabins for seat in cabin
         }
         
     def get_cabins_of(self, travel_class: TravelClass):
@@ -98,7 +107,7 @@ class Aircraft:
         """
         return {
             seat for cabin in self.get_cabins_of(travel_class)
-            for seat in cabin.seats
+            for seat in cabin
         }
         
     def get_seat(self, number: str):

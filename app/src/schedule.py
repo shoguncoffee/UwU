@@ -6,8 +6,7 @@ from app.base import *
 if TYPE_CHECKING:
     from . import Aircraft, Flight, Fare
     
-    
-@dataclass(slots=True)
+
 class Deviation:
     """
     ### A exception to a FlightPlan
@@ -18,9 +17,14 @@ class Deviation:
     - `months`: `set(int)`
         - 1 <= month <= 12
     """
-    __weekdays: set[int] = field(default_factory=set) # type: ignore
-    __months: set[int] = field(default_factory=set) # type: ignore
-    __dates: set[dt.date] = field(default_factory=set) # type: ignore
+    def __init__(self, 
+        weekdays: Optional[Iterable[int]] = None, 
+        months: Optional[Iterable[int]] = None,
+        dates: Optional[Iterable[dt.date]] = None,
+    ):
+        self.__weekdays = set(weekdays or [])
+        self.__months = set(months or [])
+        self.__dates = set(dates or [])
     
     def __contains__(self, date: dt.date):
         """
@@ -43,20 +47,28 @@ class Deviation:
     @property
     def dates(self):
         return self.__dates
-    
 
-@dataclass(slots=True)
+
 class FlightPlan:
     """
     A plan which tell what Flight will be available (operated) 
     on what period of time or range of dates
     """
-    __flight: Flight # type: ignore
-    __start: dt.date # type: ignore
-    __default_aircraft: Aircraft # type: ignore
-    __default_fares: Sequence[tuple[TravelClass, Fare]] # type: ignore
-    __end: dt.date = dt.date.max # type: ignore
-    __exception: Deviation = field(default_factory=Deviation) # type: ignore    
+    def __init__(self,
+        flight: Flight,
+        start: dt.date,
+        end: dt.date = dt.date.max,
+        exception: Optional[Deviation] = None,
+        *,
+        default_aircraft: Aircraft,
+        default_fares: Sequence[tuple[TravelClass, Fare]],
+    ):
+        self.__flight = flight
+        self.__start = start
+        self.__end = end
+        self.__exception = exception or Deviation()
+        self.__default_aircraft = default_aircraft
+        self.__default_fares = tuple(default_fares)
     
     def __contains__(self, value: dt.date | Self):
         """

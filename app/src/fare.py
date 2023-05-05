@@ -5,10 +5,13 @@ if TYPE_CHECKING:
     from . import Pax
 
 
-@dataclass(slots=True)
 class Fare:
-    __passenger_fare: list[tuple[PassengerType, int]] # type: ignore
-    __seat_fare: list[tuple[SeatType, int]] # type: ignore
+    def __init__(self,
+        passenger_fare: Iterable[tuple[PassengerType, int]],
+        seat_fare: Iterable[tuple[SeatType, int]]
+    ):
+        self.__passenger_fare = list(passenger_fare)
+        self.__seat_fare = list(seat_fare)
     
     def get_passenger_price(self, passenger_type: PassengerType):
         for type, price in self.__passenger_fare:
