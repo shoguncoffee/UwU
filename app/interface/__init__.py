@@ -51,6 +51,14 @@ class Root(Section, tk.Tk):
         response = requests.get(f'{URL}/account/{self.username}/{id}')
         print(response.text)
         return body.BookingInfoBody(**response.json())
-        
-sleep(3.5)
+
+
+while 1:
+    try:
+        requests.get(f'{URL}/')
+    except:
+        sleep(1)
+    else:
+        break
+    
 Root().mainloop()

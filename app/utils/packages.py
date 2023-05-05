@@ -12,7 +12,7 @@ import datetime as dt
 from uuid import UUID, uuid4
 from math import ceil, floor
 from copy import deepcopy
-from time import sleep
+from time import sleep, time
 from random import sample, choice, randrange, random
 from dataclasses import (
     dataclass, 

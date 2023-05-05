@@ -3,7 +3,6 @@ from app.src import *
 
 from app.airline import Airline
 from . import algorithm
-from time import time
 
 
 def timmer(func: Callable):
