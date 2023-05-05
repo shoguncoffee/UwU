@@ -481,7 +481,7 @@ class FillPassengerPage(Page):
             birthdate = dt.date.fromisoformat(self.birth_entry.get()),
             nationality = self.nationality_combobox.get(),
             passport_id = self.passport_detail_entry.get(),
-            gender = GenderType(self.gender_combobox.current()),
+            gender = GenderType(self.gender_combobox.current() + 1),
             type = self.passenger_type
         )
 
@@ -994,7 +994,7 @@ class SelectSeatSection(SubSection):
 
     def procedure(self):
         while 1: 
-            segment_index, reservation_index = self.peek(
+            segment_index, reservation_index = self.open(
                 SelectSeatMenu(self)
             ).returned()
             
@@ -1004,12 +1004,13 @@ class SelectSeatSection(SubSection):
             reservation = self.booking.segments[segment_index][reservation_index]
             available_seats = self.get_avaliable_seats(reservation)
             selected_seats: list[str] = []
-            
+
             for passenger in self.booking.passengers:
-                seat = self.peek(
+                seat = self.open(
                     SelectSeatPage(self, passenger, reservation, available_seats)
                 ).returned()
-                
+
+                print(seat)
                 available_seats.remove(seat)
                 selected_seats.append(seat)
 
@@ -1051,7 +1052,7 @@ class SelectSeatMenu(Page):
         self.indexs = -1, -1
     
     def select(self, segment_index: int, reservation_index: int):
-        self.c = segment_index, reservation_index
+        self.indexs = segment_index, reservation_index
         self.next()
 
     def returned(self):
@@ -1174,7 +1175,6 @@ class SelectSeatPage(Page):
 
 class ViewBookingSection(SubSection):
     def procedure(self):
-        self.all_bookings = self.get_all_bookings()
         selected = self.peek(
             ViewBookingsMenu(self)
         ).returned()            
@@ -1191,12 +1191,6 @@ class ViewBookingSection(SubSection):
                 )
         
         self.jump(MenuPage)
-        
-    def get_all_bookings(self):
-        response = requests.get(f'{URL}/account/{self.root.username}/my-bookings')
-        return [
-            body.BookingBody(**data) for data in response.json()
-        ]
 
 
 class ViewBookingsMenu(Page):
@@ -1206,6 +1200,12 @@ class ViewBookingsMenu(Page):
         self.selected_id = None
         super().__init__(master)
 
+    def get_all_bookings(self):
+        response = requests.get(f'{URL}/account/{self.root.username}/my-bookings')
+        return [
+            body.BookingBody(**data) for data in response.json()
+        ]
+
     def select(self, selected_id: UUID):
         self.selected_id = selected_id
         self.next()
@@ -1213,6 +1213,10 @@ class ViewBookingsMenu(Page):
     def returned(self):
         super().returned()
         return self.selected_id
+
+    def back(self):
+        self.selected_id = None
+        self.next()
     
     def add_widgets(self):
         top_frame = Frame(self).pack(side=TOP)
@@ -1223,10 +1227,10 @@ class ViewBookingsMenu(Page):
         
         Button(top_frame,
             text='back',
-            command=self.next
+            command=self.back
         ).pack()
         
-        for booking in self.master.all_bookings:
+        for booking in self.get_all_bookings():
             frame = LabelFrame(self,
                 text = f'{booking.datetime: %d %b %Y %H:%M}',
             ).pack(ipadx=5, ipady=5, padx=5, pady=6)
@@ -1455,18 +1459,7 @@ class ViewBookingPage(Page):
         
         payment = self.booking.payment
         
-        if payment is None:
-            self.paybutton = Button(self,
-                text="pay",
-                command=self.pay
-            ).grid(row=i+11, column=1)
-
-            self.cancel_booking_button = Button(self,
-                text='Cancel booking',
-                command=self.cancel
-            ).grid(row=i+11, column=2)
-            
-        else:
+        if payment:
             self.payment_label = Label(self,
                 text="Payment: ",                           
             ).grid(row=i+8, column=0)
@@ -1485,4 +1478,15 @@ class ViewBookingPage(Page):
 
             self.payment_time_result_label = Label(self,
                 text=str(payment.payment_time),                           
-            ).grid(row=i+10, column=1)  
+            ).grid(row=i+10, column=1)
+            
+        elif self.booking.status is not BookingStatus.CANCELLED:
+            self.paybutton = Button(self,
+                text="pay",
+                command=self.pay
+            ).grid(row=i+11, column=1)
+
+            self.cancel_booking_button = Button(self,
+                text='Cancel booking',
+                command=self.cancel
+            ).grid(row=i+11, column=2)
