@@ -266,6 +266,7 @@ class SearchPage(Page):
         Radiobutton(self,
             text = 'Return',
             variable = self.trip_type,
+            state = DISABLED,
             value = 1
         ).grid(row=2, column=2,)
 
