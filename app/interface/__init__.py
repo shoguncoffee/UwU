@@ -28,13 +28,6 @@ class Root(Section, tk.Tk):
         
         self.open(main_tk.MenuPage(self))
         
-
-    # def report_callback_exception(self, exception: Type[Exception], value, traceback):
-    #     if exception is ReLoop:
-    #         raise exception #.with_traceback(traceback)
-    #     else:
-    #         super().report_callback_exception(exception, value, traceback)
-        
     def get_airports(self):
         data: list[dict[str, str]] = requests.get(f'{URL}{API_Data1}').json()        
         self.airports = [

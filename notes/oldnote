@@ -5,3 +5,10 @@ IATA
 
 py-moneyed
 tdqm
+
+
+# def report_callback_exception(self, exception: Type[Exception], value, traceback):
+#     if exception is ReLoop:
+#         raise exception #.with_traceback(traceback)
+#     else:
+#         super().report_callback_exception(exception, value, traceback)

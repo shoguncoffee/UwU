@@ -276,13 +276,13 @@ class SearchPage(Page):
         self.departure_day_spinbox = Combobox(self,
             width=6,
             state='readonly',
-            values=[str(s) for s in range(1, 31)],
+            values=[str(s) for s in range(1, 11)],
         ).grid(row=1, column=3)
 
         self.departure_month_spinbox = Combobox(self,
             width=6,
             state='readonly',
-            values=['7', '8'],
+            values=['6'],
         ).grid(row=2, column=3,)
         
         self.departure_year_spinbox = Combobox(self,
